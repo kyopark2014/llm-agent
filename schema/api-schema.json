@@ -1,0 +1,235 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "Hotel, Spa and Golf booking API for LJ Resorts",
+      "version": "1.0.0",
+      "description": "APIs for managing hotel, spa and golf bookings for our customers."
+    },
+    "paths": {
+      "/rooms": {
+        "get": {
+          "summary": "Get a list of all rooms which are available",
+          "description": "Get the list of all available rooms for a given date",
+          "operationId": "getAllAvailableRooms",
+          "responses": {
+            "200": {
+              "description": "Gets the list of all available rooms for a given date",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "roomId": {
+                          "type": "string",
+                          "description": "Unique ID of the room."
+                        },
+                        "roomType": {
+                          "type": "string",
+                          "description": "The room type."
+                        },
+                        "roomDescription": {
+                          "type": "string",
+                          "description": "The room description."
+                        },
+                        "date": {
+                          "type": "string",
+                          "description": "The date the room is free."
+                        },
+                        "cost": {
+                          "type": "string",
+                          "description": "The cost of the room per night."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "summary": "Book an available room for a specific date",
+          "description": "Books a room for a specific date",
+          "operationId": "bookRoom",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "roomId": {
+                      "type": "string",
+                      "description": "ID of the room to book"
+                    },
+                    "date": {
+                      "type": "string",
+                      "description": "Date to book the room"
+                    }
+                  },
+                  "required": ["roomId", "date"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Room booked successfully"
+            }
+          }
+        }
+      },
+      "/spa-sessions": {
+        "get": {
+          "summary": "Get a list of all spa treatments which are available",
+          "description": "Get the list of all available spa treatments for a given date",
+          "operationId": "getAllAvailableSpaTreatments",
+          "responses": {
+            "200": {
+              "description": "Gets a list of all available spa treatments for a given date",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "treatmentId": {
+                          "type": "string",
+                          "description": "Unique ID of the treatment."
+                        },
+                        "treatmentType": {
+                          "type": "string",
+                          "description": "The treatment type."
+                        },
+                        "treatmentDescription": {
+                          "type": "string",
+                          "description": "The treatment description."
+                        },
+                        "date": {
+                          "type": "string",
+                          "description": "The date the treatment session is free."
+                        },
+                        "cost": {
+                          "type": "string",
+                          "description": "The cost of the treatment."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "summary": "Book an available spa treatment for a specific date",
+          "description": "Book an available spa treatment for a specific date",
+          "operationId": "bookSpaTreatment",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "treatmentId": {
+                      "type": "string",
+                      "description": "ID of the spa treatment to book"
+                    },
+                    "date": {
+                      "type": "string",
+                      "description": "Date to book the spa treatment"
+                    }
+                  },
+                  "required": ["treatmentId", "date"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Spa treatment booked successfully"
+            }
+          }
+        }
+      },
+      "/golf-sessions": {
+        "get": {
+          "summary": "Get a list of all golf sessions which are available",
+          "description": "Get a list of all golf sessions which are available",
+          "operationId": "getAllAvailableGolfSessions",
+          "responses": {
+            "200": {
+              "description": "Gets a list of all available golf sessions for a given date",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "sessionId": {
+                          "type": "string",
+                          "description": "Unique ID of the golf session."
+                        },
+                        "sessionType": {
+                          "type": "string",
+                          "description": "The golf session type."
+                        },
+                        "sessionDescription": {
+                          "type": "string",
+                          "description": "The session description."
+                        },
+                        "date": {
+                          "type": "string",
+                          "description": "The date the golf session is free."
+                        },
+                        "cost": {
+                          "type": "string",
+                          "description": "The cost of the golf session."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "summary": "Book an available golf session",
+          "description": "Books an available golf session for a specific date",
+          "operationId": "bookGolfSession",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sessionId": {
+                      "type": "string",
+                      "description": "ID of the golf session to book"
+                    },
+                    "date": {
+                      "type": "string",
+                      "description": "Date to book the golf session"
+                    }
+                  },
+                  "required": ["sessionId", "date"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Golf session booked successfully"
+            }
+          }
+        }
+      }
+    }
+  }

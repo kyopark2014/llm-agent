@@ -45,7 +45,7 @@ const agent = new bedrock.Agent(this, 'BedrockAgent', {
 });
 ```
 
-Action Group
+Action Group을 정의합니다. 여기서 Open API schema로 [api-schema.json](https://github.com/kyopark2014/llm-agent/blob/main/schema/api-schema.json)을 정의합니다.
 
 ```typescirpt
 // add the action group for making bookings

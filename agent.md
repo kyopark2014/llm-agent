@@ -29,6 +29,8 @@ agent.run("Send an email to test@testing123.com saying hello world.")
 
 [Teddylee 가이드](https://teddylee777.github.io/langchain/langchain-agent/)
 
+[Travily](https://wikidocs.net/234282)
+
 ```python
 from langchain_community.tools.tavily_search import TavilySearchResults
 search = TavilySearchResults(k=5)

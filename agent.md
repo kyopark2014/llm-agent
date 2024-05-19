@@ -23,3 +23,29 @@ agent = initialize_agent(
 
 agent.run("Send an email to test@testing123.com saying hello world.")
 ```
+
+
+## Tavily Search 사용 예
+
+[Teddylee 가이드](https://teddylee777.github.io/langchain/langchain-agent/)
+
+```python
+from langchain_community.tools.tavily_search import TavilySearchResults
+search = TavilySearchResults(k=5)
+
+search.invoke("판교 카카오 프렌즈샵 아지트점의 전화번호는 무엇인가요?")
+
+tools = [search, retriever_tool]
+
+tools = [search, retriever_tool]
+
+from langchain_openai import ChatOpenAI
+llm = ChatOpenAI(model="gpt-4-turbo-preview", temperature=0)
+agent = create_openai_functions_agent(llm, tools, prompt)
+
+from langchain.agents import AgentExecutor
+agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+
+response = agent_executor.invoke({"input": "안녕, 반가워!"})
+print(f'답변: {response["output"]}')
+```

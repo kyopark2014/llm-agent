@@ -133,9 +133,8 @@ Previous conversation history:
 {chat_history}
 
 New input: {input}
-{agent_scratchpad}
-"""
-
+{agent_scratchpad}"""
+```
 
 
 

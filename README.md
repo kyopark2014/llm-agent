@@ -1,6 +1,7 @@
-# LLM Agent
-
 # LangChain의 Agent 사용하기
+
+여기서는 LangChain의 [ReAct](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/react/)를 이용하여 Agent를 정의합니다.
+
 
 ## 외부 검색 API 
 
@@ -61,7 +62,7 @@ def use_agent(connectionId, requestId, chat, query):
     return msg
 ```
 
-## React
+### React
 
 이때, ReAct를 위한 Prompt는 [hwchase17/react](https://smith.langchain.com/hub/hwchase17/react)을 이용해 아래와 같이 정의합니다.
 

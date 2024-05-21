@@ -9,6 +9,8 @@ LLM을 사용할때 다양한 API로 부터 얻은 결과를 사용하고 싶을
 
 ## Prompt
 
+[Agent Concept](https://python.langchain.com/v0.1/docs/modules/agents/concepts/)을 참조합니다.
+
 ### Schema
 
 #### AgentAction

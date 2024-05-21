@@ -7,6 +7,28 @@ LLM을 사용할때 다양한 API로 부터 얻은 결과를 사용하고 싶을
 3) Action결과를 관찰(Obseravation)합니다.
 4) 결과가 만족스러운지 확인(Thought) 합니다. 만족하지 않으면 반복합니다.
 
+## Prompt
+
+### Schema
+
+#### AgentAction
+
+- tool: tool의 이름
+- tool_input: tool의 input
+
+#### AgentFinish
+
+Agent로 부터의 final result를 의미합니다.
+
+return_values: final agent output을 포함하고 있는 key-value. output key를 가지고 있습니다. 
+
+#### Intermediate Steps
+
+이전 Agent action을 나타내는것으로 CURRENT agent의 실행으로 인한 output을 포함하고 있습니다. List[Tuple[AgentAction Any]]로 구성됩니다. 
+
+
+  
+
 ## Tool의 종류
 
 ### Internet Search

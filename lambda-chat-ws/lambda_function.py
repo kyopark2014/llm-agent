@@ -65,6 +65,13 @@ def initiate_chat():
 
 chat = initiate_chat()
 
+
+
+chat.bind_tools
+
+from langchain.agents import AgentExecutor, create_react_agent
+agent = create_react_agent(chat,tools,prompt)
+
 from langchain.agents import create_openai_functions_agent
 
 tools = load_tools(

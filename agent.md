@@ -15,6 +15,10 @@ LLM을 사용할때 다양한 API로 부터 얻은 결과를 사용하고 싶을
 
 - Tavily Search
 
+[LangChain: Tavily Search API](https://python.langchain.com/v0.1/docs/integrations/retrievers/tavily/)와 [api-tavily-search.ipynb](./api/api-tavily-search.ipynb)을 참조합니다.
+
+  
+
 ### Custom 함수
 
 - 현재 날짜, 시간등의 정보 조회하기 

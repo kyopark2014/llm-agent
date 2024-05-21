@@ -21,7 +21,12 @@ LLM을 사용할때 다양한 API로 부터 얻은 결과를 사용하고 싶을
 
 ### Custom 함수
 
-- 현재 날짜, 시간등의 정보 조회하기 
+- 현재 날짜, 시간등의 정보 조회하기
+
+- 시스템 시간 (한국)
+
+[api-system-time.ipynb](./api/api-system-time.ipynb)와 같이 구현합니다.
+  
 
 ### RAG의 Knowledge store를 이용 (Retriever)
 

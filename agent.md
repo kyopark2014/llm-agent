@@ -28,6 +28,8 @@ LLM을 사용할때 다양한 API로 부터 얻은 결과를 사용하고 싶을
 [14-Agent/04-Agent-with-various-models.ipynb](https://github.com/teddylee777/langchain-kr/blob/main/14-Agent/04-Agent-with-various-models.ipynb)을 참조합니다.
 
 ```python
+from langchain.tools.retriever import create_retriever_tool
+
 retriever_tool = create_retriever_tool(
     retriever,
     name="pdf_search",

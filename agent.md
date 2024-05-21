@@ -25,6 +25,16 @@ LLM을 사용할때 다양한 API로 부터 얻은 결과를 사용하고 싶을
 
 ### RAG의 Knowledge store를 이용 (Retriever)
 
+[14-Agent/04-Agent-with-various-models.ipynb](https://github.com/teddylee777/langchain-kr/blob/main/14-Agent/04-Agent-with-various-models.ipynb)을 참조합니다.
+
+```python
+retriever_tool = create_retriever_tool(
+    retriever,
+    name="pdf_search",
+    description="2023년 12월 AI 관련 정보를 PDF 문서에서 검색합니다. '2023년 12월 AI 산업동향' 과 관련된 질문은 이 도구를 사용해야 합니다!",
+)
+```
+
 ### DB query
 
 

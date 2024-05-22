@@ -339,6 +339,9 @@ def get_product_list(keyword: str) -> list:
         prod_list = [
             {"title": prod.text.strip(), "link": prod.get("href")} for prod in prod_info
         ]
+        print('prod_list: ', prod_list)
+        
+        # return the first 5 products
         return prod_list[:5]
     else:
         return []
@@ -386,6 +389,39 @@ def get_weather_info(city: str) -> str:
     #weather_str = f"Today, the overall of {city} is {overall}, current temperature is {current_temp} degree, min temperature is {min_temp} degree, highest temperature is {max_temp} degree. huminity is {humidity}%, wind status is {wind_speed} meter per second. the amount of cloud is {cloud}%."    
         
     return weather_str
+
+from langchain.agents import AgentExecutor, create_tool_calling_agent
+def run_tool_calling_agent(connectionId, requestId, chat, query):
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                "You are a helpful assistant. Make sure to use the get_current_time, get_product_list, get_weather_info tools for information.",
+            ),
+            ("placeholder", "{chat_history}"),
+            ("human", "{input}"),
+            ("placeholder", "{agent_scratchpad}"),
+        ]
+    )
+    # define tools
+    tools = [get_current_time, get_product_list, get_weather_info]
+    
+     # create agent
+    agent = create_tool_calling_agent(chat, tools, prompt)
+    
+    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
+    
+    # run agent
+    response = agent_executor.invoke({"input": query})
+    print('response: ', response)
+
+    # streaming    
+    msg = readStreamMsg(connectionId, requestId, response['output'])
+
+    msg = response['output']
+    print('msg: ', msg)
+            
+    return msg
 
 def run_agent_react(connectionId, requestId, chat, query):
     # define tools
@@ -765,7 +801,8 @@ def getResponse(connectionId, jsonBody):
                 if convType == 'normal':      # normal
                     msg = general_conversation(connectionId, requestId, chat, text)                  
                 elif convType == 'agent-react':
-                    msg = run_agent_react(connectionId, requestId, chat, text)                
+                    # msg = run_agent_react(connectionId, requestId, chat, text)      
+                    msg = run_tool_calling_agent(connectionId, requestId, chat, text)             
                 elif convType == 'agent-react-chat':
                     msg = run_agent_react_chat(connectionId, requestId, chat, text)
                     

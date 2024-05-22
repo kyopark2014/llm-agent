@@ -645,8 +645,8 @@ def removeFunctionXML(msg):
         
         output = ""
         if start_index>=0:
-            print('start_index: ', start_index)
-            print('msg: ', msg)
+            # print('start_index: ', start_index)
+            # print('msg: ', msg)
             
             if start_index>=1:
                 output = msg[:start_index-1]
@@ -655,7 +655,7 @@ def removeFunctionXML(msg):
                     output = ""
             
             if end_index >= 1:
-                print('end_index: ', end_index)
+                # print('end_index: ', end_index)
                 output = output + msg[end_index+length:]
                             
             msg = output

@@ -644,11 +644,11 @@ def removeFunctionXML(msg):
             length = 10
         
         output = ""
-        if start_index>0:
+        if start_index>=0:
             #print('start_index: ', start_index)
             output = msg[:start_index-1]
             
-            if end_index>0:
+            if end_index>=0:
                 #print('end_index: ', end_index)
                 output = output + msg[end_index+length:]
             

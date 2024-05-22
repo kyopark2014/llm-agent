@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>LLM</title>
+        <link rel="stylesheet", href="login.css">
+    </head>
+    <body>
+        <header> 
+            <h1>LLM Chatbot</h1>
+        </header>
+        <section class="container">
+            <form id="my-form">
+                <div class="msg">For login, use your own ID which should represent your identity.</div>
+                <div class="input">
+                    <label for="userId">User Id:</label>
+                    <input type="text" id="userId">
+                    <text>Conversation Type: </text>
+                    <select name="conversationType" id="convtype">
+                        <option type="text" value="normal" selected>1. General Conversation</option>
+                        <option value="translation">2. Translation</option>
+                        <option value="grammar">3. Grammatical Error Correction</option>
+                        <option value="sentiment">4. Extracted Topic and sentiment</option>          
+                        <option value="extraction">5. Information Extraction</option>          
+                        <option value="pii">6. Removing PII</option>          
+                        <option value="step-by-step">7. Complex Question (step-by-step)</option>          
+                        <option value="timestamp-extraction">8. Timestamp Extraction</option>          
+                    </select>
+                </div>
+                <input class="btn" type="submit" value="Submit">                
+            </form>
+        </section>        
+        <script src="login.js"></script>
+    </body>
+</html>
+

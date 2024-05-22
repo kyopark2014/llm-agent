@@ -332,9 +332,13 @@ def who_are_you():
 
 @tool
 def get_current_time() -> str:
-    """Returns the current datetime"""
+    """
+    Get current time and return it.
+    return: string of datetime
+    """    
     
-    timestr = str(datetime.datetime.now(timezone('Asia/Seoul')).isoformat())
+    format: str = "%Y-%m-%d %H:%M:%S"
+    timestr = datetime.datetime.now(timezone('Asia/Seoul')).strftime(format)
     print('timestr: ', timestr)
     
     return timestr

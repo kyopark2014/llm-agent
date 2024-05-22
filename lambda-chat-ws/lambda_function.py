@@ -854,7 +854,7 @@ def getResponse(connectionId, jsonBody):
         memory_chain = map_chain[userId]
     else: 
         print('memory does not exist. create new one!')        
-        memory_chain = ConversationBufferWindowMemory(memory_key="chat_history", output_key='answer', return_messages=True, k=10)
+        memory_chain = ConversationBufferWindowMemory(memory_key="chat_history", output_key='answer', return_messages=True, k=5)
         map_chain[userId] = memory_chain
 
         allowTime = getAllowTime()

@@ -404,6 +404,46 @@ def run_tool_calling_agent(connectionId, requestId, chat, query):
             
     return output
 
+def run_tool_calling_agent_with_history(connectionId, requestId, chat, query):
+    toolList = "get_current_time, get_product_list, get_weather_info"
+    # system = f"You are a helpful assistant. Make sure to use the {toolList} tools for information."
+    system = f"다음의 Human과 Assistant의 친근한 이전 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다. 답변에 필요한 정보는 다움의 tools를 이용해 수집하세요. Tools: {toolList}"
+            
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system",system),
+            ("placeholder", "{chat_history}"),
+            ("human", "{input}"),
+            ("placeholder", "{agent_scratchpad}"),
+        ]
+    )
+    # define tools
+    tools = [get_current_time, get_product_list, get_weather_info]
+    
+     # create agent
+    agent = create_tool_calling_agent(chat, tools, prompt)
+    
+    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
+    
+    # run agent
+    history = memory_chain.load_memory_variables({})["chat_history"]
+    
+    isTyping(connectionId, requestId)
+    response = agent_executor.invoke({
+        "input": query,
+        "chat_history": history
+    })
+    print('response: ', response)
+
+    # streaming        
+    readStreamMsgForAgent(connectionId, requestId, response['output'])
+
+    msg = response['output']    
+    output = removeFunctionXML(msg)
+    # print('output: ', output)
+            
+    return output
+
 def get_react_prompt_template(): # (hwchase17/react) https://smith.langchain.com/hub/hwchase17/react
     # Get the react prompt template
     return PromptTemplate.from_template("""Answer the following questions as best you can. You have access to the following tools:
@@ -849,11 +889,13 @@ def getResponse(connectionId, jsonBody):
                 if convType == 'normal':      # normal
                     msg = general_conversation(connectionId, requestId, chat, text)                  
                 elif convType == 'agent-react':
-                    # msg = run_agent_react(connectionId, requestId, chat, text)      
                     msg = run_tool_calling_agent(connectionId, requestId, chat, text)             
-                elif convType == 'agent-react-chat':
-                    msg = run_agent_react_chat(connectionId, requestId, chat, text)
+                    # msg = run_agent_react(connectionId, requestId, chat, text)      
                     
+                elif convType == 'agent-react-chat':                    
+                    msg = run_tool_calling_agent_with_history(connectionId, requestId, chat, text)             
+                    # msg = run_agent_react_chat(connectionId, requestId, chat, text)
+                                        
                 elif convType == "translation":
                     msg = translate_text(chat, text) 
                 elif convType == "grammar":

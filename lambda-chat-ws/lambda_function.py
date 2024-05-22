@@ -634,10 +634,14 @@ def removeFunctionXML(msg):
     #print('msg: ', msg)
     
     while(1):
-        #tart_index = msg.find('<function_calls>')
-        #end_index = msg.find('</function_calls>')
-        start_index = msg.find('\n\n<invoke>')
-        end_index = msg.find('</invoke>')
+        start_index = msg.find('<function_calls>')
+        end_index = msg.find('</function_calls>')
+        length = 18
+        
+        if start_index == -1:
+            start_index = msg.find('\n\n<invoke>')
+            end_index = msg.find('</invoke>')
+            length = 10
         
         output = ""
         if start_index>0:
@@ -646,8 +650,7 @@ def removeFunctionXML(msg):
             
             if end_index>0:
                 #print('end_index: ', end_index)
-                #output = output + msg[end_index+18:] # </function_calls>
-                output = output + msg[end_index+10:]  # </invoke>
+                output = output + msg[end_index+length:]
             
                 #print('output[start_index-1]: ', msg[:start_index-1])
                 #print('output[end_index+18:]: ', msg[end_index+18:])

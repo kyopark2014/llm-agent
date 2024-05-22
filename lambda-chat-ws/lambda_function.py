@@ -675,14 +675,15 @@ def readStreamMsgForAgent(connectionId, requestId, stream):
             output = removeFunctionXML(msg)
             print('output: ', output)
             
-            result = {
-                'request_id': requestId,
-                'msg': output,
-                'status': 'proceeding'
-            }
-            #print('result: ', json.dumps(result))
-            sendMessage(connectionId, result)
-        
+            if output[0]!='<':
+                result = {
+                    'request_id': requestId,
+                    'msg': output,
+                    'status': 'proceeding'
+                }
+                #print('result: ', json.dumps(result))
+                sendMessage(connectionId, result)
+            
 def readStreamMsg(connectionId, requestId, stream):
     msg = ""
     if stream:

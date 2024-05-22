@@ -646,7 +646,8 @@ def removeFunctionXML(msg):
             
             if end_index>0:
                 #print('end_index: ', end_index)
-                output = output + msg[end_index+18:]           
+                #output = output + msg[end_index+18:] # </function_calls>
+                output = output + msg[end_index+10:]  # </invoke>
             
                 #print('output[start_index-1]: ', msg[:start_index-1])
                 #print('output[end_index+18:]: ', msg[end_index+18:])

@@ -62,7 +62,7 @@ def use_agent(connectionId, requestId, chat, query):
     return msg
 ```
 
-### React
+### ReAct
 
 이때, ReAct를 위한 Prompt는 [hwchase17/react](https://smith.langchain.com/hub/hwchase17/react)을 이용해 아래와 같이 정의합니다.
 

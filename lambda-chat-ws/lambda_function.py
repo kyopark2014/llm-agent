@@ -634,12 +634,12 @@ def removeFunctionXML(msg):
     #print('msg: ', msg)
     
     while(1):
-        start_index = msg.find('\n<function_calls>')
+        start_index = msg.find('\n\n<function_calls>')
         end_index = msg.find('</function_calls>')
         length = 18
         
         if start_index == -1:
-            start_index = msg.find('\n<invoke>')
+            start_index = msg.find('\n\n<invoke>')
             end_index = msg.find('</invoke>')
             length = 10
         

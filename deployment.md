@@ -36,13 +36,13 @@ chmod a+rx resize.sh && ./resize.sh 80
 4) 소스를 다운로드합니다.
 
 ```java
-git clone https://github.com/kyopark2014/stream-chatbot-for-amazon-bedrock
+git clone https://github.com/kyopark2014/llm-agent
 ```
 
 5) cdk 폴더로 이동하여 필요한 라이브러리를 설치합니다.
 
 ```java
-cd stream-chatbot-for-amazon-bedrock/cdk-stream-chatbot/ && npm install
+cd llm-agent/cdk-llm-agent/ && npm install
 ```
 
 7) CDK 사용을 위해 Boostraping을 수행합니다.

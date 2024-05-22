@@ -646,7 +646,9 @@ def removeFunctionXML(msg):
         output = ""
         if start_index>=0:
             print('start_index: ', start_index)
+            
             if start_index>=1:
+                print('output[:start_index-1]: ', msg[:start_index-1])
                 output = msg[:start_index-1]
                 
                 if output == "\n" or output == "\n\n":
@@ -654,16 +656,16 @@ def removeFunctionXML(msg):
             
             if end_index != -1:
                 print('end_index: ', end_index)
+                print('output[end_index+length:]: ', msg[end_index+length:])
                 
                 if msg[end_index+length] == '\n':
+                    print("msg[end_index+length]: ", msg[end_index+length])
                     output = output + msg[end_index+length+1:]
-                if msg[end_index+length:2] == '\n\n':
+                if msg[end_index+length:2] == "\n\n":
+                    print("msg[end_index+length:2]: ", msg[end_index+length:2])
                     output = output + msg[end_index+length+2:]
                 else:
-                    output = output + msg[end_index+length]
-            
-                print('output[:start_index-1]: ', msg[:start_index-1])
-                print('output[end_index+length:]: ', msg[end_index+length:])
+                    output = output + msg[end_index+length:]
                             
             msg = output
         else:

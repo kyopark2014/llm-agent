@@ -22,6 +22,11 @@ from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.memory import ConversationBufferWindowMemory
 from langchain_aws import ChatBedrock
 
+from langchain.agents import tool
+from langchain.agents import AgentExecutor, create_react_agent
+from bs4 import BeautifulSoup
+from pytz import timezone
+
 s3 = boto3.client('s3')
 s3_bucket = os.environ.get('s3_bucket') # bucket name
 s3_prefix = os.environ.get('s3_prefix')
@@ -282,6 +287,146 @@ def general_conversation(connectionId, requestId, chat, query):
     
     return msg
 
+def get_react_prompt_template(): # (hwchase17/react) https://smith.langchain.com/hub/hwchase17/react
+    # Get the react prompt template
+    return PromptTemplate.from_template("""Answer the following questions as best you can. You have access to the following tools:
+
+{tools}
+
+Use the following format:
+
+Question: the input question you must answer
+Thought: you should always think about what to do
+Action: the action to take, should be one of [{tool_names}]
+Action Input: the input to the action
+Observation: the result of the action
+... (this Thought/Action/Action Input/Observation can repeat N times)
+Thought: I now know the final answer
+Final Answer: the final answer to the original input question
+
+Begin!
+
+Question: {input}
+Thought:{agent_scratchpad}
+""")
+
+@tool
+def get_product_list(keyword: str) -> list:
+    """
+    Search product list by keyword and then return product list
+    keyword: search keyword
+    return: product list
+    """
+
+    url = f"https://search.kyobobook.co.kr/search?keyword={keyword}&gbCode=TOT&target=total"
+    response = requests.get(url)
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, "html.parser")
+        prod_info = soup.find_all("a", attrs={"class": "prod_info"})
+        prod_list = [
+            {"title": prod.text.strip(), "link": prod.get("href")} for prod in prod_info
+        ]
+        return prod_list[:5]
+    else:
+        return []
+
+@tool
+def get_current_time(format: str = "%Y-%m-%d %H:%M:%S"):
+    """Returns the current date and time in the specified format"""
+    
+    timestr = datetime.datetime.now(timezone('Asia/Seoul')).strftime(format)
+    # print('timestr:', timestr)
+    
+    # return the formatted time
+    return timestr
+
+@tool
+def get_weather_info(city: str) -> str:
+    """
+    Search weather information by city name and then return weather statement.
+    city: the english name of city to search
+    return: weather statement
+    """    
+                
+    if isKorean(city):
+        chat = get_chat(LLM_for_chat, selected_LLM)
+        city = traslation_to_english(chat, city)
+        print('city (translated): ', city)
+    
+    apiKey = api_key
+    lang = 'en' 
+    units = 'metric' 
+    api = f"https://api.openweathermap.org/data/2.5/weather?q={city}&APPID={apiKey}&lang={lang}&units={units}"
+    # print('api: ', api)
+
+    result = requests.get(api)
+    result = json.loads(result.text)
+    
+    overall = result['weather'][0]['main']
+    current_temp = result['main']['temp']
+    min_temp = result['main']['temp_min']
+    max_temp = result['main']['temp_max']
+    humidity = result['main']['humidity']
+    wind_speed = result['wind']['speed']
+    cloud = result['clouds']['all']
+    
+    weather_str = f"오늘의 {city} 날씨의 특징은 {overall}이며, 현재 온도는 {current_temp}도 이고, 최저온도는 {min_temp}도, 최고 온도는 {max_temp}도 입니다. 현재 습도는 {humidity}% 이고, 바람은 초당 {wind_speed} 미터 입니다. 구름은 {cloud}% 입니다."
+    #weather_str = f"Today, the overall of {city} is {overall}, current temperature is {current_temp} degree, min temperature is {min_temp} degree, highest temperature is {max_temp} degree. huminity is {humidity}%, wind status is {wind_speed} meter per second. the amount of cloud is {cloud}%."    
+        
+    return weather_str
+
+def run_agent_react(connectionId, requestId, chat, query):
+    # define tools
+    tools = [get_current_time, get_product_list, get_weather_info]
+    prompt_template = get_react_prompt_template()
+    print('prompt_template: ', prompt_template)
+    
+     # create agent
+    agent = create_react_agent(chat, tools, prompt_template)
+    
+    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
+    
+    # run agent
+    response = agent_executor.invoke({"input": query})
+    print('response: ', response)
+
+    # streaming    
+    msg = readStreamMsg(connectionId, requestId, response['output'])
+
+    msg = response['output']
+    print('msg: ', msg)
+            
+    return msg
+
+def run_agent_react_chat(connectionId, requestId, chat, query):
+    # revise question
+    revised_question = revise_question(connectionId, requestId, chat, query)     
+    print('revised_question: ', revised_question)  
+    
+    # define tools
+    tools = [get_current_time, get_product_list, get_weather_info]
+    
+    # get template based on react 
+    prompt_template = get_react_prompt_template()
+    print('prompt_template: ', prompt_template)
+    
+    # create agent
+    agent = create_react_agent(chat, tools, prompt_template)
+    
+    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
+    
+    # run agent
+    response = agent_executor.invoke({"input": revised_question})
+    print('response: ', response)
+    
+    # streaming
+    msg = readStreamMsg(connectionId, requestId, response['output'])
+
+    msg = response['output']
+    print('msg: ', msg)
+            
+    return msg
+
 def isTyping(connectionId, requestId):    
     msg_proceeding = {
         'request_id': requestId,
@@ -428,211 +573,6 @@ def check_grammer(chat, text):
     
     return msg
 
-def extract_sentiment(chat, text):
-    if isKorean(text)==True:
-        system = (
-            """아래의 <example> review와 Extracted Topic and sentiment 인 <result>가 있습니다.
-            <example>
-            객실은 작지만 깨끗하고 편안합니다. 프론트 데스크는 정말 분주했고 체크인 줄도 길었지만, 직원들은 프로페셔널하고 매우 유쾌하게 각 사람을 응대했습니다. 우리는 다시 거기에 머물것입니다.
-            </example>
-            <result>
-            청소: 긍정적, 
-            서비스: 긍정적
-            </result>
-
-            아래의 <review>에 대해서 위의 <result> 예시처럼 Extracted Topic and sentiment 을 만들어 주세요."""
-        )
-    else: 
-        system = (
-            """Here is <example> review and extracted topics and sentiments as <result>.
-
-            <example>
-            The room was small but clean and comfortable. The front desk was really busy and the check-in line was long, but the staff were professional and very pleasant with each person they helped. We will stay there again.
-            </example>
-
-            <result>
-            Cleanliness: Positive, 
-            Service: Positive
-            </result>"""
-        )
-        
-    human = "<review>{text}</review>"
-    
-    prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
-    print('prompt: ', prompt)
-    
-    chain = prompt | chat    
-    try: 
-        result = chain.invoke(
-            {
-                "text": text
-            }
-        )        
-        msg = result.content                
-        print('result of sentiment extraction: ', msg)
-        
-    except Exception:
-        err_msg = traceback.format_exc()
-        print('error message: ', err_msg)                    
-        raise Exception ("Not able to request to LLM")
-    
-    return msg
-
-def extract_information(chat, text):
-    if isKorean(text)==True:
-        system = (
-            """다음 텍스트에서 이메일 주소를 정확하게 복사하여 한 줄에 하나씩 적어주세요. 입력 텍스트에 정확하게 쓰여있는 이메일 주소만 적어주세요. 텍스트에 이메일 주소가 없다면, "N/A"라고 적어주세요. 또한 결과는 <result> tag를 붙여주세요."""
-        )
-    else: 
-        system = (
-            """Please precisely copy any email addresses from the following text and then write them, one per line.  Only write an email address if it's precisely spelled out in the input text. If there are no email addresses in the text, write "N/A".  Do not say anything else.  Put it in <result> tags."""
-        )
-        
-    human = "<text>{text}</text>"
-    
-    prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
-    print('prompt: ', prompt)
-    
-    chain = prompt | chat    
-    try: 
-        result = chain.invoke(
-            {
-                "text": text
-            }
-        )        
-        output = result.content        
-        msg = output[output.find('<result>')+8:len(output)-9] # remove <result> 
-        
-        print('result of information extraction: ', msg)
-    except Exception:
-        err_msg = traceback.format_exc()
-        print('error message: ', err_msg)                    
-        raise Exception ("Not able to request to LLM")
-    
-    return msg
-
-def remove_pii(chat, text):
-    if isKorean(text)==True:
-        system = (
-            """아래의 <text>에서 개인식별정보(PII)를 모두 제거하여 외부 계약자와 안전하게 공유할 수 있도록 합니다. 이름, 전화번호, 주소, 이메일을 XXX로 대체합니다. 또한 결과는 <result> tag를 붙여주세요."""
-        )
-    else: 
-        system = (
-            """We want to de-identify some text by removing all personally identifiable information from this text so that it can be shared safely with external contractors.
-            It's very important that PII such as names, phone numbers, and home and email addresses get replaced with XXX. Put it in <result> tags."""
-        )
-        
-    human = "<text>{text}</text>"
-    
-    prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
-    print('prompt: ', prompt)
-    
-    chain = prompt | chat    
-    try: 
-        result = chain.invoke(
-            {
-                "text": text
-            }
-        )        
-        output = result.content        
-        msg = output[output.find('<result>')+8:len(output)-9] # remove <result> 
-        
-        print('result of removing PII : ', msg)
-    except Exception:
-        err_msg = traceback.format_exc()
-        print('error message: ', err_msg)                    
-        raise Exception ("Not able to request to LLM")
-    
-    return msg
-
-def do_step_by_step(chat, text):
-    if isKorean(text)==True:
-        system = (
-            """다음은 Human과 Assistant의 친근한 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. 아래 문맥(context)을 참조했음에도 답을 알 수 없다면, 솔직히 모른다고 말합니다. 여기서 Assistant의 이름은 서연입니다.
-
-            Assistant: 단계별로 생각할까요?
-
-            Human: 예, 그렇게하세요."""
-        )
-    else: 
-        system = (
-            """Using the following conversation, answer friendly for the newest question. If you don't know the answer, just say that you don't know, don't try to make up an answer. You will be acting as a thoughtful advisor. 
-            
-            Assistant: Can I think step by step?
-
-            Human: Yes, please do."""
-        )
-        
-    human = "<text>{text}</text>"
-    
-    prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
-    print('prompt: ', prompt)
-    
-    chain = prompt | chat    
-    try: 
-        result = chain.invoke(
-            {
-                "text": text
-            }
-        )        
-        msg = result.content        
-        
-        print('result of sentiment extraction: ', msg)
-    except Exception:
-        err_msg = traceback.format_exc()
-        print('error message: ', err_msg)                    
-        raise Exception ("Not able to request to LLM")
-    
-    return msg
-
-def extract_timestamp(chat, text):
-    system = (
-        """Human: 아래의 <text>는 시간을 포함한 텍스트입니다. 친절한 AI Assistant로서 시간을 추출하여 아래를 참조하여 <example>과 같이 정리해주세요.
-            
-        - 년도를 추출해서 <year>/<year>로 넣을것 
-        - 월을 추출해서 <month>/<month>로 넣을것
-        - 일을 추출해서 <day>/<day>로 넣을것
-        - 시간을 추출해서 24H으로 정리해서 <hour>/<hour>에 넣을것
-        - 분을 추출해서 <minute>/<minute>로 넣을것
-
-        이때의 예제는 아래와 같습니다.
-        <example>
-        2022년 11월 3일 18시 26분
-        </example>
-        <result>
-            <year>2022</year>
-            <month>11</month>
-            <day>03</day>
-            <hour>18</hour>
-            <minute>26</minute>
-        </result>
-
-        결과에 개행문자인 "\n"과 글자 수와 같은 부가정보는 절대 포함하지 마세요."""
-    )    
-        
-    human = "<text>{text}</text>"
-    
-    prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
-    print('prompt: ', prompt)
-    
-    chain = prompt | chat    
-    try: 
-        result = chain.invoke(
-            {
-                "text": text
-            }
-        )        
-        output = result.content        
-        msg = output[output.find('<result>')+8:len(output)-9] # remove <result> 
-        
-        print('result of sentiment extraction: ', msg)
-    except Exception:
-        err_msg = traceback.format_exc()
-        print('error message: ', err_msg)                    
-        raise Exception ("Not able to request to LLM")
-    
-    return msg
-
 def getResponse(connectionId, jsonBody):
     print('jsonBody: ', jsonBody)
     
@@ -698,22 +638,17 @@ def getResponse(connectionId, jsonBody):
                 print('initiate the chat memory!')
                 msg  = "The chat memory was intialized in this session."
             else:            
-                if convType == "normal":
-                    msg = general_conversation(connectionId, requestId, chat, text)    
+                if convType == 'normal' or conv_type == 'funny':      # normal
+                    msg = general_conversation(connectionId, requestId, chat, text)                  
+                elif convType == 'agent-react':
+                    msg = run_agent_react(connectionId, requestId, chat, text)                
+                elif convType == 'agent-react-chat':
+                    msg = run_agent_react_chat(connectionId, requestId, chat, text)
+                    
                 elif convType == "translation":
                     msg = translate_text(chat, text) 
                 elif convType == "grammar":
                     msg = check_grammer(chat, text)  
-                elif convType == "sentiment":
-                    msg = extract_sentiment(chat, text)
-                elif convType == "extraction": # infomation extraction
-                    msg = extract_information(chat, text)  
-                elif convType == "pii":
-                    msg = remove_pii(chat, text)   
-                elif convType == "step-by-step":
-                    msg = do_step_by_step(chat, text)  
-                elif convType == "timestamp-extraction":
-                    msg = extract_timestamp(chat, text)  
                 else:
                     msg = general_conversation(connectionId, requestId, chat, text)  
                     

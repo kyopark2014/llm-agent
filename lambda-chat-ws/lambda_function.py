@@ -331,10 +331,13 @@ def who_are_you():
     return "경수"
 
 @tool
-def get_current_time():
+def get_current_time() -> str:
     """Returns the current datetime"""
     
-    return datetime.datetime.now(timezone('Asia/Seoul')).isoformat()
+    timestr = str(datetime.datetime.now(timezone('Asia/Seoul')).isoformat())
+    print('timestr: ', timestr)
+    
+    return timestr
 
 @tool
 def get_weather_info(city: str) -> str:

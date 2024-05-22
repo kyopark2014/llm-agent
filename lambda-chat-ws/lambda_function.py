@@ -392,11 +392,11 @@ def run_tool_calling_agent(connectionId, requestId, chat, query):
     agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
     
     # run agent
+    isTyping(connectionId, requestId)
     response = agent_executor.invoke({"input": query})
     print('response: ', response)
 
-    # streaming    
-    isTyping(connectionId, requestId)
+    # streaming        
     readStreamMsgForAgent(connectionId, requestId, response['output'])
 
     msg = response['output']    
@@ -581,7 +581,6 @@ def revise_question(connectionId, requestId, chat, query):
             
     return revised_question    
     # return revised_question.replace("\n"," ")
-
 
 def isTyping(connectionId, requestId):    
     msg_proceeding = {

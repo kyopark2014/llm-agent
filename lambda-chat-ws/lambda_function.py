@@ -397,12 +397,13 @@ def run_tool_calling_agent(connectionId, requestId, chat, query):
 
     # streaming    
     isTyping(connectionId, requestId)
-    msg = readStreamMsgForAgent(connectionId, requestId, response['output'])
+    readStreamMsgForAgent(connectionId, requestId, response['output'])
 
-    msg = response['output']
-    print('msg: ', msg)
+    msg = response['output']    
+    output = removeFunctionXML(msg)
+    print('output: ', output)
             
-    return msg
+    return output
 
 def get_react_prompt_template(): # (hwchase17/react) https://smith.langchain.com/hub/hwchase17/react
     # Get the react prompt template
@@ -629,8 +630,6 @@ def readStreamMsgForAgent(connectionId, requestId, stream):
             }
             #print('result: ', json.dumps(result))
             sendMessage(connectionId, result)
-    # print('msg: ', msg)
-    return msg
         
 def readStreamMsg(connectionId, requestId, stream):
     msg = ""

@@ -649,7 +649,6 @@ def removeFunctionXML(msg):
             print('msg: ', msg)
             
             if start_index>=1:
-                print('output[:start_index-1]: ', msg[:start_index-1])
                 output = msg[:start_index-1]
                 
                 if output == "\n" or output == "\n\n":
@@ -657,16 +656,7 @@ def removeFunctionXML(msg):
             
             if end_index >= 1:
                 print('end_index: ', end_index)
-                print('output[end_index+length:]: ', msg[end_index+length:])
-                                
-                if msg[end_index+length:1] == "\n":
-                    print("msg[end_index+length:1]: ", msg[end_index+length:1])
-                    output = output + msg[end_index+length+1:]
-                if msg[end_index+length:2] == "\n\n":
-                    print("msg[end_index+length:2]: ", msg[end_index+length:2])
-                    output = output + msg[end_index+length+2:]
-                else:
-                    output = output + msg[end_index+length:]
+                output = output + msg[end_index+length:]
                             
             msg = output
         else:
@@ -683,6 +673,7 @@ def readStreamMsgForAgent(connectionId, requestId, stream):
             msg = msg + event
             
             output = removeFunctionXML(msg)
+            print('output: ', output)
             
             result = {
                 'request_id': requestId,

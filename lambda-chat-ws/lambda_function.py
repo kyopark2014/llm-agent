@@ -675,7 +675,7 @@ def readStreamMsgForAgent(connectionId, requestId, stream):
             output = removeFunctionXML(msg)
             print('output: ', output)
             
-            if output[0]!='<':
+            if len(output)>0 and output[0]!='<':
                 result = {
                     'request_id': requestId,
                     'msg': output,

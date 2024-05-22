@@ -11,6 +11,7 @@ import * as apiGateway from 'aws-cdk-lib/aws-apigateway';
 import * as s3Deploy from "aws-cdk-lib/aws-s3-deployment";
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as apigatewayv2 from 'aws-cdk-lib/aws-apigatewayv2';
+import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 
 const region = process.env.CDK_DEFAULT_REGION;    
 const accountId = process.env.CDK_DEFAULT_ACCOUNT;
@@ -22,6 +23,7 @@ const projectName = `llm-agent`;
 
 const bucketName = `storage-for-${projectName}-${accountId}-${region}`; 
 const bedrock_region = "us-east-1";  // "us-east-1" "us-west-2" 
+const debugMessageMode = 'true'; // if true, debug messages will be delivered to the client.
 
 export class CdkLlmAgentStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -399,6 +401,20 @@ export class CdkLlmAgentStack extends cdk.Stack {
       }),
     );  
 
+    const weatherApiSecret = new secretsmanager.Secret(this, `weather-api-secret-for-${projectName}`, {
+      description: 'secret for weather api key', // openweathermap
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      secretName: 'openweathermap',
+      generateSecretString: {
+        secretStringTemplate: JSON.stringify({ 
+          api_name: 'weather'
+        }),
+        generateStringKey: 'api_key',
+        excludeCharacters: '/@"',
+      },
+    });
+    weatherApiSecret.grantRead(roleLambdaWebsocket) 
+
     const lambdaChatWebsocket = new lambda.DockerImageFunction(this, `lambda-chat-ws-for-${projectName}`, {
       description: 'lambda for chat using websocket',
       functionName: `lambda-chat-ws-for-${projectName}`,
@@ -412,7 +428,8 @@ export class CdkLlmAgentStack extends cdk.Stack {
         s3_prefix: s3_prefix,
         path: 'https://'+distribution.domainName+'/',   
         callLogTableName: callLogTableName,
-        connection_url: connection_url
+        connection_url: connection_url,
+        debugMessageMode: debugMessageMode
       }
     });     
     lambdaChatWebsocket.grantInvoke(new iam.ServicePrincipal('apigateway.amazonaws.com'));  

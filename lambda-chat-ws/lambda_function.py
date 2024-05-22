@@ -5,9 +5,9 @@ import time
 import datetime
 import PyPDF2
 import csv
-import sys
 import re
 import traceback
+import requests
 
 from botocore.config import Config
 from io import BytesIO
@@ -15,10 +15,7 @@ from urllib import parse
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.docstore.document import Document
 from langchain.chains.summarize import load_summarize_chain
-from langchain.memory import ConversationBufferMemory
-from langchain_community.chat_models import BedrockChat
 from langchain_core.prompts import MessagesPlaceholder, ChatPromptTemplate
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.memory import ConversationBufferWindowMemory
 from langchain_aws import ChatBedrock
 
@@ -26,6 +23,7 @@ from langchain.agents import tool
 from langchain.agents import AgentExecutor, create_react_agent
 from bs4 import BeautifulSoup
 from pytz import timezone
+from langchain.prompts import PromptTemplate
 
 s3 = boto3.client('s3')
 s3_bucket = os.environ.get('s3_bucket') # bucket name
@@ -36,6 +34,21 @@ modelId = os.environ.get('model_id', 'amazon.titan-tg1-large')
 print('model_id[:9]: ', modelId[:9])
 path = os.environ.get('path')
 doc_prefix = s3_prefix+'/'
+debugMessageMode = os.environ.get('debugMessageMode', 'false')
+
+# api key to get weather information in agent
+secretsmanager = boto3.client('secretsmanager')
+try:
+    get_secret_value_response = secretsmanager.get_secret_value(
+        SecretId='openweathermap'
+    )
+    #print('get_secret_value_response: ', get_secret_value_response)
+    secret = json.loads(get_secret_value_response['SecretString'])
+    #print('secret: ', secret)
+    api_key = secret['api_key']
+
+except Exception as e:
+    raise e
    
 # websocket
 connection_url = os.environ.get('connection_url')
@@ -349,7 +362,6 @@ def get_weather_info(city: str) -> str:
     """    
                 
     if isKorean(city):
-        chat = get_chat(LLM_for_chat, selected_LLM)
         city = traslation_to_english(chat, city)
         print('city (translated): ', city)
     
@@ -427,6 +439,109 @@ def run_agent_react_chat(connectionId, requestId, chat, query):
             
     return msg
 
+def traslation_to_english(chat, text):
+    input_language = "Korean"
+    output_language = "English"
+        
+    system = (
+        "You are a helpful assistant that translates {input_language} to {output_language} in <article> tags. Put it in <result> tags."
+    )
+    human = "<article>{text}</article>"
+    
+    prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
+    print('prompt: ', prompt)
+    
+    chain = prompt | chat    
+    try: 
+        result = chain.invoke(
+            {
+                "input_language": input_language,
+                "output_language": output_language,
+                "text": text,
+            }
+        )
+        
+        msg = result.content
+        print('translated text: ', msg)
+    except Exception:
+        err_msg = traceback.format_exc()
+        print('error message: ', err_msg)                    
+        raise Exception ("Not able to request to LLM")
+
+    return msg[msg.find('<result>')+8:len(msg)-9] # remove <result> tag
+
+def revise_question(connectionId, requestId, chat, query):    
+    global history_length, token_counter_history    
+    history_length = token_counter_history = 0
+        
+    if isKorean(query)==True :      
+        system = (
+            ""
+        )  
+        human = """이전 대화를 참조하여, 다음의 <question>의 뜻을 명확히 하는 새로운 질문을 한국어로 생성하세요. 새로운 질문은 원래 질문의 중요한 단어를 반드시 포함합니다. 결과는 <result> tag를 붙여주세요.
+        
+        <question>            
+        {question}
+        </question>"""
+        
+    else: 
+        system = (
+            ""
+        )
+        human = """Rephrase the follow up <question> to be a standalone question. Put it in <result> tags.
+        <question>            
+        {question}
+        </question>"""
+            
+    prompt = ChatPromptTemplate.from_messages([("system", system), MessagesPlaceholder(variable_name="history"), ("human", human)])
+    print('prompt: ', prompt)
+    
+    history = memory_chain.load_memory_variables({})["chat_history"]
+    print('memory_chain: ', history)
+                
+    chain = prompt | chat    
+    try: 
+        result = chain.invoke(
+            {
+                "history": history,
+                "question": query,
+            }
+        )
+        generated_question = result.content
+        
+        revised_question = generated_question[generated_question.find('<result>')+8:len(generated_question)-9] # remove <result> tag                   
+        print('revised_question: ', revised_question)
+        
+    except Exception:
+        err_msg = traceback.format_exc()
+        print('error message: ', err_msg)        
+            
+        sendErrorMessage(connectionId, requestId, err_msg)    
+        raise Exception ("Not able to request to LLM")
+
+    if debugMessageMode == 'true':  
+        chat_history = ""
+        for dialogue_turn in history:
+            #print('type: ', dialogue_turn.type)
+            #print('content: ', dialogue_turn.content)
+            
+            dialog = f"{dialogue_turn.type}: {dialogue_turn.content}\n"            
+            chat_history = chat_history + dialog
+                
+        history_length = len(chat_history)
+        print('chat_history length: ', history_length)
+        
+        token_counter_history = 0
+        if chat_history:
+            token_counter_history = chat.get_num_tokens(chat_history)
+            print('token_size of history: ', token_counter_history)
+            
+        sendDebugMessage(connectionId, requestId, f"새로운 질문: {revised_question}\n * 대화이력({str(history_length)}자, {token_counter_history} Tokens)을 활용하였습니다.")
+            
+    return revised_question    
+    # return revised_question.replace("\n"," ")
+
+
 def isTyping(connectionId, requestId):    
     msg_proceeding = {
         'request_id': requestId,
@@ -472,6 +587,15 @@ def sendResultMessage(connectionId, requestId, msg):
     }
     #print('debug: ', json.dumps(debugMsg))
     sendMessage(connectionId, result)
+    
+def sendDebugMessage(connectionId, requestId, msg):
+    debugMsg = {
+        'request_id': requestId,
+        'msg': msg,
+        'status': 'debug'
+    }
+    #print('debug: ', json.dumps(debugMsg))
+    sendMessage(connectionId, debugMsg)    
         
 def sendErrorMessage(connectionId, requestId, msg):
     errorMsg = {

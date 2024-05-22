@@ -606,7 +606,7 @@ def removeFunctionXML(output):
             print('end_index: ', end_index)
             msg = msg + output[end_index+18:]           
         
-            print('output[start_index-1]: ', output[start_index-1])
+            print('output[start_index-1]: ', output[:start_index-1])
             print('output[end_index+18:]: ', output[end_index+18:])
     else:
         msg = output

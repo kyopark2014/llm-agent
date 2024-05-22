@@ -24,6 +24,7 @@ from langchain.agents import AgentExecutor, create_react_agent
 from bs4 import BeautifulSoup
 from pytz import timezone
 from langchain.prompts import PromptTemplate
+from langchain.agents import AgentExecutor, create_tool_calling_agent
 
 s3 = boto3.client('s3')
 s3_bucket = os.environ.get('s3_bucket') # bucket name
@@ -300,29 +301,6 @@ def general_conversation(connectionId, requestId, chat, query):
     
     return msg
 
-def get_react_prompt_template(): # (hwchase17/react) https://smith.langchain.com/hub/hwchase17/react
-    # Get the react prompt template
-    return PromptTemplate.from_template("""Answer the following questions as best you can. You have access to the following tools:
-
-{tools}
-
-Use the following format:
-
-Question: the input question you must answer
-Thought: you should always think about what to do
-Action: the action to take, should be one of [{tool_names}]
-Action Input: the input to the action
-Observation: the result of the action
-... (this Thought/Action/Action Input/Observation can repeat N times)
-Thought: I now know the final answer
-Final Answer: the final answer to the original input question
-
-Begin!
-
-Question: {input}
-Thought:{agent_scratchpad}
-""")
-
 @tool
 def get_product_list(keyword: str) -> list:
     """
@@ -390,8 +368,10 @@ def get_weather_info(city: str) -> str:
         
     return weather_str
 
-from langchain.agents import AgentExecutor, create_tool_calling_agent
+
 def run_tool_calling_agent(connectionId, requestId, chat, query):
+    system = "다음의 Human과 Assistant의 친근한 이전 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다."
+            
     prompt = ChatPromptTemplate.from_messages(
         [
             (
@@ -423,6 +403,29 @@ def run_tool_calling_agent(connectionId, requestId, chat, query):
     print('msg: ', msg)
             
     return msg
+
+def get_react_prompt_template(): # (hwchase17/react) https://smith.langchain.com/hub/hwchase17/react
+    # Get the react prompt template
+    return PromptTemplate.from_template("""Answer the following questions as best you can. You have access to the following tools:
+
+{tools}
+
+Use the following format:
+
+Question: the input question you must answer
+Thought: you should always think about what to do
+Action: the action to take, should be one of [{tool_names}]
+Action Input: the input to the action
+Observation: the result of the action
+... (this Thought/Action/Action Input/Observation can repeat N times)
+Thought: I now know the final answer
+Final Answer: the final answer to the original input question
+
+Begin!
+
+Question: {input}
+Thought:{agent_scratchpad}
+""")
 
 def run_agent_react(connectionId, requestId, chat, query):
     # define tools
@@ -589,13 +592,16 @@ def isTyping(connectionId, requestId):
     sendMessage(connectionId, msg_proceeding)
 
 def removeFunctionXML(output):
+    print('output: ', output)
+    
     start_index = output.find('<function_calls>')
     end_index = output.find('</function_calls>')
-    #17
+    print('start_index: ', start_index)
+    print('end_index: ', end_index)
         
     msg = ""
     if start_index:
-        msg = output[start_index-1]
+        msg = output[:start_index-1]
         
         if end_index:
             msg = msg + output[end_index+18:]           

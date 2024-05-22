@@ -416,7 +416,8 @@ def run_tool_calling_agent(connectionId, requestId, chat, query):
     print('response: ', response)
 
     # streaming    
-    msg = readStreamMsg(connectionId, requestId, response['output'])
+    isTyping(connectionId, requestId)
+    msg = readStreamMsgForAgent(connectionId, requestId, response['output'])
 
     msg = response['output']
     print('msg: ', msg)
@@ -586,6 +587,42 @@ def isTyping(connectionId, requestId):
     }
     #print('result: ', json.dumps(result))
     sendMessage(connectionId, msg_proceeding)
+
+def removeFunctionXML(output):
+    start_index = output.find('<function_calls>')
+    end_index = output.find('</function_calls>')
+    #17
+        
+    msg = ""
+    if start_index:
+        msg = output[start_index-1]
+        
+        if end_index:
+            msg = msg + output[end_index+18:]           
+        
+            print('output[start_index-1]: ', output[start_index-1])
+            print('output[end_index+18:]: ', output[end_index+18:])
+
+    return msg
+
+def readStreamMsgForAgent(connectionId, requestId, stream):
+    msg = ""
+    if stream:
+        for event in stream:
+            #print('event: ', event)
+            output = msg + event
+            
+            msg = removeFunctionXML(output)
+            
+            result = {
+                'request_id': requestId,
+                'msg': msg,
+                'status': 'proceeding'
+            }
+            #print('result: ', json.dumps(result))
+            sendMessage(connectionId, result)
+    # print('msg: ', msg)
+    return msg
         
 def readStreamMsg(connectionId, requestId, stream):
     msg = ""
@@ -593,7 +630,7 @@ def readStreamMsg(connectionId, requestId, stream):
         for event in stream:
             #print('event: ', event)
             msg = msg + event
-
+            
             result = {
                 'request_id': requestId,
                 'msg': msg,

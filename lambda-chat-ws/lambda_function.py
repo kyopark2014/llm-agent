@@ -638,7 +638,7 @@ def getResponse(connectionId, jsonBody):
                 print('initiate the chat memory!')
                 msg  = "The chat memory was intialized in this session."
             else:            
-                if convType == 'normal' or conv_type == 'funny':      # normal
+                if convType == 'normal':      # normal
                     msg = general_conversation(connectionId, requestId, chat, text)                  
                 elif convType == 'agent-react':
                     msg = run_agent_react(connectionId, requestId, chat, text)                

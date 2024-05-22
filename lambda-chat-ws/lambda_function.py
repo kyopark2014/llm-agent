@@ -658,8 +658,8 @@ def removeFunctionXML(msg):
                 print('end_index: ', end_index)
                 print('output[end_index+length:]: ', msg[end_index+length:])
                 
-                if msg[end_index+length] == '\n':
-                    print("msg[end_index+length]: ", msg[end_index+length])
+                if msg[end_index+length:1] == '\n':
+                    print("msg[end_index+length:1]: ", msg[end_index+length:1])
                     output = output + msg[end_index+length+1:]
                 if msg[end_index+length:2] == "\n\n":
                     print("msg[end_index+length:2]: ", msg[end_index+length:2])

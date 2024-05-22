@@ -332,15 +332,9 @@ def who_are_you():
 
 @tool
 def get_current_time():
-    """Returns the current date and time in the specified format"""
+    """Returns the current datetime"""
     
-    format = f"%Y-%m-%d %H:%M:%S"
-    
-    timestr = '현재시간: '+datetime.datetime.now(timezone('Asia/Seoul')).strftime(format)
-    # print('timestr:', timestr)
-    
-    # return the formatted time
-    return timestr
+    return datetime.datetime.now(timezone('Asia/Seoul')).isoformat()
 
 @tool
 def get_weather_info(city: str) -> str:

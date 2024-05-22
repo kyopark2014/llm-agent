@@ -591,40 +591,40 @@ def isTyping(connectionId, requestId):
     #print('result: ', json.dumps(result))
     sendMessage(connectionId, msg_proceeding)
 
-def removeFunctionXML(output):
-    print('output: ', output)
+def removeFunctionXML(msg):
+    print('msg: ', msg)
     
-    start_index = output.find('<function_calls>')
-    end_index = output.find('</function_calls>')
+    start_index = msg.find('<function_calls>')
+    end_index = msg.find('</function_calls>')
     
-    msg = ""
-    if start_index:
+    output = ""
+    if start_index>0:
         print('start_index: ', start_index)
-        msg = output[:start_index-1]
+        output = msg[:start_index-1]
         
-        if end_index:
+        if end_index>0:
             print('end_index: ', end_index)
-            msg = msg + output[end_index+18:]           
+            output = output + msg[end_index+18:]           
         
-            print('output[start_index-1]: ', output[:start_index-1])
-            print('output[end_index+18:]: ', output[end_index+18:])
+            print('output[start_index-1]: ', msg[:start_index-1])
+            print('output[end_index+18:]: ', msg[end_index+18:])
     else:
-        msg = output
+        output = msg
 
-    return msg
+    return output
 
 def readStreamMsgForAgent(connectionId, requestId, stream):
     msg = ""
     if stream:
         for event in stream:
             #print('event: ', event)
-            output = msg + event
+            msg = msg + event
             
-            msg = removeFunctionXML(output)
+            output = removeFunctionXML(msg)
             
             result = {
                 'request_id': requestId,
-                'msg': msg,
+                'msg': output,
                 'status': 'proceeding'
             }
             #print('result: ', json.dumps(result))

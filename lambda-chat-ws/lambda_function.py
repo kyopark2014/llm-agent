@@ -645,15 +645,16 @@ def removeFunctionXML(msg):
         
         output = ""
         if start_index>=0:
-            #print('start_index: ', start_index)
-            output = msg[:start_index-1]
+            print('start_index: ', start_index)
+            if start_index>=1:
+                output = msg[:start_index-1]
             
-            if end_index>=0:
-                #print('end_index: ', end_index)
+            if end_index != -1:
+                print('end_index: ', end_index)
                 output = output + msg[end_index+length:]
             
-                #print('output[start_index-1]: ', msg[:start_index-1])
-                #print('output[end_index+18:]: ', msg[end_index+18:])
+                print('output[start_index-1]: ', msg[:start_index-1])
+                print('output[end_index+18:]: ', msg[end_index+18:])
                             
             msg = output
         else:

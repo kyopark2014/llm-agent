@@ -6,10 +6,14 @@
 
 LangChain의 [ReAct](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/react/)를 이용하여 Agent를 정의합니다.
 
+[ReAct Paper - ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629)에서는 the use of LLMs to generate both reasoning traces and task-specific actions in an interleaved manner 라고 설명하고 있습니다.
+
 ![image](https://github.com/kyopark2014/llm-agent/assets/52392004/4b2f79cc-6782-4c44-b594-1c5f22472dc7)
 
 ![image](https://github.com/kyopark2014/llm-agent/assets/52392004/69ff3e46-ec3e-4ba1-9f10-380b31554f15)
 
+
+[Using LangChain ReAct Agents for Answering Multi-hop Questions in RAG Systems](https://towardsdatascience.com/using-langchain-react-agents-for-answering-multi-hop-questions-in-rag-systems-893208c1847e)
 
 ## Tool calling agent
 

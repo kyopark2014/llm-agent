@@ -174,7 +174,6 @@ export class CdkLlmAgentStack extends cdk.Stack {
       code: lambda.Code.fromAsset("../lambda-upload"), 
       handler: "index.handler", 
       timeout: cdk.Duration.seconds(10),
-      logRetention: logs.RetentionDays.ONE_DAY,
       environment: {
         bucketName: s3Bucket.bucketName,
         s3_prefix:  s3_prefix
@@ -223,7 +222,6 @@ export class CdkLlmAgentStack extends cdk.Stack {
       code: lambda.Code.fromAsset("../lambda-query"), 
       handler: "index.handler", 
       timeout: cdk.Duration.seconds(60),
-      logRetention: logs.RetentionDays.ONE_DAY,
       environment: {
         tableName: callLogTableName,
         indexName: callLogIndexName
@@ -265,7 +263,6 @@ export class CdkLlmAgentStack extends cdk.Stack {
       code: lambda.Code.fromAsset("../lambda-gethistory"), 
       handler: "index.handler", 
       timeout: cdk.Duration.seconds(60),
-      logRetention: logs.RetentionDays.ONE_DAY,
       environment: {
         tableName: callLogTableName
       }      
@@ -306,7 +303,6 @@ export class CdkLlmAgentStack extends cdk.Stack {
       code: lambda.Code.fromAsset("../lambda-delete-items"), 
       handler: "index.handler", 
       timeout: cdk.Duration.seconds(60),
-      logRetention: logs.RetentionDays.ONE_DAY,
       environment: {
         tableName: callLogTableName
       }      
@@ -491,7 +487,6 @@ export class CdkLlmAgentStack extends cdk.Stack {
       runtime: lambda.Runtime.PYTHON_3_11,
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-provisioning')),
       timeout: cdk.Duration.seconds(30),
-      logRetention: logs.RetentionDays.ONE_DAY,
       environment: {
         wss_url: wss_url,
       }
@@ -523,6 +518,55 @@ export class CdkLlmAgentStack extends cdk.Stack {
       allowedMethods: cloudFront.AllowedMethods.ALLOW_ALL,  
       viewerProtocolPolicy: cloudFront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
     });
+
+    /*
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+          {
+              "Sid": "Invoke",
+              "Effect": "Allow",
+              "Action": [
+                  "lambda:InvokeFunction"
+              ],
+              "Resource": "*"
+          }
+      ]
+    } */
+
+    // role - datetime
+    const roleLambdaDateTime = new iam.Role(this, `role-datetime-ws-for-${projectName}`, {
+      roleName: `role-datetime-for-${projectName}-${region}`,
+      assumedBy: new iam.CompositePrincipal(
+        new iam.ServicePrincipal("lambda.amazonaws.com"),
+        new iam.ServicePrincipal("bedrock.amazonaws.com"),
+      )
+    });
+    roleLambdaDateTime.addManagedPolicy({
+      managedPolicyArn: 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+    });
+    const lambdaInvokePolicy = new iam.PolicyStatement({ 
+      resources: ['*'],
+      actions: [
+        "lambda:InvokeFunction"
+      ],
+    });        
+    roleLambdaDateTime.attachInlinePolicy( 
+      new iam.Policy(this, `lambda-invoke-policy-for-${projectName}`, {
+        statements: [lambdaInvokePolicy],
+      }),
+    );  
+
+    // lambda - datetime
+    const lambdaDateTime = new lambda.DockerImageFunction(this, `lambda-datetime-for-${projectName}`, {
+      description: 'lambda for datetime',
+      functionName: `lambda-datetime-for-${projectName}`,
+      code: lambda.DockerImageCode.fromImageAsset(path.join(__dirname, '../../lambda-datetime')),
+      timeout: cdk.Duration.seconds(30),
+      role: roleLambdaDateTime,
+      environment: {
+      }
+    });     
 
     // deploy components
     new componentDeployment(scope, `deployment-for-${projectName}`, websocketapi.attrApiId)       

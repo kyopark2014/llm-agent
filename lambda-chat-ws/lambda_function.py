@@ -10,6 +10,7 @@ import traceback
 import requests
 
 from botocore.config import Config
+from botocore.exceptions import ClientError
 from io import BytesIO
 from urllib import parse
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -324,12 +325,36 @@ def get_product_list(keyword: str) -> list:
     else:
         return []
 
+
+def get_lambda_client(region):
+    return boto3.client(
+        service_name='lambda',
+        region_name=region
+    )
+    
 @tool
 def get_current_time(format: str = "%Y-%m-%d %H:%M:%S") -> str:
     """
     Get current time and return it.
     return: string of datetime
     """    
+    
+    function_name = "lambda-datetime"
+    lambda_region = 'ap-northeast-2'
+    try:
+        lambda_client = get_lambda_client(region=lambda_region)
+        payload = {}
+        print("Payload: ", payload)
+            
+        response = lambda_client.invoke(
+            FunctionName=function_name,
+            Payload=json.dumps(payload),
+        )
+        print("Invoked function %s.", function_name)
+        print("Response: ", response)
+    except ClientError:
+        print("Couldn't invoke function %s.", function_name)
+        raise
     
     timestr = datetime.datetime.now(timezone('Asia/Seoul')).strftime(format)
     print('timestr: ', timestr)

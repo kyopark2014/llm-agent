@@ -330,8 +330,9 @@ def get_lambda_client(region):
         service_name='lambda',
         region_name=region
     )
-
-def current_time():
+    
+@tool
+def get_current_time():
     """
     Get current time and return it.
     return: string of datetime
@@ -359,47 +360,7 @@ def current_time():
     body = json.load(payload)['body']
     print('body: ', body)
     jsonBody = json.loads(body) 
-    print('jsonBody: ', jsonBody)
-    
-    timestr = jsonBody['timestr']
-    print('timestr: ', timestr)
-    
-    return timestr
-timestr = current_time() 
-print('timestr: ', timestr)
-
-    
-@tool
-def get_current_time():
-    """
-    Get current time and return it.
-    return: string of datetime
-    """    
-    
-    function_name = "lambda-datetime-for-llm-agent"
-    lambda_region = 'ap-northeast-2'
-    try:
-        lambda_client = get_lambda_client(region=lambda_region)
-        payload = {}
-        print("Payload: ", payload)
-            
-        response = lambda_client.invoke(
-            FunctionName=function_name,
-            Payload=json.dumps(payload),
-        )
-        print("Invoked function %s.", function_name)
-        print("Response: ", response)
-    except ClientError:
-        print("Couldn't invoke function %s.", function_name)
-        raise
-    
-    ayload = response['Payload']
-    print('payload: ', payload)
-    body = json.load(payload)['body']
-    print('body: ', body)
-    jsonBody = json.loads(body) 
-    print('jsonBody: ', jsonBody)
-    
+    print('jsonBody: ', jsonBody)    
     timestr = jsonBody['timestr']
     print('timestr: ', timestr)
     

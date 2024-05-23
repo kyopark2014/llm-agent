@@ -545,36 +545,12 @@ export class CdkLlmAgentStack extends cdk.Stack {
       ]
     } */
 
-    // role - datetime
- /*   const roleLambdaDateTime = new iam.Role(this, `role-datetime-ws-for-${projectName}`, {
-      roleName: `role-datetime-for-${projectName}-${region}`,
-      assumedBy: new iam.CompositePrincipal(
-        new iam.ServicePrincipal("lambda.amazonaws.com"),
-        new iam.ServicePrincipal("bedrock.amazonaws.com"),
-      )
-    });
-    roleLambdaDateTime.addManagedPolicy({
-      managedPolicyArn: 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
-    });
-    const lambdaInvokePolicy = new iam.PolicyStatement({ 
-      resources: ['*'],
-      actions: [
-        "lambda:InvokeFunction"
-      ],
-    });        
-    roleLambdaDateTime.attachInlinePolicy( 
-      new iam.Policy(this, `lambda-invoke-policy-for-${projectName}`, {
-        statements: [lambdaInvokePolicy],
-      }),
-    );  */
-
     // lambda - datetime
     const lambdaDateTime = new lambda.DockerImageFunction(this, `lambda-datetime-for-${projectName}`, {
       description: 'lambda for datetime',
       functionName: `lambda-datetime-for-${projectName}`,
       code: lambda.DockerImageCode.fromImageAsset(path.join(__dirname, '../../lambda-datetime')),
       timeout: cdk.Duration.seconds(30),
-      // role: roleLambdaDateTime,
       environment: {
       }
     });     

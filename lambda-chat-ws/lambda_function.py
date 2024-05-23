@@ -331,70 +331,19 @@ def get_lambda_client(region):
         region_name=region
     )
 
-def current_time(city: str) -> str:
-    """
-    Get current time and return it.
-    city: the english name of city to search
-    return: string of datetime
-    """    
-    
-    print('city: ', city)
-    
-    function_name = "lambda-datetime-for-llm-agent"
-    lambda_region = 'ap-northeast-2'
-    
-    
-    try:
-        lambda_client = get_lambda_client(region=lambda_region)
-        payload = {'city': city}
-        print("Payload: ", payload)
-            
-        response = lambda_client.invoke(
-            FunctionName=function_name,
-            Payload=json.dumps(payload),
-        )
-        print("Invoked function %s.", function_name)
-        print("Response: ", response)
-    except ClientError:
-        print("Couldn't invoke function %s.", function_name)
-        raise
-    
-    payload = response['Payload']
-    print('payload: ', payload)
-    body = json.load(payload)['body']
-    print('body: ', body)
-    jsonBody = json.loads(body) 
-    print('jsonBody: ', jsonBody)    
-    timestr = jsonBody['timestr']
-    print('timestr: ', timestr)
-    
-    return timestr
-
-timestr = current_time('Seoul')
-print('timestr: ', timestr)
-    
 @tool
-def search_current_time(city: str) -> str:
+def get_current_time() -> str:
     """
-    Get current time and return it.
-    city: the english name of city to search
+    Get datetime string and return it.
     return: string of datetime
     """    
-    
-    print('city: ', city)
     
     function_name = "lambda-datetime-for-llm-agent"
     lambda_region = 'ap-northeast-2'
     
-    apiKey = api_key
-    lang = 'en' 
-    units = 'metric' 
-    api = f"https://api.openweathermap.org/data/2.5/weather?q={city}&APPID={apiKey}&lang={lang}&units={units}"
-    print('api: ', api)
-    
     try:
         lambda_client = get_lambda_client(region=lambda_region)
-        payload = {'city': city}
+        payload = {}
         print("Payload: ", payload)
             
         response = lambda_client.invoke(
@@ -454,7 +403,7 @@ def get_weather_info(city: str) -> str:
 
 
 def run_tool_calling_agent(connectionId, requestId, chat, query):
-    toolList = "search_current_time, get_product_list, get_weather_info"
+    toolList = "get_current_time, get_product_list, get_weather_info"
     # system = f"You are a helpful assistant. Make sure to use the {toolList} tools for information."
     system = f"다음의 Human과 Assistant의 친근한 이전 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다. 답변에 필요한 정보는 다움의 tools를 이용해 수집하세요. Tools: {toolList}"
             
@@ -469,7 +418,7 @@ def run_tool_calling_agent(connectionId, requestId, chat, query):
     print('prompt: ', prompt)
     
     # define tools
-    tools = [search_current_time, get_product_list, get_weather_info]
+    tools = [get_current_time, get_product_list, get_weather_info]
     
      # create agent
     agent = create_tool_calling_agent(chat, tools, prompt)
@@ -491,7 +440,7 @@ def run_tool_calling_agent(connectionId, requestId, chat, query):
     return output
 
 def run_tool_calling_agent_with_history(connectionId, requestId, chat, query):
-    toolList = "search_current_time, get_product_list, get_weather_info"
+    toolList = "get_current_time, get_product_list, get_weather_info"
     # system = f"You are a helpful assistant. Make sure to use the {toolList} tools for information."
     system = f"다음의 Human과 Assistant의 친근한 이전 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다. 답변에 필요한 정보는 다움의 tools를 이용해 수집하세요. Tools: {toolList}"
             
@@ -504,7 +453,7 @@ def run_tool_calling_agent_with_history(connectionId, requestId, chat, query):
         ]
     )
     # define tools
-    tools = [search_current_time, get_product_list, get_weather_info]
+    tools = [get_current_time, get_product_list, get_weather_info]
     
      # create agent
     agent = create_tool_calling_agent(chat, tools, prompt)
@@ -555,7 +504,7 @@ Thought:{agent_scratchpad}
 
 def run_agent_react(connectionId, requestId, chat, query):
     # define tools
-    tools = [search_current_time, get_product_list, get_weather_info]
+    tools = [get_current_time, get_product_list, get_weather_info]
     prompt_template = get_react_prompt_template()
     print('prompt_template: ', prompt_template)
     
@@ -582,7 +531,7 @@ def run_agent_react_chat(connectionId, requestId, chat, query):
     print('revised_question: ', revised_question)  
     
     # define tools
-    tools = [search_current_time, get_product_list, get_weather_info]
+    tools = [get_current_time, get_product_list, get_weather_info]
     
     # get template based on react 
     prompt_template = get_react_prompt_template()

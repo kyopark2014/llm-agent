@@ -514,7 +514,11 @@ Thought:{agent_scratchpad}
 def run_agent_react(connectionId, requestId, chat, query):
     # define tools
     tools = [get_system_time, get_product_list, get_weather_info]
-    prompt_template = get_react_prompt_template()
+    
+    #prompt_template = get_react_prompt_template()
+    
+    from langchain import hub
+    prompt_template = hub.pull("hwchase17/react")
     print('prompt_template: ', prompt_template)
     
      # create agent

@@ -343,6 +343,13 @@ def search_current_time(city: str) -> str:
     
     function_name = "lambda-datetime-for-llm-agent"
     lambda_region = 'ap-northeast-2'
+    
+    apiKey = api_key
+    lang = 'en' 
+    units = 'metric' 
+    api = f"https://api.openweathermap.org/data/2.5/weather?q={city}&APPID={apiKey}&lang={lang}&units={units}"
+    print('api: ', api)
+    
     try:
         lambda_client = get_lambda_client(region=lambda_region)
         payload = {'city': city}

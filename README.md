@@ -6,6 +6,10 @@
 
 LangChain의 [ReAct](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/react/)를 이용하여 Agent를 정의합니다.
 
+![image](https://github.com/kyopark2014/llm-agent/assets/52392004/4b2f79cc-6782-4c44-b594-1c5f22472dc7)
+
+![image](https://github.com/kyopark2014/llm-agent/assets/52392004/69ff3e46-ec3e-4ba1-9f10-380b31554f15)
+
 
 ## Tool calling agent
 

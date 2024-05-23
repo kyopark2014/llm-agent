@@ -16,6 +16,7 @@ RUN /var/lang/bin/python3 -m pip install unstructured
 RUN /var/lang/bin/python3 -m pip install anthropic
 RUN /var/lang/bin/python3 -m pip install python-pptx
 RUN /var/lang/bin/python3 -m pip install python-docx
+RUN /var/lang/bin/python3 -m pip install langchainhub
 
 RUN /var/lang/bin/python3 -m pip install botocore --upgrade
 RUN /var/lang/bin/python3 -m pip install boto3 --upgrade

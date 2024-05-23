@@ -518,6 +518,7 @@ def run_agent_react(connectionId, requestId, chat, query):
     print('prompt_template: ', prompt_template)
     
      # create agent
+    isTyping(connectionId, requestId)
     agent = create_react_agent(chat, tools, prompt_template)
     
     agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
@@ -547,6 +548,7 @@ def run_agent_react_chat(connectionId, requestId, chat, query):
     print('prompt_template: ', prompt_template)
     
     # create agent
+    isTyping(connectionId, requestId)
     agent = create_react_agent(chat, tools, prompt_template)
     
     agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)

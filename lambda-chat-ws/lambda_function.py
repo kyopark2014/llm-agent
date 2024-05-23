@@ -331,7 +331,7 @@ def get_lambda_client(region):
         region_name=region
     )
 
-def current_time() -> str:
+def current_time():
     """
     Get current time and return it.
     return: string of datetime
@@ -358,8 +358,10 @@ def current_time() -> str:
     print('payload: ', payload)
     body = json.load(payload)['body']
     print('body: ', body)
+    jsonBody = json.loads(body) 
+    print('jsonBody: ', jsonBody)
     
-    timestr = json.load(body)['timestr']
+    timestr = jsonBody['timestr']
     print('timestr: ', timestr)
     
     return timestr
@@ -368,7 +370,7 @@ print('timestr: ', timestr)
 
     
 @tool
-def get_current_time() -> str:
+def get_current_time():
     """
     Get current time and return it.
     return: string of datetime
@@ -391,14 +393,14 @@ def get_current_time() -> str:
         print("Couldn't invoke function %s.", function_name)
         raise
     
-    payload = response['Payload']
+    ayload = response['Payload']
     print('payload: ', payload)
     body = json.load(payload)['body']
     print('body: ', body)
+    jsonBody = json.loads(body) 
+    print('jsonBody: ', jsonBody)
     
-    timestr = body['timestr']
-    
-    # timestr = datetime.datetime.now(timezone('Asia/Seoul')).strftime(format)
+    timestr = jsonBody['timestr']
     print('timestr: ', timestr)
     
     return timestr

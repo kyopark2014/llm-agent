@@ -25,6 +25,7 @@ from langchain.agents import AgentExecutor, create_react_agent
 from bs4 import BeautifulSoup
 from langchain.prompts import PromptTemplate
 from langchain.agents import AgentExecutor, create_tool_calling_agent
+from pytz import timezone
 
 s3 = boto3.client('s3')
 s3_bucket = os.environ.get('s3_bucket') # bucket name
@@ -319,24 +320,26 @@ def get_product_list(keyword: str) -> list:
         prod_list = [
             {"title": prod.text.strip(), "link": prod.get("href")} for prod in prod_info
         ]
-        print('prod_list: ', prod_list)
-        
-        # return the first 5 products
         return prod_list[:5]
     else:
         return []
 
+@tool
+def get_current_time(format: str = "%Y-%m-%d %H:%M:%S"):
+    """Returns the current date and time in the specified format"""
+    
+    timestr = datetime.datetime.now(timezone('Asia/Seoul')).strftime(format)
+    # print('timestr:', timestr)
+    
+    # return the formatted time
+    return timestr
 
 def get_lambda_client(region):
     return boto3.client(
         service_name='lambda',
         region_name=region
     )
-
-import datetime
-from langchain.agents import tool
-
-@tool
+    
 def get_system_time() -> list:
     """
     retrive system time to earn the current date and time.
@@ -411,11 +414,11 @@ def get_weather_info(city: str) -> str:
 
 
 def run_tool_calling_agent(connectionId, requestId, chat, query):
-    # toolList = "get_system_time, get_product_list, get_weather_info"
+    # toolList = "get_current_time, get_product_list, get_weather_info"
     toolList = ", ".join((t.name for t in tools))
     
     system = f"You are a helpful assistant. Make sure to use the {toolList} tools for information."
-    # system = f"You are a helpful assistant. Make sure to use the get_system_time tool for information."
+    # system = f"You are a helpful assistant. Make sure to use the get_current_time tool for information."
     #system = f"다음의 Human과 Assistant의 친근한 이전 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다. 답변에 필요한 정보는 다움의 tools를 이용해 수집하세요. Tools: {toolList}"
             
     prompt = ChatPromptTemplate.from_messages(
@@ -429,7 +432,7 @@ def run_tool_calling_agent(connectionId, requestId, chat, query):
     print('prompt: ', prompt)
     
     # define tools
-    tools = [get_system_time, get_product_list, get_weather_info]
+    tools = [get_current_time, get_product_list, get_weather_info]
     
      # create agent
     agent = create_tool_calling_agent(chat, tools, prompt)
@@ -451,7 +454,7 @@ def run_tool_calling_agent(connectionId, requestId, chat, query):
     return output
 
 def run_tool_calling_agent_with_history(connectionId, requestId, chat, query):
-    toolList = "get_system_time, get_product_list, get_weather_info"
+    toolList = "get_current_time, get_product_list, get_weather_info"
     # system = f"You are a helpful assistant. Make sure to use the {toolList} tools for information."
     system = f"다음의 Human과 Assistant의 친근한 이전 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다. 답변에 필요한 정보는 다움의 tools를 이용해 수집하세요. Tools: {toolList}"
             
@@ -464,7 +467,7 @@ def run_tool_calling_agent_with_history(connectionId, requestId, chat, query):
         ]
     )
     # define tools
-    tools = [get_system_time, get_product_list, get_weather_info]
+    tools = [get_current_time, get_product_list, get_weather_info]
     
      # create agent
     agent = create_tool_calling_agent(chat, tools, prompt)
@@ -515,7 +518,7 @@ Thought:{agent_scratchpad}
 
 def run_agent_react(connectionId, requestId, chat, query):
     # define tools
-    tools = [get_system_time, get_product_list, get_weather_info]
+    tools = [get_current_time, get_product_list, get_weather_info]
     
     #prompt_template = get_react_prompt_template()
     
@@ -553,7 +556,7 @@ def run_agent_react_chat(connectionId, requestId, chat, query):
     print('revised_question: ', revised_question)  
     
     # define tools
-    tools = [get_system_time, get_product_list, get_weather_info]
+    tools = [get_current_time, get_product_list, get_weather_info]
     
     # get template based on react 
     prompt_template = get_react_prompt_template()

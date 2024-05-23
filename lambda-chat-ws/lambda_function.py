@@ -332,11 +332,14 @@ def get_lambda_client(region):
     )
     
 @tool
-def get_current_time():
+def get_current_time(city: str) -> str:
     """
     Get current time and return it.
+    city: the english name of city to search
     return: string of datetime
     """    
+    
+    print('city: ', city)
     
     function_name = "lambda-datetime-for-llm-agent"
     lambda_region = 'ap-northeast-2'

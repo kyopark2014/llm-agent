@@ -334,6 +334,14 @@ def get_lambda_client(region):
 @tool
 def get_system_time() -> str:
     """
+    현재의 시간을 전달합니다.
+    """ 
+    
+    return "2023-04-10 10:20:11"
+
+@tool
+def get_system_time2() -> str:
+    """
     retrive system time to earn the current date and time.
     return: a string of date and time
     """    

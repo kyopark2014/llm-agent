@@ -535,7 +535,7 @@ def run_agent_react(connectionId, requestId, chat, query):
         tools=tools, 
         verbose=True, 
         handle_parsing_errors=True,
-        max_iterations = 3  # default = 5
+        # max_iterations = 3  # default = 5
     )
     
     # run agent

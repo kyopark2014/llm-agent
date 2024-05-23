@@ -335,7 +335,7 @@ import datetime
 from langchain.agents import tool
 
 @tool
-def get_system_time() -> str:
+def get_system_time() -> list:
     """
     retrive system time to earn the current date and time.
     return: a string of date and time
@@ -368,7 +368,10 @@ def get_system_time() -> str:
     timestr = jsonBody['timestr']
     print('timestr: ', timestr)
     
-    return timestr
+    result = []
+    result.append(timestr)
+    
+    return result
 
 @tool
 def get_weather_info(city: str) -> str:

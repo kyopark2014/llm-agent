@@ -345,7 +345,7 @@ def get_current_time(city: str) -> str:
     lambda_region = 'ap-northeast-2'
     try:
         lambda_client = get_lambda_client(region=lambda_region)
-        payload = {}
+        payload = {'city': city}
         print("Payload: ", payload)
             
         response = lambda_client.invoke(

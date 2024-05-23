@@ -37,6 +37,8 @@ path = os.environ.get('path')
 doc_prefix = s3_prefix+'/'
 debugMessageMode = os.environ.get('debugMessageMode', 'false')
 
+agentMethod = os.environ.get('agentMethod')  # ToolCalling ReAct
+
 # api key to get weather information in agent
 secretsmanager = boto3.client('secretsmanager')
 try:
@@ -940,12 +942,16 @@ def getResponse(connectionId, jsonBody):
                 if convType == 'normal':      # normal
                     msg = general_conversation(connectionId, requestId, chat, text)                  
                 elif convType == 'agent-react':
-                    msg = run_tool_calling_agent(connectionId, requestId, chat, text)             
-                    # msg = run_agent_react(connectionId, requestId, chat, text)      
+                    if agentMethod == 'ReAct':
+                        msg = run_agent_react(connectionId, requestId, chat, text)      
+                    else:  # tool calling agent
+                        msg = run_tool_calling_agent(connectionId, requestId, chat, text)             
                     
-                elif convType == 'agent-react-chat':                    
-                    msg = run_tool_calling_agent_with_history(connectionId, requestId, chat, text)             
-                    # msg = run_agent_react_chat(connectionId, requestId, chat, text)
+                elif convType == 'agent-react-chat':         
+                    if agentMethod == 'ReAct':
+                        msg = run_agent_react_chat(connectionId, requestId, chat, text)
+                    else:  # tool calling agent
+                        msg = run_tool_calling_agent_with_history(connectionId, requestId, chat, text)             
                                         
                 elif convType == "translation":
                     msg = translate_text(chat, text) 

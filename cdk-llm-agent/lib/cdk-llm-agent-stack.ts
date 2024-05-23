@@ -24,6 +24,7 @@ const projectName = `llm-agent`;
 const bucketName = `storage-for-${projectName}-${accountId}-${region}`; 
 const bedrock_region = "us-east-1";  // "us-east-1" "us-west-2" 
 const debugMessageMode = 'true'; // if true, debug messages will be delivered to the client.
+const agentMethod = "ReAct" // ToolCalling ReAct
 
 export class CdkLlmAgentStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -436,7 +437,8 @@ export class CdkLlmAgentStack extends cdk.Stack {
         path: 'https://'+distribution.domainName+'/',   
         callLogTableName: callLogTableName,
         connection_url: connection_url,
-        debugMessageMode: debugMessageMode
+        debugMessageMode: debugMessageMode,
+        agentMethod: agentMethod
       }
     });     
     lambdaChatWebsocket.grantInvoke(new iam.ServicePrincipal('apigateway.amazonaws.com'));  

@@ -337,7 +337,7 @@ def current_time() -> str:
     return: string of datetime
     """    
     
-    function_name = "lambda-datetime"
+    function_name = "lambda-datetime-for-llm-agent"
     lambda_region = 'ap-northeast-2'
     try:
         lambda_client = get_lambda_client(region=lambda_region)

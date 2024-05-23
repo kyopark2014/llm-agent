@@ -354,11 +354,12 @@ def current_time() -> str:
         print("Couldn't invoke function %s.", function_name)
         raise
     
-    body = response['body']
+    payload = response['Payload']
+    print('payload: ', payload)
+    body = json.load(payload)['body']
     print('body: ', body)
-    timestr = json.load(body)['timestr']
     
-    # timestr = datetime.datetime.now(timezone('Asia/Seoul')).strftime(format)
+    timestr = json.load(body)['timestr']
     print('timestr: ', timestr)
     
     return timestr
@@ -390,8 +391,11 @@ def get_current_time() -> str:
         print("Couldn't invoke function %s.", function_name)
         raise
     
-    body = response['body']
+    payload = response['Payload']
+    print('payload: ', payload)
+    body = json.load(payload)['body']
     print('body: ', body)
+    
     timestr = json.load(body)['timestr']
     
     # timestr = datetime.datetime.now(timezone('Asia/Seoul')).strftime(format)

@@ -4,6 +4,7 @@
 
 ## Tool calling agent
 
+[Tool calling agent](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/tool_calling/)
 
 
 

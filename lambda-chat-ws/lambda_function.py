@@ -359,7 +359,7 @@ def current_time() -> str:
     body = json.load(payload)['body']
     print('body: ', body)
     
-    timestr = body['timestr']
+    timestr = json.load(body)['timestr']
     print('timestr: ', timestr)
     
     return timestr

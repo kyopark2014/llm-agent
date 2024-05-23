@@ -23,7 +23,6 @@ from langchain_aws import ChatBedrock
 from langchain.agents import tool
 from langchain.agents import AgentExecutor, create_react_agent
 from bs4 import BeautifulSoup
-from pytz import timezone
 from langchain.prompts import PromptTemplate
 from langchain.agents import AgentExecutor, create_tool_calling_agent
 
@@ -333,7 +332,7 @@ def get_lambda_client(region):
     )
     
 @tool
-def get_current_time(format: str = "%Y-%m-%d %H:%M:%S") -> str:
+def get_current_time() -> str:
     """
     Get current time and return it.
     return: string of datetime
@@ -356,7 +355,11 @@ def get_current_time(format: str = "%Y-%m-%d %H:%M:%S") -> str:
         print("Couldn't invoke function %s.", function_name)
         raise
     
-    timestr = datetime.datetime.now(timezone('Asia/Seoul')).strftime(format)
+    body = response['body']
+    print('body: ', body)
+    timestr = json.load(body)['timestr']   
+    
+    # timestr = datetime.datetime.now(timezone('Asia/Seoul')).strftime(format)
     print('timestr: ', timestr)
     
     return timestr

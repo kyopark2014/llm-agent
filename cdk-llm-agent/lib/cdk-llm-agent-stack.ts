@@ -382,6 +382,17 @@ export class CdkLlmAgentStack extends cdk.Stack {
         statements: [BedrockPolicy],
       }),
     );        
+    const lambdaInvokePolicy = new iam.PolicyStatement({ 
+      resources: ['*'],
+      actions: [
+        "lambda:InvokeFunction"
+      ],
+    });        
+    roleLambdaWebsocket.attachInlinePolicy( 
+      new iam.Policy(this, `lambda-invoke-policy-for-${projectName}`, {
+        statements: [lambdaInvokePolicy],
+      }),
+    );  
 
     const apiInvokePolicy = new iam.PolicyStatement({ 
       // resources: ['arn:aws:execute-api:*:*:*'],
@@ -535,7 +546,7 @@ export class CdkLlmAgentStack extends cdk.Stack {
     } */
 
     // role - datetime
-    const roleLambdaDateTime = new iam.Role(this, `role-datetime-ws-for-${projectName}`, {
+ /*   const roleLambdaDateTime = new iam.Role(this, `role-datetime-ws-for-${projectName}`, {
       roleName: `role-datetime-for-${projectName}-${region}`,
       assumedBy: new iam.CompositePrincipal(
         new iam.ServicePrincipal("lambda.amazonaws.com"),
@@ -555,7 +566,7 @@ export class CdkLlmAgentStack extends cdk.Stack {
       new iam.Policy(this, `lambda-invoke-policy-for-${projectName}`, {
         statements: [lambdaInvokePolicy],
       }),
-    );  
+    );  */
 
     // lambda - datetime
     const lambdaDateTime = new lambda.DockerImageFunction(this, `lambda-datetime-for-${projectName}`, {
@@ -563,7 +574,7 @@ export class CdkLlmAgentStack extends cdk.Stack {
       functionName: `lambda-datetime-for-${projectName}`,
       code: lambda.DockerImageCode.fromImageAsset(path.join(__dirname, '../../lambda-datetime')),
       timeout: cdk.Duration.seconds(30),
-      role: roleLambdaDateTime,
+      // role: roleLambdaDateTime,
       environment: {
       }
     });     

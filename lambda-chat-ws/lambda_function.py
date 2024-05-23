@@ -359,7 +359,7 @@ def current_time() -> str:
     body = json.load(payload)['body']
     print('body: ', body)
     
-    timestr = json.load(body)['timestr']
+    timestr = body['timestr']
     print('timestr: ', timestr)
     
     return timestr
@@ -396,7 +396,7 @@ def get_current_time() -> str:
     body = json.load(payload)['body']
     print('body: ', body)
     
-    timestr = json.load(body)['timestr']
+    timestr = body['timestr']
     
     # timestr = datetime.datetime.now(timezone('Asia/Seoul')).strftime(format)
     print('timestr: ', timestr)

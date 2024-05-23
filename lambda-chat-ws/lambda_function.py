@@ -335,29 +335,7 @@ import datetime
 from langchain.agents import tool
 
 @tool
-def get_travel_time() -> str:
-    """Returns the travel date and time in the specified format"""
-
-    format: str = "%Y-%m-%d %H:%M:%S"
-    # get the current date and time
-    current_time = datetime.datetime.now()
-    
-    # format the time as a string in the format "YYYY-MM-DD HH:MM:SS"
-    formatted_time = current_time.strftime(format)
-    
-    # return the formatted time
-    return formatted_time
-
-@tool
-def get_travel_time3() -> str:
-    """
-    현재의 시간을 전달합니다.
-    """ 
-    
-    return "2023-04-10 10:20:11"
-
-@tool
-def get_travel_time2() -> str:
+def get_system_time() -> str:
     """
     retrive system time to earn the current date and time.
     return: a string of date and time
@@ -428,7 +406,7 @@ def get_weather_info(city: str) -> str:
 
 
 def run_tool_calling_agent(connectionId, requestId, chat, query):
-    toolList = "get_travel_time, get_product_list, get_weather_info"
+    toolList = "get_system_time, get_product_list, get_weather_info"
     # system = f"You are a helpful assistant. Make sure to use the {toolList} tools for information."
     system = f"다음의 Human과 Assistant의 친근한 이전 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다. 답변에 필요한 정보는 다움의 tools를 이용해 수집하세요. Tools: {toolList}"
             
@@ -443,7 +421,7 @@ def run_tool_calling_agent(connectionId, requestId, chat, query):
     print('prompt: ', prompt)
     
     # define tools
-    tools = [get_travel_time, get_product_list, get_weather_info]
+    tools = [get_system_time, get_product_list, get_weather_info]
     
      # create agent
     agent = create_tool_calling_agent(chat, tools, prompt)
@@ -465,7 +443,7 @@ def run_tool_calling_agent(connectionId, requestId, chat, query):
     return output
 
 def run_tool_calling_agent_with_history(connectionId, requestId, chat, query):
-    toolList = "get_travel_time, get_product_list, get_weather_info"
+    toolList = "get_system_time, get_product_list, get_weather_info"
     # system = f"You are a helpful assistant. Make sure to use the {toolList} tools for information."
     system = f"다음의 Human과 Assistant의 친근한 이전 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다. 답변에 필요한 정보는 다움의 tools를 이용해 수집하세요. Tools: {toolList}"
             
@@ -478,7 +456,7 @@ def run_tool_calling_agent_with_history(connectionId, requestId, chat, query):
         ]
     )
     # define tools
-    tools = [get_travel_time, get_product_list, get_weather_info]
+    tools = [get_system_time, get_product_list, get_weather_info]
     
      # create agent
     agent = create_tool_calling_agent(chat, tools, prompt)
@@ -529,7 +507,7 @@ Thought:{agent_scratchpad}
 
 def run_agent_react(connectionId, requestId, chat, query):
     # define tools
-    tools = [get_travel_time, get_product_list, get_weather_info]
+    tools = [get_system_time, get_product_list, get_weather_info]
     prompt_template = get_react_prompt_template()
     print('prompt_template: ', prompt_template)
     
@@ -556,7 +534,7 @@ def run_agent_react_chat(connectionId, requestId, chat, query):
     print('revised_question: ', revised_question)  
     
     # define tools
-    tools = [get_travel_time, get_product_list, get_weather_info]
+    tools = [get_system_time, get_product_list, get_weather_info]
     
     # get template based on react 
     prompt_template = get_react_prompt_template()

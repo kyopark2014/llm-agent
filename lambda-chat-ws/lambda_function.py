@@ -507,6 +507,8 @@ Final Answer: the final answer to the original input question
 
 Begin!
 
+Always answer in Korean.
+
 Question: {input}
 Thought:{agent_scratchpad}
 """)

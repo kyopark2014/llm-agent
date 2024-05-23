@@ -411,9 +411,11 @@ def get_weather_info(city: str) -> str:
 
 
 def run_tool_calling_agent(connectionId, requestId, chat, query):
-    toolList = "get_system_time, get_product_list, get_weather_info"
-    #system = f"You are a helpful assistant. Make sure to use the {toolList} tools for information."
-    system = f"You are a helpful assistant. Make sure to use the get_system_time tool for information."
+    # toolList = "get_system_time, get_product_list, get_weather_info"
+    toolList = ", ".join((t.name for t in tools))
+    
+    system = f"You are a helpful assistant. Make sure to use the {toolList} tools for information."
+    # system = f"You are a helpful assistant. Make sure to use the get_system_time tool for information."
     #system = f"다음의 Human과 Assistant의 친근한 이전 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다. 답변에 필요한 정보는 다움의 tools를 이용해 수집하세요. Tools: {toolList}"
             
     prompt = ChatPromptTemplate.from_messages(
@@ -421,7 +423,7 @@ def run_tool_calling_agent(connectionId, requestId, chat, query):
             ("system",system),
             # ("placeholder", "{chat_history}"),
             ("human", "{input}"),
-            ("placeholder", "{agent_scratchpad}"),
+            ("placeholder", "{agent_scratchpad}"), 
         ]
     )
     print('prompt: ', prompt)
@@ -525,7 +527,13 @@ def run_agent_react(connectionId, requestId, chat, query):
     isTyping(connectionId, requestId)
     agent = create_react_agent(chat, tools, prompt_template)
     
-    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
+    agent_executor = AgentExecutor(
+        agent=agent, 
+        tools=tools, 
+        verbose=True, 
+        handle_parsing_errors=True,
+        max_iterations = 3  # default = 5
+    )
     
     # run agent
     response = agent_executor.invoke({"input": query})

@@ -510,10 +510,10 @@ Final Answer: the final answer to the original input question
 
 Begin!
 
-Answer the Final Answer in Korean.
-
 Question: {input}
 Thought:{agent_scratchpad}
+
+Only the final answer should be Korean.
 """)
 
 def run_agent_react(connectionId, requestId, chat, query):

@@ -330,6 +330,48 @@ def get_lambda_client(region):
         service_name='lambda',
         region_name=region
     )
+
+def current_time(city: str) -> str:
+    """
+    Get current time and return it.
+    city: the english name of city to search
+    return: string of datetime
+    """    
+    
+    print('city: ', city)
+    
+    function_name = "lambda-datetime-for-llm-agent"
+    lambda_region = 'ap-northeast-2'
+    
+    
+    try:
+        lambda_client = get_lambda_client(region=lambda_region)
+        payload = {'city': city}
+        print("Payload: ", payload)
+            
+        response = lambda_client.invoke(
+            FunctionName=function_name,
+            Payload=json.dumps(payload),
+        )
+        print("Invoked function %s.", function_name)
+        print("Response: ", response)
+    except ClientError:
+        print("Couldn't invoke function %s.", function_name)
+        raise
+    
+    payload = response['Payload']
+    print('payload: ', payload)
+    body = json.load(payload)['body']
+    print('body: ', body)
+    jsonBody = json.loads(body) 
+    print('jsonBody: ', jsonBody)    
+    timestr = jsonBody['timestr']
+    print('timestr: ', timestr)
+    
+    return timestr
+
+timestr = current_time('Seoul')
+print('timestr: ', timestr)
     
 @tool
 def search_current_time(city: str) -> str:

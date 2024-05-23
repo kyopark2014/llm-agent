@@ -331,8 +331,24 @@ def get_lambda_client(region):
         region_name=region
     )
 
+import datetime
+from langchain.agents import tool
+
 @tool
-def get_system_time() -> str:
+def get_system_time(format: str = "%Y-%m-%d %H:%M:%S"):
+    """Returns the current date and time in the specified format"""
+
+    # get the current date and time
+    current_time = datetime.datetime.now()
+    
+    # format the time as a string in the format "YYYY-MM-DD HH:MM:SS"
+    formatted_time = current_time.strftime(format)
+    
+    # return the formatted time
+    return formatted_time
+
+@tool
+def get_system_time3() -> str:
     """
     현재의 시간을 전달합니다.
     """ 

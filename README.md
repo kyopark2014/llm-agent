@@ -12,6 +12,10 @@ LangChain의 [ReAct](https://python.langchain.com/v0.1/docs/modules/agents/agent
 [Tool calling agent](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/tool_calling/)
 
 
+- [Chat models](https://python.langchain.com/v0.1/docs/integrations/chat/)에서는 BedrockChat만 있고 미지원으로 표시가 되어 있습니다.
+- ChatBedrock으로 테스트시에 Tool Calling은 아래와 같이 응답을 얻지 못하므로 현재 미지원이나 향후 지원이 예상됩니다.
+
+![image](https://github.com/kyopark2014/llm-agent/assets/52392004/86364b1b-0f52-4faa-b370-dd6660d4974f)
 
 
 

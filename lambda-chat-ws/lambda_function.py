@@ -325,14 +325,12 @@ def get_product_list(keyword: str) -> list:
         return []
 
 @tool
-def get_current_time() -> str:
+def get_current_time(format: str = "%Y-%m-%d %H:%M:%S") -> str:
     """
     Get current time and return it.
     return: string of datetime
     """    
     
-    #format: str = f"%Y-%m-%d %H:%M:%S"
-    format: str = f"%Y년 %m월 %d일 %H시 %M분 %S초"
     timestr = datetime.datetime.now(timezone('Asia/Seoul')).strftime(format)
     print('timestr: ', timestr)
     

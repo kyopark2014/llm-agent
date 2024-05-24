@@ -428,8 +428,9 @@ export class CdkLlmAgentStack extends cdk.Stack {
       secretName: 'langsmithapikey',
       generateSecretString: {
         secretStringTemplate: JSON.stringify({ 
-          api_key: ''
-        })
+          langchain_project: "agent-"+projectName
+        }),
+        generateStringKey: 'api_key'
       },
     });
     langsmithApiSecret.grantRead(roleLambdaWebsocket) 
@@ -449,9 +450,7 @@ export class CdkLlmAgentStack extends cdk.Stack {
         path: 'https://'+distribution.domainName+'/',   
         callLogTableName: callLogTableName,
         connection_url: connection_url,
-        debugMessageMode: debugMessageMode,
-        LANGCHAIN_TRACING_V2: "true",
-        langchain_project: "agent-"+projectName
+        debugMessageMode: debugMessageMode        
       }
     });     
     lambdaChatWebsocket.grantInvoke(new iam.ServicePrincipal('apigateway.amazonaws.com'));  

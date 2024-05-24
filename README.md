@@ -48,6 +48,13 @@ Thought -> Action (Search) -> Observation -> Thought - Action (Search) -> Observ
 <img width="849" alt="image" src="https://github.com/kyopark2014/llm-agent/assets/52392004/e62b4654-ba18-40e6-86ae-2152b241aa04">
 
 
+- "서울과 부산의 날씨를 알려줘"와 같이 서울과 부산의 결과를 모두 기대하고 입력시에 아래와 같은 결과를 얻습니다. 
+
+<img width="848" alt="image" src="https://github.com/kyopark2014/llm-agent/assets/52392004/7b5c4993-1178-442d-9fb0-ddaff6b7ab09">
+
+이때의 LangSmith의 로그를 확인하면 서울과 부산과 대한 검색후 결과를 생성하였습니다.
+
+![image](https://github.com/kyopark2014/llm-agent/assets/52392004/38334666-c71d-4076-9be1-eb8fc16a34f5)
 
 
 ### Tool calling agent

@@ -430,7 +430,8 @@ export class CdkLlmAgentStack extends cdk.Stack {
         secretStringTemplate: JSON.stringify({ 
           langchain_project: "agent-"+projectName
         }),
-        generateStringKey: 'api_key'
+        generateStringKey: 'api_key',
+        excludeCharacters: '/@"',
       },
     });
     langsmithApiSecret.grantRead(roleLambdaWebsocket) 

@@ -16,4 +16,4 @@ export LANGCHAIN_PROJECT=<project-name>
 
 #### Lambda에서 LangSmith를 사용하기 위한 설정
 
-[Secrets manager console](https://ap-northeast-2.console.aws.amazon.com/secretsmanager/listsecrets?region=ap-northeast-2)에서 langsmithapikey을 선택한 후에, [Secret value]에서 [Retrieve secret value]을 선택한 후에 api_key에 적절한 key를 입력합니다.
+[Secrets manager console](https://ap-northeast-2.console.aws.amazon.com/secretsmanager/listsecrets?region=ap-northeast-2)에서 langsmithapikey을 선택한 후에, [Secret value]에서 [Retrieve secret value]을 선택한 후에 api_key에 적절한 key를 입력합니다. LangSmith의 api key는 [LangSmith](https://www.langchain.com/langsmith)에서 발급 받습니다.

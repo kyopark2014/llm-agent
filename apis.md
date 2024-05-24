@@ -157,27 +157,3 @@ search.run('langchain의 agent는 무엇이야?')
 ```text
 '"Olivia Wilde의 남자 친구인 Harry Styles는 29 세이고, 그의 나이에 0.23 거듭제곱한 값은 2.169459462491557 이야." 이 예제는 LangChain 문서\xa0... Jul 16, 2023 ... Langchain 이란? Langchain은 language model 기반의 ... 사실 간단한 챗이야 ... AgentType 을 보면 감이 오시겠지만, 우리는 다양한 종류의 Agent를\xa0... Agent 활용에서는 LangChain의 ReAct Agent를 정의합니다. ... "엔씨의 Lex 서비스는 무엇인지 설명해줘."와 같이 ... 메뉴에서 "Timestamp Extraction"을 선택하고, "지금은\xa0... Aug 16, 2023 ... ... 의 답변을 받을 수는 있어도 상세한 정보를 얻을 수는 없다. 이러한 한계를 극복하기 위해 LangChain에서는 검색을 통해 언어모델에 지식을 보완하는\xa0... Jul 3, 2023 ... 현재 LangChain에서 사용되는 에이전트 체인은 사용자와 AI의 요청과 응답으로 구성된 구성된 프롬프트 처리를 지원하지 않습니다. 우리는 주로 이를 모델\xa0...'
 ```
-
-### Lambda Agent
-
-[LangChain Agent - AWS Lambda](https://python.langchain.com/v0.1/docs/integrations/tools/awslambda/)를 참조합니다.
-
-```python
-from langchain.agents import AgentType, initialize_agent, load_tools
-from langchain_openai import OpenAI
-
-llm = OpenAI(temperature=0)
-
-tools = load_tools(
-    ["awslambda"],
-    awslambda_tool_name="email-sender",
-    awslambda_tool_description="sends an email with the specified content to test@testing123.com",
-    function_name="testFunction1",
-)
-
-agent = initialize_agent(
-    tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True
-)
-
-agent.run("Send an email to test@testing123.com saying hello world.")
-```

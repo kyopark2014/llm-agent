@@ -37,42 +37,7 @@ Thought: I now know the final answer.
 Final Answer: Joe Biden is the United States President and his current age raised divided by 2 is 40.
 ```
 
-
-[hello-langchain-6.py](https://github.com/chrishayuk/how-react-agents-work/blob/main/hello-langchain-6.py)
-
-
-아래와 같이 Agent를 ReAct로 정의합니다. 결과는 아래와 같이 stream으로 출력합니다.
-
-```python
-from langchain.agents import AgentExecutor, create_react_agent
-
-def use_agent(connectionId, requestId, chat, query):
-    tools = [check_system_time, get_product_list]
-    prompt_template = get_react_prompt_template()
-    print('prompt_template: ', prompt_template)
-    
-    agent = create_react_agent(chat, tools, prompt_template)
-    
-    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
-    
-    response = agent_executor.invoke({"input": query})
-    print('response: ', response)
-    
-    msg = readStreamMsg(connectionId, requestId, response['output'])
-
-    msg = response['output']
-    print('msg: ', msg)
-            
-    return msg
-```
-
-
-
-## Prompt
-
-[Agent Concept](https://python.langchain.com/v0.1/docs/modules/agents/concepts/)을 참조합니다.
-
-### ReAct
+### ReAct의 구현
 
 [Reasoning and Action의 약자](https://blog.kubwa.co.kr/%EB%85%BC%EB%AC%B8%EB%A6%AC%EB%B7%B0-%EB%9E%AD%EC%B2%B4%EC%9D%B8%EA%B4%80%EB%A0%A8-%EB%85%BC%EB%AC%B8-react-synergizing-reasoning-and-acting-in-language-models-%EA%B0%84%EB%8B%A8%ED%95%9C-%EC%8B%A4%EC%8A%B5-w-pytorch-dd31321ead00)로서, reasoning trace는 CoT(Chain of Thought)을 기초로 하고, Reasoning과 action을 반복적으로 수행하면서 환각(Hallucination)과 에러 전파(error properation)을 줄일 수 있습니다. 이를 통해 사람처럼 task를 푸는 것(human like task solving trajectory)을 가능하게 합니다.
 
@@ -183,9 +148,7 @@ def run_agent_react(connectionId, requestId, chat, query):
     return msg
 ```
 
-
-
-### ReAct Chat
+### ReAct Chat의 구현
 
 [react-chat](https://smith.langchain.com/hub/hwchase17/react-chat)을 이용하여 채팅이력이 포함된 ReAct Agent를 정의할 수 있습니다.
 

@@ -1,5 +1,34 @@
 # ReAct
 
+## 동작 방식
+
+아래와 같은 질문이 있을때 결과는 [아래와 같은 순서](https://github.com/samwit/langchain-tutorials/blob/main/agents/YT_LangChain_Agents.ipynb)로 처리 됩니다. 
+
+```text
+agent.run("Who is the United States President? What is his current age raised divided by 2?")
+```
+
+이때의 실행 결과는 아래와 같습니다.
+
+```text
+> Entering new AgentExecutor chain...
+ I need to find out who the President is and then do some math.
+Action: Search
+Action Input: "United States President"
+Observation: Joe Biden
+Thought: I now need to find out Joe Biden's age.
+Action: Search
+Action Input: "Joe Biden age"
+Observation: 80 years
+Thought: I now need to divide Joe Biden's age by 2.
+Action: Calculator
+Action Input: 80/2
+Observation: Answer: 40
+Thought: I now know the final answer.
+Final Answer: Joe Biden is the United States President and his current age raised divided by 2 is 40.
+```
+
+
 [hello-langchain-6.py](https://github.com/chrishayuk/how-react-agents-work/blob/main/hello-langchain-6.py)
 
 

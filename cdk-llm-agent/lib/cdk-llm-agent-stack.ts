@@ -440,7 +440,7 @@ export class CdkLlmAgentStack extends cdk.Stack {
         debugMessageMode: debugMessageMode,
         LANGCHAIN_TRACING_V2: "true",
         langsmith_api_key: "",
-        LANGCHAIN_PROJECT: "agent-"+projectName
+        langchain_project: "agent-"+projectName
       }
     });     
     lambdaChatWebsocket.grantInvoke(new iam.ServicePrincipal('apigateway.amazonaws.com'));  

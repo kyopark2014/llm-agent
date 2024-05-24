@@ -40,9 +40,12 @@ debugMessageMode = os.environ.get('debugMessageMode', 'false')
 agentLangMode = 'kor'
 
 langsmith_api_key = os.environ.get('langsmith_api_key')
+langchain_project = os.environ.get('langchain_project')
 print('langsmith_api_key: ', langsmith_api_key)
 if langsmith_api_key:
     os.environ["LANGCHAIN_API_KEY"] = langsmith_api_key
+    os.environ["LANGCHAIN_TRACING_V2"] = "true"
+    os.environ["LANGCHAIN_PROJECT"] = langchain_project
 
 # api key to get weather information in agent
 secretsmanager = boto3.client('secretsmanager')

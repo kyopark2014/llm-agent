@@ -414,10 +414,13 @@ def get_weather_info(city: str) -> str:
     city = city.replace('\'','')
                 
     if isKorean(city):
-        place = traslation_to_english(chat, city)
+        place = traslation(chat, city, "Korean", "English")
         print('city (translated): ', place)
     else:
         place = city
+        city = traslation(chat, city, "English", "Korean")
+        print('city (translated): ', place)
+        
     print('place: ', place)
     
     apiKey = weather_api_key
@@ -542,62 +545,6 @@ def run_agent_react(connectionId, requestId, chat, query):
             
     return msg
 
-def run_agent_react_chat_history(connectionId, requestId, chat, query):
-    # revise question
-    revised_question = revise_question(connectionId, requestId, chat, query)     
-    print('revised_question: ', revised_question)  
-        
-    # get template based on react 
-    prompt_template = get_react_prompt_template(agentLangMode)
-    print('prompt_template: ', prompt_template)
-    
-    # create agent
-    isTyping(connectionId, requestId)
-    agent = create_react_agent(chat, tools, prompt_template)
-    
-    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
-    
-    # run agent
-    response = agent_executor.invoke({"input": revised_question})
-    print('response: ', response)
-    
-    # streaming
-    msg = readStreamMsg(connectionId, requestId, response['output'])
-
-    msg = response['output']
-    print('msg: ', msg)
-            
-    return msg
-
-def run_agent_react_chat(connectionId, requestId, chat, query):
-    # get template based on react 
-    prompt_template = get_react_chat_prompt_template()
-    print('prompt_template: ', prompt_template)
-    
-    # create agent
-    isTyping(connectionId, requestId)
-    agent = create_react_agent(chat, tools, prompt_template)
-    
-    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
-    
-    history = memory_chain.load_memory_variables({})["chat_history"]
-    print('memory_chain: ', history)
-    
-    # run agent
-    response = agent_executor.invoke({
-        "input": query,
-        "chat_history": history
-    })
-    print('response: ', response)
-    
-    # streaming
-    msg = readStreamMsg(connectionId, requestId, response['output'])
-
-    msg = response['output']
-    print('msg: ', msg)
-            
-    return msg
-
 def get_react_chat_prompt_template():
     # Get the react prompt template
 
@@ -633,6 +580,62 @@ Previous conversation history:
 New input: {input}
 Thought:{agent_scratchpad}
 """)
+    
+def run_agent_react_chat(connectionId, requestId, chat, query):
+    # get template based on react 
+    prompt_template = get_react_chat_prompt_template()
+    print('prompt_template: ', prompt_template)
+    
+    # create agent
+    isTyping(connectionId, requestId)
+    agent = create_react_agent(chat, tools, prompt_template)
+    
+    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
+    
+    history = memory_chain.load_memory_variables({})["chat_history"]
+    print('memory_chain: ', history)
+    
+    # run agent
+    response = agent_executor.invoke({
+        "input": query,
+        "chat_history": history
+    })
+    print('response: ', response)
+    
+    # streaming
+    msg = readStreamMsg(connectionId, requestId, response['output'])
+
+    msg = response['output']
+    print('msg: ', msg)
+            
+    return msg
+
+def run_agent_react_chat_using_revised_question(connectionId, requestId, chat, query):
+    # revise question
+    revised_question = revise_question(connectionId, requestId, chat, query)     
+    print('revised_question: ', revised_question)  
+        
+    # get template based on react 
+    prompt_template = get_react_prompt_template(agentLangMode)
+    print('prompt_template: ', prompt_template)
+    
+    # create agent
+    isTyping(connectionId, requestId)
+    agent = create_react_agent(chat, tools, prompt_template)
+    
+    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
+    
+    # run agent
+    response = agent_executor.invoke({"input": revised_question})
+    print('response: ', response)
+    
+    # streaming
+    msg = readStreamMsg(connectionId, requestId, response['output'])
+
+    msg = response['output']
+    print('msg: ', msg)
+            
+    return msg
 
 def run_agent_tool_calling(connectionId, requestId, chat, query):
     # toolList = "get_current_time, get_product_list, get_weather_info"
@@ -708,10 +711,9 @@ def run_agent_tool_calling_chat(connectionId, requestId, chat, query):
             
     return output
 
-def traslation_to_english(chat, text):
-    input_language = "Korean"
-    output_language = "English"
-        
+#input_language = "Korean"
+#output_language = "English"
+def traslation(chat, text, input_language, output_language):
     system = (
         "You are a helpful assistant that translates {input_language} to {output_language} in <article> tags. Put it in <result> tags."
     )

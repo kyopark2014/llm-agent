@@ -1,8 +1,10 @@
 # ReAct
 
-[ReAct Prompting](https://www.promptingguide.ai/techniques/react)와 같이 ReAct는 reasoning traces와 task-specific actions을 교차 배열하는 방식(interleaved manner)으로 동작합니다.
+[ReAct Prompting](https://www.promptingguide.ai/techniques/react)와 같이 ReAct는 reasoning traces와 task-specific actions을 교차 배열하는 방식(interleaved manner)으로 동작합니다. 
 
 ## 동작 방식
+
+[ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629)에서는 LLM에게 단계별로 추론 흔적(reseoning traces)과 작업별 조치들(task-specific actions)을 생성하도록 요청하면 작업 수행 능력이 향상된다(the use of LLMs to generate both reasoning traces and task-specific actions in an interleaved manner) 라고 설명하고 있습니다.
 
 아래와 같은 질문이 있을때 결과는 [아래와 같은 순서](https://github.com/samwit/langchain-tutorials/blob/main/agents/YT_LangChain_Agents.ipynb)로 처리 됩니다. 
 

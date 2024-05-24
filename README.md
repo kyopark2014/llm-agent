@@ -43,7 +43,9 @@ ReAct에 대한 자세한 내용은 [ReAct.md](./ReAct.md)을 참조합니다.
 ![image](https://github.com/kyopark2014/llm-agent/assets/52392004/86364b1b-0f52-4faa-b370-dd6660d4974f)
 
 
+## 외부 API 
 
+[apis.md](./apis.md)에서는 도서 검색, 날씨, 시간과 같은 유용한 검색 API에 대해 설명하고 있습니다.
 
 
 

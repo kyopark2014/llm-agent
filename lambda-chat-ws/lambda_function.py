@@ -85,7 +85,7 @@ def initiate_chat():
                 "max_tokens":1024,
                 "temperature":0.3,
                 "top_k":250,
-                "top_p": 0.7,
+                "top_p": 0.9,
                 "stop_sequences": [HUMAN_PROMPT]            
             }
     parameters = get_parameter(modelId)
@@ -648,7 +648,7 @@ def traslation_to_english(chat, text):
     human = "<article>{text}</article>"
     
     prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
-    print('prompt: ', prompt)
+    # print('prompt: ', prompt)
     
     chain = prompt | chat    
     try: 
@@ -661,7 +661,7 @@ def traslation_to_english(chat, text):
         )
         
         msg = result.content
-        # print('translated text: ', msg)
+        print('translated text: ', msg)
     except Exception:
         err_msg = traceback.format_exc()
         print('error message: ', err_msg)                    

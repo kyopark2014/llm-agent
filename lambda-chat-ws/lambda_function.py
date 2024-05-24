@@ -430,20 +430,21 @@ def get_weather_info(city: str) -> str:
     weather_str: str = ""
     try:
         result = requests.get(api)
-        result = json.loads(result.text)        
+        result = json.loads(result.text)
         print('result: ', result)
     
-        overall = result['weather'][0]['main']
-        current_temp = result['main']['temp']
-        min_temp = result['main']['temp_min']
-        max_temp = result['main']['temp_max']
-        humidity = result['main']['humidity']
-        wind_speed = result['wind']['speed']
-        cloud = result['clouds']['all']
-        
-        city_str = city.replace('\n','')
-        weather_str = f"{city_str}의 현재 날씨의 특징은 {overall}이며, 현재 온도는 {current_temp}도 이고, 최저온도는 {min_temp}도, 최고 온도는 {max_temp}도 입니다. 현재 습도는 {humidity}% 이고, 바람은 초당 {wind_speed} 미터 입니다. 구름은 {cloud}% 입니다."
-        #weather_str = f"Today, the overall of {city} is {overall}, current temperature is {current_temp} degree, min temperature is {min_temp} degree, highest temperature is {max_temp} degree. huminity is {humidity}%, wind status is {wind_speed} meter per second. the amount of cloud is {cloud}%."            
+        if 'weather' in result:
+            overall = result['weather'][0]['main']
+            current_temp = result['main']['temp']
+            min_temp = result['main']['temp_min']
+            max_temp = result['main']['temp_max']
+            humidity = result['main']['humidity']
+            wind_speed = result['wind']['speed']
+            cloud = result['clouds']['all']
+            
+            city_str = city.replace('\n','')
+            weather_str = f"{city_str}의 현재 날씨의 특징은 {overall}이며, 현재 온도는 {current_temp}도 이고, 최저온도는 {min_temp}도, 최고 온도는 {max_temp}도 입니다. 현재 습도는 {humidity}% 이고, 바람은 초당 {wind_speed} 미터 입니다. 구름은 {cloud}% 입니다."
+            #weather_str = f"Today, the overall of {city} is {overall}, current temperature is {current_temp} degree, min temperature is {min_temp} degree, highest temperature is {max_temp} degree. huminity is {humidity}%, wind status is {wind_speed} meter per second. the amount of cloud is {cloud}%."            
     except Exception:
         err_msg = traceback.format_exc()
         print('error message: ', err_msg)                    

@@ -82,10 +82,10 @@ def initiate_chat():
             }
         elif modelId[:9] == 'anthropic':
             return {
-                "max_tokens":1024,
-                "temperature":0.3,
+                "max_tokens":4096,
+                "temperature":0.1,
                 "top_k":250,
-                "top_p": 0.9,
+                "top_p": 0.7,
                 "stop_sequences": [HUMAN_PROMPT]            
             }
     parameters = get_parameter(modelId)

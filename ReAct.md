@@ -1,5 +1,7 @@
 # ReAct
 
+[ReAct Prompting](https://www.promptingguide.ai/techniques/react)와 같이 ReAct는 reasoning traces와 task-specific actions을 교차 배열하는 방식(interleaved manner)으로 동작합니다.
+
 ## 동작 방식
 
 아래와 같은 질문이 있을때 결과는 [아래와 같은 순서](https://github.com/samwit/langchain-tutorials/blob/main/agents/YT_LangChain_Agents.ipynb)로 처리 됩니다. 

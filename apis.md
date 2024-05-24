@@ -1,6 +1,6 @@
 # Agent
 
-## 외부 검색 API 
+## API 예제
 
 ### 도서 정보 가져오기
 
@@ -11,26 +11,93 @@ from langchain.agents import tool
 import requests
 from bs4 import BeautifulSoup
 
-@tool
-def get_product_list(keyword: str) -> list:
+@tool 
+def get_product_list(keyword: str) -> str:
     """
     Search product list by keyword and then return product list
     keyword: search keyword
     return: product list
     """
 
+    answer = ""
     url = f"https://search.kyobobook.co.kr/search?keyword={keyword}&gbCode=TOT&target=total"
     response = requests.get(url)
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, "html.parser")
         prod_info = soup.find_all("a", attrs={"class": "prod_info"})
-        prod_list = [
-            {"title": prod.text.strip(), "link": prod.get("href")} for prod in prod_info
-        ]
-        return prod_list[:5]
-    else:
-        return []
+        
+        if len(prod_info):
+            answer = "추천 도서는 아래와 같습니다.\n"
+            
+        for prod in prod_info[:5]:
+            # \n문자를 replace합니다.
+            title = prod.text.strip().replace("\n", "")       
+            link = prod.get("href")
+            answer = answer + f"{title}, URL: {link}\n"
+    
+    return answer
 ```
+
+### 날짜와 시간 정보 가져오기
+
+```python
+@tool
+def get_current_time(format: str = "%Y-%m-%d %H:%M:%S")->str:
+    """Returns the current date and time in the specified format"""
+    
+    timestr = datetime.datetime.now(timezone('Asia/Seoul')).strftime(format)
+    # print('timestr:', timestr)
+    
+    return timestr
+```
+
+### 날씨 정보 가져오기
+
+```python
+@tool
+def get_weather_info(city: str) -> str:
+    """
+    Search weather information by city name and then return weather statement.
+    city: the english name of city to search
+    return: weather statement
+    """    
+    
+    city = city.replace('\n','')
+    city = city.replace('\'','')
+                
+    if isKorean(city):
+        place = traslation_to_english(chat, city)
+        print('city (translated): ', place)
+    else:
+        place = city
+    
+    apiKey = weather_api_key
+    lang = 'en' 
+    units = 'metric' 
+    api = f"https://api.openweathermap.org/data/2.5/weather?q={place}&APPID={apiKey}&lang={lang}&units={units}"
+    
+    weather_str: str = f"{city}에 대한 날씨 정보가 없습니다."
+            
+    try:
+        result = requests.get(api)
+        result = json.loads(result.text)
+    
+        if 'weather' in result:
+            overall = result['weather'][0]['main']
+            current_temp = result['main']['temp']
+            min_temp = result['main']['temp_min']
+            max_temp = result['main']['temp_max']
+            humidity = result['main']['humidity']
+            wind_speed = result['wind']['speed']
+            cloud = result['clouds']['all']
+            
+            weather_str = f"{city}의 현재 날씨의 특징은 {overall}이며, 현재 온도는 {current_temp}도 이고, 최저온도는 {min_temp}도, 최고 온도는 {max_temp}도 입니다. 현재 습도는 {humidity}% 이고, 바람은 초당 {wind_speed} 미터 입니다. 구름은 {cloud}% 입니다."
+    except Exception:
+        err_msg = traceback.format_exc()
+        print('error message: ', err_msg)                    
+    
+    return weather_str
+
 
 ### Lambda Agent
 

@@ -62,7 +62,7 @@ try:
     #print('get_langsmith_api_secret: ', get_langsmith_api_secret)
     secret = json.loads(get_langsmith_api_secret['SecretString'])
     #print('secret: ', secret)
-    langsmith_api_key = secret['api_key']
+    langsmith_api_key = secret['langsmith_api_key']
     langchain_project = secret['langchain_project']
 
 except Exception as e:

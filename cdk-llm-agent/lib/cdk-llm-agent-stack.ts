@@ -426,12 +426,9 @@ export class CdkLlmAgentStack extends cdk.Stack {
       description: 'secret for lamgsmith api key', // openweathermap
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       secretName: 'langsmithapikey',
-      generateSecretString: {
-        secretStringTemplate: JSON.stringify({ 
-          langchain_project: "agent-"+projectName
-        }),
-        generateStringKey: 'api_key',
-        excludeCharacters: '/@"',
+      secretObjectValue: {
+        langchain_project: secretsmanager.SecretValue.unsafePlainText('agent-'+projectName),
+        langsmith_api_key: secretsmanager.SecretValue.unsafePlainText(''),
       },
     });
     langsmithApiSecret.grantRead(roleLambdaWebsocket) 

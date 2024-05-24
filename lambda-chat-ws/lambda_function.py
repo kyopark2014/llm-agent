@@ -37,8 +37,7 @@ print('model_id[:9]: ', modelId[:9])
 path = os.environ.get('path')
 doc_prefix = s3_prefix+'/'
 debugMessageMode = os.environ.get('debugMessageMode', 'false')
-
-agentMethod = os.environ.get('agentMethod')  # ToolCalling ReAct
+agentLangMode = 'kor'
 
 # api key to get weather information in agent
 secretsmanager = boto3.client('secretsmanager')
@@ -413,9 +412,11 @@ def get_weather_info(city: str) -> str:
         
     return weather_str
 
-def get_react_prompt_template(): # (hwchase17/react) https://smith.langchain.com/hub/hwchase17/react
+def get_react_prompt_template(mode: str): # (hwchase17/react) https://smith.langchain.com/hub/hwchase17/react
     # Get the react prompt template
-    return PromptTemplate.from_template("""Answer the following questions as best you can. You have access to the following tools:
+    
+    if mode=='eng':
+        return PromptTemplate.from_template("""Answer the following questions as best you can. You have access to the following tools:
 
 {tools}
 
@@ -435,12 +436,35 @@ Begin!
 Question: {input}
 Thought:{agent_scratchpad}
 """)
+    else: 
+        return PromptTemplate.from_template("""다음의 Human과 Assistant의 친근한 이전 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다.
+
+사용할 수 있는 tools은 아래와 같습니다:
+
+{tools}
+
+Use the following format:
+
+Question: input question에 반드시 답변합니다. 
+Thought: 항상 무엇을 해야 할지 생각합니다. 
+Action: 해야 할 action으로 [{tool_names}]중 하나를 선택합니다.
+Action Input: action의 input
+Observation: action의 result
+... (Thought/Action/Action Input/Observation 은 N번 반복 될 수 있습니다.)
+Thought: 나는 이제 Final Answer를 알고 있습니다.
+Final Answer: original input 질문에 대한 Final Answer
+
+Begin!
+
+Question: {input}
+Thought:{agent_scratchpad}
+""")
 
 def run_agent_react(connectionId, requestId, chat, query):
     # define tools
     tools = [get_current_time, get_product_list, get_weather_info]
     
-    prompt_template = get_react_prompt_template()
+    prompt_template = get_react_prompt_template(agentLangMode)
     print('prompt_template: ', prompt_template)
     
     #from langchain import hub
@@ -480,7 +504,7 @@ def run_agent_react_chat(connectionId, requestId, chat, query):
     tools = [get_current_time, get_product_list, get_weather_info]
     
     # get template based on react 
-    prompt_template = get_react_prompt_template()
+    prompt_template = get_react_prompt_template(agentLangMode)
     print('prompt_template: ', prompt_template)
     
     # create agent
@@ -501,7 +525,7 @@ def run_agent_react_chat(connectionId, requestId, chat, query):
             
     return msg
 
-def run_tool_calling_agent(connectionId, requestId, chat, query):
+def run_agent_tool_calling(connectionId, requestId, chat, query):
     # toolList = "get_current_time, get_product_list, get_weather_info"
     toolList = ", ".join((t.name for t in tools))
     
@@ -541,7 +565,7 @@ def run_tool_calling_agent(connectionId, requestId, chat, query):
             
     return output
 
-def run_tool_calling_agent_with_history(connectionId, requestId, chat, query):
+def run_agent_tool_calling_chat(connectionId, requestId, chat, query):
     toolList = "get_current_time, get_product_list, get_weather_info"
     # system = f"You are a helpful assistant. Make sure to use the {toolList} tools for information."
     system = f"다음의 Human과 Assistant의 친근한 이전 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다. 답변에 필요한 정보는 다움의 tools를 이용해 수집하세요. Tools: {toolList}"
@@ -960,16 +984,13 @@ def getResponse(connectionId, jsonBody):
                 if convType == 'normal':      # normal
                     msg = general_conversation(connectionId, requestId, chat, text)                  
                 elif convType == 'agent-react':
-                    if agentMethod == 'ReAct':
-                        msg = run_agent_react(connectionId, requestId, chat, text)      
-                    else:  # tool calling agent
-                        msg = run_tool_calling_agent(connectionId, requestId, chat, text)             
-                    
+                    msg = run_agent_react(connectionId, requestId, chat, text)      
                 elif convType == 'agent-react-chat':         
-                    if agentMethod == 'ReAct':
-                        msg = run_agent_react_chat(connectionId, requestId, chat, text)
-                    else:  # tool calling agent
-                        msg = run_tool_calling_agent_with_history(connectionId, requestId, chat, text)             
+                    msg = run_agent_react_chat(connectionId, requestId, chat, text)
+                elif convType == 'agent-toolcalling':
+                    msg = run_agent_tool_calling(connectionId, requestId, chat, text)
+                elif convType == 'agent-toolcalling-chat':         
+                    msg = run_agent_tool_calling_chat(connectionId, requestId, chat, text)       
                                         
                 elif convType == "translation":
                     msg = translate_text(chat, text) 

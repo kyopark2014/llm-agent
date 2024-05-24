@@ -344,7 +344,9 @@ def get_product_list(keyword: str) -> str:
             answer = "추천 도서는 아래와 같습니다.\n"
             
         for prod in prod_info[:5]:
-            answer = answer + f"제목: {prod.text.strip()}, 링크: {prod.get("href")}\n"
+            title = prod.text.strip()
+            link = prod.get("href")
+            answer = answer + f"제목: {title}, 링크: {link}\n"
     
     return answer
     

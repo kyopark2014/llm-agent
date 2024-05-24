@@ -42,11 +42,11 @@ Thought -> Action (Search) -> Observation -> Thought - Action (Search) -> Observ
 
 ### Tool calling agent
 
-LangChain의 [Tool calling agent](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/tool_calling/)에 대해 설명합니다. 
+LangChain의 [Tool calling agent](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/tool_calling/)은 Multi-Input Tools, Parallel Function Calling와 같은 다양한 기능을 제공하고 있습니다. 상세한 내용은 [toolcalling.md](https://github.com/kyopark2014/llm-agent/blob/main/toolcalling.md)을 참조합니다. 
 
 - [Chat models](https://python.langchain.com/v0.1/docs/integrations/chat/)에 따르면, BedrockChat은 Tool calling agent을 지원하고 있지 않습니다.
-- ChatBedrock은 API를 호출할 수 있으나, 아래와 같이 테스트를 하면, Tool Calling에 대한 응답을 얻지 못하고 있습니다.
-- Tool calling은 ReAct에서 지원하지 못하고 있는 Multi-Input Tools, Parallel Function Calling을 지원하므로 향후 지원을 기대해 봅니다.
+- ChatBedrock API는 Agent를 선언할 수 있으나, 아래의 LangSmith 결과와 같이 Tool Calling에 대한 응답을 얻지 못하고 있습니다.
+- Tool calling은 ReAct에서 지원하지 못하고 있는 Multi-Input Tools, Parallel Function Calling등을 지원하고 있으므로, 향후 지원을 기대해 봅니다.
   
 ![image](https://github.com/kyopark2014/llm-agent/assets/52392004/86364b1b-0f52-4faa-b370-dd6660d4974f)
 

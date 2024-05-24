@@ -18,7 +18,7 @@ const accountId = process.env.CDK_DEFAULT_ACCOUNT;
 const debug = false;
 const stage = 'dev';
 const s3_prefix = 'docs';
-const model_id = "anthropic.claude-3-sonnet-20240229-v1:0"; // anthropic.claude-3-sonnet-20240229-v1:0  "anthropic.claude-3-haiku-20240307-v1:0"
+const model_id = "anthropic.claude-3-haiku-20240307-v1:0"; // anthropic.claude-3-sonnet-20240229-v1:0  "anthropic.claude-3-haiku-20240307-v1:0"
 const projectName = `llm-agent`; 
 
 const bucketName = `storage-for-${projectName}-${accountId}-${region}`; 

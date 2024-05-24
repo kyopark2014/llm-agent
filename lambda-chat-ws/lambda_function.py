@@ -417,9 +417,10 @@ def get_weather_info(city: str) -> str:
     if isKorean(city):
         place = traslation_to_english(chat, city)
         place = place.replace('\n', '')
-        # print('city (translated): ', place)
+        print('city (translated): ', place)
     else:
         place = city
+    print('place: ', place)
     
     apiKey = api_key
     lang = 'en' 
@@ -449,7 +450,9 @@ def get_weather_info(city: str) -> str:
     except Exception:
         err_msg = traceback.format_exc()
         print('error message: ', err_msg)                    
-        # raise Exception ("Not able to request to LLM")                        
+        # raise Exception ("Not able to request to LLM")    
+    
+    print('weather_str: ', weather_str)                            
     return weather_str
 
 def get_react_prompt_template(mode: str): # (hwchase17/react) https://smith.langchain.com/hub/hwchase17/react

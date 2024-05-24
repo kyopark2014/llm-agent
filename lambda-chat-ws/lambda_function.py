@@ -416,6 +416,7 @@ def get_weather_info(city: str) -> str:
                 
     if isKorean(city):
         city = traslation_to_english(chat, city)
+        city = city.replace('\n', '')
         print('city (translated): ', city)
     
     apiKey = api_key

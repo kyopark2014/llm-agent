@@ -83,9 +83,9 @@ def initiate_chat():
         elif modelId[:9] == 'anthropic':
             return {
                 "max_tokens":1024,
-                "temperature":0.1,
+                "temperature":0.3,
                 "top_k":250,
-                "top_p": 0.9,
+                "top_p": 0.7,
                 "stop_sequences": [HUMAN_PROMPT]            
             }
     parameters = get_parameter(modelId)
@@ -417,7 +417,7 @@ def get_weather_info(city: str) -> str:
     if isKorean(city):
         place = traslation_to_english(chat, city)
         place = place.replace('\n', '')
-        print('city (translated): ', place)
+        # print('city (translated): ', place)
     else:
         place = city
     
@@ -661,7 +661,7 @@ def traslation_to_english(chat, text):
         )
         
         msg = result.content
-        print('translated text: ', msg)
+        # print('translated text: ', msg)
     except Exception:
         err_msg = traceback.format_exc()
         print('error message: ', err_msg)                    

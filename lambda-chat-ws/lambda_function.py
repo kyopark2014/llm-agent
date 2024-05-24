@@ -39,27 +39,40 @@ doc_prefix = s3_prefix+'/'
 debugMessageMode = os.environ.get('debugMessageMode', 'false')
 agentLangMode = 'kor'
 
-langsmith_api_key = os.environ.get('langsmith_api_key')
+# api key to get weather information in agent
+secretsmanager = boto3.client('secretsmanager')
+try:
+    get_weather_api_secret = secretsmanager.get_secret_value(
+        SecretId='openweathermap'
+    )
+    #print('get_weather_api_secret: ', get_weather_api_secret)
+    secret = json.loads(get_weather_api_secret['SecretString'])
+    #print('secret: ', secret)
+    weather_api_key = secret['api_key']
+
+except Exception as e:
+    raise e
+   
+# api key to use LangSmith
+langsmith_api_key = ""
+try:
+    get_langsmith_api_secret = secretsmanager.get_secret_value(
+        SecretId='langsmithapikey'
+    )
+    #print('get_langsmith_api_secret: ', get_langsmith_api_secret)
+    secret = json.loads(get_langsmith_api_secret['SecretString'])
+    #print('secret: ', secret)
+    langsmith_api_key = secret['api_key']
+
+except Exception as e:
+    raise e
+
 langchain_project = os.environ.get('langchain_project')
 print('langsmith_api_key: ', langsmith_api_key)
 if langsmith_api_key:
     os.environ["LANGCHAIN_API_KEY"] = langsmith_api_key
     os.environ["LANGCHAIN_TRACING_V2"] = "true"
     os.environ["LANGCHAIN_PROJECT"] = langchain_project
-
-# api key to get weather information in agent
-secretsmanager = boto3.client('secretsmanager')
-try:
-    get_secret_value_response = secretsmanager.get_secret_value(
-        SecretId='openweathermap'
-    )
-    #print('get_secret_value_response: ', get_secret_value_response)
-    secret = json.loads(get_secret_value_response['SecretString'])
-    #print('secret: ', secret)
-    api_key = secret['api_key']
-
-except Exception as e:
-    raise e
    
 # websocket
 connection_url = os.environ.get('connection_url')
@@ -409,7 +422,7 @@ def get_weather_info(city: str) -> str:
         place = city
     print('place: ', place)
     
-    apiKey = api_key
+    apiKey = weather_api_key
     lang = 'en' 
     units = 'metric' 
     api = f"https://api.openweathermap.org/data/2.5/weather?q={place}&APPID={apiKey}&lang={lang}&units={units}"

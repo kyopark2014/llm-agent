@@ -422,6 +422,18 @@ export class CdkLlmAgentStack extends cdk.Stack {
     });
     weatherApiSecret.grantRead(roleLambdaWebsocket) 
 
+    const langsmithApiSecret = new secretsmanager.Secret(this, `weather-langsmith-secret-for-${projectName}`, {
+      description: 'secret for lamgsmith api key', // openweathermap
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      secretName: 'langsmithapikey',
+      generateSecretString: {
+        secretStringTemplate: JSON.stringify({ 
+          api_key: ''
+        })
+      },
+    });
+    langsmithApiSecret.grantRead(roleLambdaWebsocket) 
+
     const lambdaChatWebsocket = new lambda.DockerImageFunction(this, `lambda-chat-ws-for-${projectName}`, {
       description: 'lambda for chat using websocket',
       functionName: `lambda-chat-ws-for-${projectName}`,
@@ -439,7 +451,6 @@ export class CdkLlmAgentStack extends cdk.Stack {
         connection_url: connection_url,
         debugMessageMode: debugMessageMode,
         LANGCHAIN_TRACING_V2: "true",
-        langsmith_api_key: "",
         langchain_project: "agent-"+projectName
       }
     });     

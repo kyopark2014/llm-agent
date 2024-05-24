@@ -25,9 +25,13 @@ LangChain의 [Agent Type](https://python.langchain.com/v0.1/docs/modules/agents/
 
 ### ReAct
 
-LangChain의 [ReAct](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/react/)를 이용하여 Agent를 정의합니다. 최종 답변에 한 번에 도달하는 대신에 여러 단계의 thought(사고)-action(행동)-observation(관찰) 과정을 통해 과제를 해결할 수 있고, 환각도 줄일 수 있습니다. 이때의 한 예는 아래와 같습니다. 
+LangChain의 [ReAct](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/react/)를 이용하여 Agent를 정의합니다. ReAct에 대한 자세한 내용은 [ReAct.md](./ReAct.md)을 참조합니다. 
 
+최종 답변에 한 번에 도달하는 대신에 여러 단계의 thought(사고)-action(행동)-observation(관찰) 과정을 통해 과제를 해결할 수 있고, 환각도 줄일 수 있습니다. 이때의 한 예는 아래와 같습니다. 
+
+```text
 Thought -> Action (Search) -> Observation -> Thought - Action (Search) -> Observation -> Thought -> Final Result
+```
 
 실제 실행한 결과는 아래와 같습니다.
 
@@ -36,32 +40,23 @@ Thought -> Action (Search) -> Observation -> Thought - Action (Search) -> Observ
 ![image](https://github.com/kyopark2014/llm-agent/assets/52392004/69ff3e46-ec3e-4ba1-9f10-380b31554f15)
 
 
-[Using LangChain ReAct Agents for Answering Multi-hop Questions in RAG Systems](https://towardsdatascience.com/using-langchain-react-agents-for-answering-multi-hop-questions-in-rag-systems-893208c1847e)
-
-
-ReAct에 대한 자세한 내용은 [ReAct.md](./ReAct.md)을 참조합니다.
-
-
 ### Tool calling agent
 
-[Tool calling agent](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/tool_calling/)
+LangChain의 [Tool calling agent](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/tool_calling/)에 대해 설명합니다. 
 
-
-- [Chat models](https://python.langchain.com/v0.1/docs/integrations/chat/)에서는 BedrockChat만 있고 미지원으로 표시가 되어 있습니다.
-- ChatBedrock으로 테스트시에 Tool Calling은 아래와 같이 응답을 얻지 못하므로 현재 미지원이나 향후 지원이 예상됩니다.
-
+- [Chat models](https://python.langchain.com/v0.1/docs/integrations/chat/)에 따르면, BedrockChat은 Tool calling agent을 지원하고 있지 않습니다.
+- ChatBedrock은 API를 호출할 수 있으나, 아래와 같이 테스트를 하면, Tool Calling에 대한 응답을 얻지 못하고 있습니다.
+- Tool calling은 ReAct에서 지원하지 못하고 있는 Multi-Input Tools, Parallel Function Calling을 지원하므로 향후 지원을 기대해 봅니다.
+  
 ![image](https://github.com/kyopark2014/llm-agent/assets/52392004/86364b1b-0f52-4faa-b370-dd6660d4974f)
 
 ## Prompt 
 
 ReAct를 위한 Prompt 에제는 [prompt.md](./prompt.md)을 참조합니다.
 
-
 ## 외부 API 
 
 [apis.md](./apis.md)에서는 도서 검색, 날씨, 시간과 같은 유용한 검색 API에 대해 설명하고 있습니다.
-
-
 
 ## LangSmith 사용 설정
 
@@ -69,6 +64,8 @@ ReAct를 위한 Prompt 에제는 [prompt.md](./prompt.md)을 참조합니다.
 
 
 ## Reference
+
+[Using LangChain ReAct Agents for Answering Multi-hop Questions in RAG Systems](https://towardsdatascience.com/using-langchain-react-agents-for-answering-multi-hop-questions-in-rag-systems-893208c1847e)
 
 [Intro to LLM Agents with Langchain: When RAG is Not Enough](https://towardsdatascience.com/intro-to-llm-agents-with-langchain-when-rag-is-not-enough-7d8c08145834)
 

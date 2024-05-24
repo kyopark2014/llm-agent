@@ -22,26 +22,7 @@ return_values: final agent output을 포함하고 있는 key-value. output key�
 
   
 
-## Tool의 종류
-
-### Internet Search
-
-- Google Search
-
-- Tavily Search
-
-[LangChain: Tavily Search API](https://python.langchain.com/v0.1/docs/integrations/retrievers/tavily/)와 [api-tavily-search.ipynb](./api/api-tavily-search.ipynb)을 참조합니다.
-
-  
-
-### Custom 함수
-
-- 현재 날짜, 시간등의 정보 조회하기
-
-- 시스템 시간 (한국)
-
-[api-current-time.ipynb](./api/api-current-time.ipynb)와 같이 구현합니다.
-  
+## Tool의 설정
 
 ### RAG의 Knowledge store를 이용 (Retriever)
 

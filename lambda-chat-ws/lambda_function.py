@@ -427,7 +427,9 @@ def get_weather_info(city: str) -> str:
     api = f"https://api.openweathermap.org/data/2.5/weather?q={place}&APPID={apiKey}&lang={lang}&units={units}"
     # print('api: ', api)
 
-    weather_str: str = ""
+    city_str = city.replace('\n','')
+    weather_str: str = f"{city_str}에 대한 날씨 정보가 없습니다."
+            
     try:
         result = requests.get(api)
         result = json.loads(result.text)
@@ -442,7 +444,6 @@ def get_weather_info(city: str) -> str:
             wind_speed = result['wind']['speed']
             cloud = result['clouds']['all']
             
-            city_str = city.replace('\n','')
             weather_str = f"{city_str}의 현재 날씨의 특징은 {overall}이며, 현재 온도는 {current_temp}도 이고, 최저온도는 {min_temp}도, 최고 온도는 {max_temp}도 입니다. 현재 습도는 {humidity}% 이고, 바람은 초당 {wind_speed} 미터 입니다. 구름은 {cloud}% 입니다."
             #weather_str = f"Today, the overall of {city} is {overall}, current temperature is {current_temp} degree, min temperature is {min_temp} degree, highest temperature is {max_temp} degree. huminity is {humidity}%, wind status is {wind_speed} meter per second. the amount of cloud is {cloud}%."            
     except Exception:

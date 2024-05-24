@@ -427,8 +427,8 @@ export class CdkLlmAgentStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       secretName: 'langsmithapikey',
       secretObjectValue: {
-        langchain_project: secretsmanager.SecretValue.unsafePlainText('agent-'+projectName),
-        langsmith_api_key: secretsmanager.SecretValue.unsafePlainText(''),
+        langchain_project: cdk.SecretValue.unsafePlainText('agent-'+projectName),
+        langsmith_api_key: cdk.SecretValue.unsafePlainText(''),
       },
     });
     langsmithApiSecret.grantRead(roleLambdaWebsocket) 

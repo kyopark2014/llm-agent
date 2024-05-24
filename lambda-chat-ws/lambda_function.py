@@ -303,13 +303,14 @@ def general_conversation(connectionId, requestId, chat, query):
     
     return msg
 
+"""
 @tool
 def get_product_list(keyword: str) -> list:
-    """
+    "" " 
     Search product list by keyword and then return product list
     keyword: search keyword
     return: product list
-    """
+    "" "
 
     url = f"https://search.kyobobook.co.kr/search?keyword={keyword}&gbCode=TOT&target=total"
     response = requests.get(url)
@@ -322,7 +323,31 @@ def get_product_list(keyword: str) -> list:
         return prod_list[:5]
     else:
         return []
+"""       
 
+@tool 
+def get_product_list(keyword: str) -> str:
+    """
+    Search product list by keyword and then return product list
+    keyword: search keyword
+    return: product list
+    """
+
+    answer = ""
+    url = f"https://search.kyobobook.co.kr/search?keyword={keyword}&gbCode=TOT&target=total"
+    response = requests.get(url)
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, "html.parser")
+        prod_info = soup.find_all("a", attrs={"class": "prod_info"})
+        
+        if len(prod_info):
+            answer = "추천 도서는 아래와 같습니다.\n"
+            
+        for prod in prod_info[:5]:
+            answer = answer + f"제목: {prod.text.strip()}, 링크: {prod.get("href")}\n"
+    
+    return answer
+    
 @tool
 def get_current_time(format: str = "%Y-%m-%d %H:%M:%S"):
     """Returns the current date and time in the specified format"""
@@ -450,7 +475,7 @@ Thought: 항상 무엇을 해야 할지 생각합니다.
 Action: 해야 할 action으로 [{tool_names}]중 하나를 선택합니다.
 Action Input: action의 input
 Observation: action의 result
-... (result가 input에 대한 답변이면 Final Answer로 전달합니다. 만약 적절한 답변이 아니면, Thought/Action/Action Input/Observation을 N번 반복 할 수 있습니다.)
+... (result가 input에 대한 답변이면 Final Answer로 사용합니다. 만약 적절한 답변이 아니면, Thought/Action/Action Input/Observation을 N번 반복 할 수 있습니다.)
 Thought: 나는 이제 Final Answer를 알고 있습니다.
 Final Answer: original input에 대한 Final Answer
 

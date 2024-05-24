@@ -35,9 +35,19 @@ Thought -> Action (Search) -> Observation -> Thought - Action (Search) -> Observ
 
 실제 실행한 결과는 아래와 같습니다.
 
+- "오늘 날씨 알려줘"를 입력하면 현재의 [날씨 정보를 조회](./apis.md)하여 알려줍니다. 
+
 ![image](https://github.com/kyopark2014/llm-agent/assets/52392004/4b2f79cc-6782-4c44-b594-1c5f22472dc7)
 
-![image](https://github.com/kyopark2014/llm-agent/assets/52392004/69ff3e46-ec3e-4ba1-9f10-380b31554f15)
+- "오늘 날짜 알려줘"를 하면 [시스템 날짜를 확인](./apis.md)하여 알려줍니다. 
+
+<img width="850" alt="image" src="https://github.com/kyopark2014/llm-agent/assets/52392004/a0190426-33d4-46d3-b9d2-5294f9222b8c">
+
+- "서울 여행에 대한 책을 추천해줘"를 입력하면 [교보문의 책검색 API](./apis.md)를 이용하여 관련책을 검색하여 추천합니다.
+
+<img width="849" alt="image" src="https://github.com/kyopark2014/llm-agent/assets/52392004/e62b4654-ba18-40e6-86ae-2152b241aa04">
+
+
 
 
 ### Tool calling agent

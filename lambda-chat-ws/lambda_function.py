@@ -339,7 +339,8 @@ def get_lambda_client(region):
         service_name='lambda',
         region_name=region
     )
-    
+
+@tool    
 def get_system_time() -> list:
     """
     retrive system time to earn the current date and time.
@@ -412,6 +413,93 @@ def get_weather_info(city: str) -> str:
         
     return weather_str
 
+def get_react_prompt_template(): # (hwchase17/react) https://smith.langchain.com/hub/hwchase17/react
+    # Get the react prompt template
+    return PromptTemplate.from_template("""Answer the following questions as best you can. You have access to the following tools:
+
+{tools}
+
+Use the following format:
+
+Question: the input question you must answer
+Thought: you should always think about what to do
+Action: the action to take, should be one of [{tool_names}]
+Action Input: the input to the action
+Observation: the result of the action
+... (this Thought/Action/Action Input/Observation can repeat N times)
+Thought: I now know the final answer
+Final Answer: the final answer to the original input question
+
+Begin!
+
+Question: {input}
+Thought:{agent_scratchpad}
+""")
+
+def run_agent_react(connectionId, requestId, chat, query):
+    # define tools
+    tools = [get_current_time, get_product_list, get_weather_info]
+    
+    prompt_template = get_react_prompt_template()
+    print('prompt_template: ', prompt_template)
+    
+    #from langchain import hub
+    #prompt_template = hub.pull("hwchase17/react")
+    #print('prompt_template: ', prompt_template)
+    
+     # create agent
+    isTyping(connectionId, requestId)
+    agent = create_react_agent(chat, tools, prompt_template)
+    
+    agent_executor = AgentExecutor(
+        agent=agent, 
+        tools=tools, 
+        verbose=True, 
+        handle_parsing_errors=True
+        # max_iterations = 3  # default = 5
+    )
+    
+    # run agent
+    response = agent_executor.invoke({"input": query})
+    print('response: ', response)
+
+    # streaming    
+    msg = readStreamMsg(connectionId, requestId, response['output'])
+
+    msg = response['output']
+    print('msg: ', msg)
+            
+    return msg
+
+def run_agent_react_chat(connectionId, requestId, chat, query):
+    # revise question
+    revised_question = revise_question(connectionId, requestId, chat, query)     
+    print('revised_question: ', revised_question)  
+    
+    # define tools
+    tools = [get_current_time, get_product_list, get_weather_info]
+    
+    # get template based on react 
+    prompt_template = get_react_prompt_template()
+    print('prompt_template: ', prompt_template)
+    
+    # create agent
+    isTyping(connectionId, requestId)
+    agent = create_react_agent(chat, tools, prompt_template)
+    
+    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
+    
+    # run agent
+    response = agent_executor.invoke({"input": revised_question})
+    print('response: ', response)
+    
+    # streaming
+    msg = readStreamMsg(connectionId, requestId, response['output'])
+
+    msg = response['output']
+    print('msg: ', msg)
+            
+    return msg
 
 def run_tool_calling_agent(connectionId, requestId, chat, query):
     # toolList = "get_current_time, get_product_list, get_weather_info"
@@ -492,93 +580,6 @@ def run_tool_calling_agent_with_history(connectionId, requestId, chat, query):
     # print('output: ', output)
             
     return output
-
-def get_react_prompt_template(): # (hwchase17/react) https://smith.langchain.com/hub/hwchase17/react
-    # Get the react prompt template
-    return PromptTemplate.from_template("""Answer the following questions as best you can. You have access to the following tools:
-
-{tools}
-
-Use the following format:
-
-Question: the input question you must answer
-Thought: you should always think about what to do
-Action: the action to take, should be one of [{tool_names}]
-Action Input: the input to the action
-Observation: the result of the action
-... (this Thought/Action/Action Input/Observation can repeat N times)
-Thought: I now know the final answer
-Final Answer: the final answer to the original input question
-
-Begin!
-
-Question: {input}
-Thought:{agent_scratchpad}
-""")
-
-def run_agent_react(connectionId, requestId, chat, query):
-    # define tools
-    tools = [get_current_time, get_product_list, get_weather_info]
-    
-    prompt_template = get_react_prompt_template()
-    
-    #from langchain import hub
-    #prompt_template = hub.pull("hwchase17/react")
-    #print('prompt_template: ', prompt_template)
-    
-     # create agent
-    isTyping(connectionId, requestId)
-    agent = create_react_agent(chat, tools, prompt_template)
-    
-    agent_executor = AgentExecutor(
-        agent=agent, 
-        tools=tools, 
-        verbose=True, 
-        handle_parsing_errors=True,
-        # max_iterations = 3  # default = 5
-    )
-    
-    # run agent
-    response = agent_executor.invoke({"input": query})
-    print('response: ', response)
-
-    # streaming    
-    msg = readStreamMsg(connectionId, requestId, response['output'])
-
-    msg = response['output']
-    print('msg: ', msg)
-            
-    return msg
-
-def run_agent_react_chat(connectionId, requestId, chat, query):
-    # revise question
-    revised_question = revise_question(connectionId, requestId, chat, query)     
-    print('revised_question: ', revised_question)  
-    
-    # define tools
-    tools = [get_current_time, get_product_list, get_weather_info]
-    
-    # get template based on react 
-    prompt_template = get_react_prompt_template()
-    print('prompt_template: ', prompt_template)
-    
-    # create agent
-    isTyping(connectionId, requestId)
-    agent = create_react_agent(chat, tools, prompt_template)
-    
-    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
-    
-    # run agent
-    response = agent_executor.invoke({"input": revised_question})
-    print('response: ', response)
-    
-    # streaming
-    msg = readStreamMsg(connectionId, requestId, response['output'])
-
-    msg = response['output']
-    print('msg: ', msg)
-            
-    return msg
 
 def traslation_to_english(chat, text):
     input_language = "Korean"

@@ -427,21 +427,26 @@ def get_weather_info(city: str) -> str:
     api = f"https://api.openweathermap.org/data/2.5/weather?q={place}&APPID={apiKey}&lang={lang}&units={units}"
     # print('api: ', api)
 
-    result = requests.get(api)
-    result = json.loads(result.text)
+    weather_str: str = ""
+    try:
+        result = requests.get(api)
+        result = json.loads(result.text)
     
-    overall = result['weather'][0]['main']
-    current_temp = result['main']['temp']
-    min_temp = result['main']['temp_min']
-    max_temp = result['main']['temp_max']
-    humidity = result['main']['humidity']
-    wind_speed = result['wind']['speed']
-    cloud = result['clouds']['all']
-    
-    city_str = city.replace('\n','')
-    weather_str = f"{city_str}의 현재 날씨의 특징은 {overall}이며, 현재 온도는 {current_temp}도 이고, 최저온도는 {min_temp}도, 최고 온도는 {max_temp}도 입니다. 현재 습도는 {humidity}% 이고, 바람은 초당 {wind_speed} 미터 입니다. 구름은 {cloud}% 입니다."
-    #weather_str = f"Today, the overall of {city} is {overall}, current temperature is {current_temp} degree, min temperature is {min_temp} degree, highest temperature is {max_temp} degree. huminity is {humidity}%, wind status is {wind_speed} meter per second. the amount of cloud is {cloud}%."    
+        overall = result['weather'][0]['main']
+        current_temp = result['main']['temp']
+        min_temp = result['main']['temp_min']
+        max_temp = result['main']['temp_max']
+        humidity = result['main']['humidity']
+        wind_speed = result['wind']['speed']
+        cloud = result['clouds']['all']
         
+        city_str = city.replace('\n','')
+        weather_str = f"{city_str}의 현재 날씨의 특징은 {overall}이며, 현재 온도는 {current_temp}도 이고, 최저온도는 {min_temp}도, 최고 온도는 {max_temp}도 입니다. 현재 습도는 {humidity}% 이고, 바람은 초당 {wind_speed} 미터 입니다. 구름은 {cloud}% 입니다."
+        #weather_str = f"Today, the overall of {city} is {overall}, current temperature is {current_temp} degree, min temperature is {min_temp} degree, highest temperature is {max_temp} degree. huminity is {humidity}%, wind status is {wind_speed} meter per second. the amount of cloud is {cloud}%."            
+    except Exception:
+        err_msg = traceback.format_exc()
+        print('error message: ', err_msg)                    
+        # raise Exception ("Not able to request to LLM")                        
     return weather_str
 
 def get_react_prompt_template(mode: str): # (hwchase17/react) https://smith.langchain.com/hub/hwchase17/react

@@ -542,7 +542,7 @@ def run_agent_react(connectionId, requestId, chat, query):
             
     return msg
 
-def run_agent_react_chat(connectionId, requestId, chat, query):
+def run_agent_react_chat_history(connectionId, requestId, chat, query):
     # revise question
     revised_question = revise_question(connectionId, requestId, chat, query)     
     print('revised_question: ', revised_question)  
@@ -568,6 +568,71 @@ def run_agent_react_chat(connectionId, requestId, chat, query):
     print('msg: ', msg)
             
     return msg
+
+def run_agent_react_chat(connectionId, requestId, chat, query):
+    # get template based on react 
+    prompt_template = get_react_chat_prompt_template()
+    print('prompt_template: ', prompt_template)
+    
+    # create agent
+    isTyping(connectionId, requestId)
+    agent = create_react_agent(chat, tools, prompt_template)
+    
+    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
+    
+    history = memory_chain.load_memory_variables({})["chat_history"]
+    print('memory_chain: ', history)
+    
+    # run agent
+    response = agent_executor.invoke({
+        "input": query,
+        "chat_history": history
+    })
+    print('response: ', response)
+    
+    # streaming
+    msg = readStreamMsg(connectionId, requestId, response['output'])
+
+    msg = response['output']
+    print('msg: ', msg)
+            
+    return msg
+
+def get_react_chat_prompt_template(mode: str): # (hwchase17/react) https://smith.langchain.com/hub/hwchase17/react
+    # Get the react prompt template
+
+    return PromptTemplate.from_template("""다음은 Human과 Assistant의 친근한 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다.
+
+사용할 수 있는 tools은 아래와 같습니다:
+
+{tools}
+
+Use the following format:
+
+Question: 답변하여야 할 input question 
+Thought: you should always think about what to do. 
+Action: 해야 할 action으로서 [{tool_names}]중 하나를 선택합니다.
+Action Input: action의 input
+Observation: action의 result
+... (Thought/Action/Action Input/Observation을 3번 반복 할 수 있습니다. 반복이 끝날때까지 정답을 찾지 못하면 마지막 result로 답변합니다.)
+... (반복이 끝날때까지 적절한 답변을 얻지 못하면, 마지막 결과를 Final Answer를 전달합니다. )
+Thought: 나는 이제 Final Answer를 알고 있습니다. 
+Final Answer: original input에 대한 Final Answer
+
+When you have a response to say to the Human, or if you do not need to use a tool, you MUST use the format:
+'''
+Thought: Do I need to use a tool? No
+Final Answer: [your response here]
+'''
+
+Begin!
+
+Previous conversation history:
+{chat_history}
+
+New input: {input}
+Thought:{agent_scratchpad}
+""")
 
 def run_agent_tool_calling(connectionId, requestId, chat, query):
     # toolList = "get_current_time, get_product_list, get_weather_info"

@@ -429,6 +429,8 @@ def get_weather_info(city: str) -> str:
     # print('api: ', api)
 
     city_str = city.replace('\n','')
+    city_str = city.replace('\'','')
+    
     weather_str: str = f"{city_str}에 대한 날씨 정보가 없습니다."
             
     try:
@@ -509,11 +511,11 @@ Begin!
 Question: {input}
 Thought:{agent_scratchpad}
 """)
+        
+# define tools
+tools = [get_current_time, get_product_list, get_weather_info]        
 
 def run_agent_react(connectionId, requestId, chat, query):
-    # define tools
-    tools = [get_current_time, get_product_list, get_weather_info]
-    
     prompt_template = get_react_prompt_template(agentLangMode)
     print('prompt_template: ', prompt_template)
     
@@ -549,10 +551,7 @@ def run_agent_react_chat(connectionId, requestId, chat, query):
     # revise question
     revised_question = revise_question(connectionId, requestId, chat, query)     
     print('revised_question: ', revised_question)  
-    
-    # define tools
-    tools = [get_current_time, get_product_list, get_weather_info]
-    
+        
     # get template based on react 
     prompt_template = get_react_prompt_template(agentLangMode)
     print('prompt_template: ', prompt_template)
@@ -593,9 +592,6 @@ def run_agent_tool_calling(connectionId, requestId, chat, query):
     )
     print('prompt: ', prompt)
     
-    # define tools
-    tools = [get_current_time, get_product_list, get_weather_info]
-    
      # create agent
     agent = create_tool_calling_agent(chat, tools, prompt)
     
@@ -628,9 +624,6 @@ def run_agent_tool_calling_chat(connectionId, requestId, chat, query):
             ("placeholder", "{agent_scratchpad}"),
         ]
     )
-    # define tools
-    tools = [get_current_time, get_product_list, get_weather_info]
-    
      # create agent
     agent = create_tool_calling_agent(chat, tools, prompt)
     

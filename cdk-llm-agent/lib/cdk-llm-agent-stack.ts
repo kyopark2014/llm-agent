@@ -436,7 +436,10 @@ export class CdkLlmAgentStack extends cdk.Stack {
         path: 'https://'+distribution.domainName+'/',   
         callLogTableName: callLogTableName,
         connection_url: connection_url,
-        debugMessageMode: debugMessageMode
+        debugMessageMode: debugMessageMode,
+        LANGCHAIN_TRACING_V2: "true",
+        LANGCHAIN_API_KEY: "api-key",
+        LANGCHAIN_PROJECT: "agent-"+projectName
       }
     });     
     lambdaChatWebsocket.grantInvoke(new iam.ServicePrincipal('apigateway.amazonaws.com'));  

@@ -99,32 +99,7 @@ def get_weather_info(city: str) -> str:
     return weather_str
 ```
 
-### Lambda Agent
-
-[LangChain Agent - AWS Lambda](https://python.langchain.com/v0.1/docs/integrations/tools/awslambda/)를 참조합니다.
-
-```python
-from langchain.agents import AgentType, initialize_agent, load_tools
-from langchain_openai import OpenAI
-
-llm = OpenAI(temperature=0)
-
-tools = load_tools(
-    ["awslambda"],
-    awslambda_tool_name="email-sender",
-    awslambda_tool_description="sends an email with the specified content to test@testing123.com",
-    function_name="testFunction1",
-)
-
-agent = initialize_agent(
-    tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True
-)
-
-agent.run("Send an email to test@testing123.com saying hello world.")
-```
-
-
-### Tavily Search 사용 예
+### Tavily Search 
 
 [Teddylee 가이드](https://teddylee777.github.io/langchain/langchain-agent/)
 
@@ -148,63 +123,6 @@ agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 response = agent_executor.invoke({"input": "안녕, 반가워!"})
 print(f'답변: {response["output"]}')
 ```
-
-### Google Search
-
-[Langchain agent 내부 동작 구조 이해](https://bcho.tistory.com/m/1427)
-
-```python
-from langchain.llms.openai import OpenAI
-from langchain.utilities import GoogleSerperAPIWrapper
-from langchain.agents import initialize_agent, Tool
-from langchain.agents import AgentType
-from langchain_core.prompts import PromptTemplate
-from langchain.agents import AgentExecutor, create_react_agent
-import os
-
-google_search = GoogleSerperAPIWrapper()
-tools = [
-    Tool(
-        name="Intermediate Answer",
-        func=google_search.run,
-        description="useful for when you need to ask with search",
-        verbose=True
-    )
-]
-
-template = '''Answer the following questions as best you can. You have access to the following tools:
-
-{tools}
-
-Use the following format:
-
-Question: the input question you must answer
-Thought: you should always think about what to do
-Action: the action to take, should be one of [{tool_names}]
-Action Input: the input to the action
-Observation: the result of the action
-... (this Thought/Action/Action Input/Observation can repeat N times)
-Thought: I now know the final answer
-Final Answer: the final answer to the original input question
-
-Begin!
-
-Question: {input}
-Thought:{agent_scratchpad}'''
-
-prompt = PromptTemplate.from_template(template)
-
-search_agent = create_react_agent(model,tools,prompt)
-agent_executor = AgentExecutor(
-    agent=search_agent,
-    tools=tools,
-    verbose=True,
-    return_intermediate_steps=True,
-)
-response = agent_executor.invoke({"input": "Where is the hometown of the 2007 US PGA championship winner and his score?"})
-print(response)
-```
-
 
 ## Google Search
 
@@ -240,3 +158,26 @@ search.run('langchain의 agent는 무엇이야?')
 '"Olivia Wilde의 남자 친구인 Harry Styles는 29 세이고, 그의 나이에 0.23 거듭제곱한 값은 2.169459462491557 이야." 이 예제는 LangChain 문서\xa0... Jul 16, 2023 ... Langchain 이란? Langchain은 language model 기반의 ... 사실 간단한 챗이야 ... AgentType 을 보면 감이 오시겠지만, 우리는 다양한 종류의 Agent를\xa0... Agent 활용에서는 LangChain의 ReAct Agent를 정의합니다. ... "엔씨의 Lex 서비스는 무엇인지 설명해줘."와 같이 ... 메뉴에서 "Timestamp Extraction"을 선택하고, "지금은\xa0... Aug 16, 2023 ... ... 의 답변을 받을 수는 있어도 상세한 정보를 얻을 수는 없다. 이러한 한계를 극복하기 위해 LangChain에서는 검색을 통해 언어모델에 지식을 보완하는\xa0... Jul 3, 2023 ... 현재 LangChain에서 사용되는 에이전트 체인은 사용자와 AI의 요청과 응답으로 구성된 구성된 프롬프트 처리를 지원하지 않습니다. 우리는 주로 이를 모델\xa0...'
 ```
 
+### Lambda Agent
+
+[LangChain Agent - AWS Lambda](https://python.langchain.com/v0.1/docs/integrations/tools/awslambda/)를 참조합니다.
+
+```python
+from langchain.agents import AgentType, initialize_agent, load_tools
+from langchain_openai import OpenAI
+
+llm = OpenAI(temperature=0)
+
+tools = load_tools(
+    ["awslambda"],
+    awslambda_tool_name="email-sender",
+    awslambda_tool_description="sends an email with the specified content to test@testing123.com",
+    function_name="testFunction1",
+)
+
+agent = initialize_agent(
+    tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True
+)
+
+agent.run("Send an email to test@testing123.com saying hello world.")
+```

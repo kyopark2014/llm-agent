@@ -63,11 +63,11 @@ try:
     secret = json.loads(get_langsmith_api_secret['SecretString'])
     #print('secret: ', secret)
     langsmith_api_key = secret['api_key']
+    langchain_project = secret['langchain_project']
 
 except Exception as e:
     raise e
 
-langchain_project = os.environ.get('langchain_project')
 print('langsmith_api_key: ', langsmith_api_key)
 if langsmith_api_key:
     os.environ["LANGCHAIN_API_KEY"] = langsmith_api_key

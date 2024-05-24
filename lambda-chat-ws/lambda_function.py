@@ -64,11 +64,9 @@ try:
     #print('secret: ', secret)
     langsmith_api_key = secret['langsmith_api_key']
     langchain_project = secret['langchain_project']
-
 except Exception as e:
     raise e
 
-print('langsmith_api_key: ', langsmith_api_key)
 if langsmith_api_key:
     os.environ["LANGCHAIN_API_KEY"] = langsmith_api_key
     os.environ["LANGCHAIN_TRACING_V2"] = "true"

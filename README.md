@@ -57,6 +57,10 @@ ReAct를 위한 Prompt 에제는 [prompt.md](./prompt.md)을 참조합니다.
 
 
 
+## LangSmith 사용 설정
+
+[langsmith.md](./langsmith.md)와 같이 lambda-chat-ws의 envrionment의 langsmith_api_key에 [LangSmith](https://smith.langchain.com/)에서 발급한 api key를 넣으면 LangSmith로 agent의 동작을 디버깅할 수 있습니다. 
+
 
 ## Reference
 

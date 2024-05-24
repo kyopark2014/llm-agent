@@ -19,15 +19,11 @@ Agent의 동작은 Action, Observation, Thought와 같은 동작을 반복적으
 
 ### ReAct
 
-LangChain의 [ReAct](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/react/)를 이용하여 Agent를 정의합니다. [ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629)에서는 LLM에게 단계별로 추론 흔적(reseoning traces)과 작업별 조치들(task-specific actions)을 생성하도록 요청하면 작업 수행 능력이 향상된다(the use of LLMs to generate both reasoning traces and task-specific actions in an interleaved manner) 라고 설명하고 있습니다. 최종 답변에 한 번에 도달하는 대신에 여러 단계의 사고-행동-관찰(thought-action-observation) 과정을 통해 과제를 해결할 수 있고, 환각도 줄일 수 있습니다.
+LangChain의 [ReAct](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/react/)를 이용하여 Agent를 정의합니다. 최종 답변에 한 번에 도달하는 대신에 여러 단계의 thought(사고)-action(행동)-observation(관찰) 과정을 통해 과제를 해결할 수 있고, 환각도 줄일 수 있습니다. 이때의 한 예는 아래와 같습니다. 
 
 Thought -> Action (Search) -> Observation -> Thought - Action (Search) -> Observation -> Thought -> Final Result
 
-아래와 같이 [LangChain의 ReAct는 Reasoning와 Action](https://www.youtube.com/watch?v=Eug2clsLtFs)으로 표현됩니다. 여기서는 생각하는 방법(Paradigm of thinking)으로 Reseoning은 답변의 정당성(justification of the answer)을 확인하여, 답변에 필요한 것(prime)을 찾습니다. 또한, 현재의 환경(Envrionment)에서 어떤 행동(Action)을 선택(SayCan)하고, 관찰(Obseravation)을 통해 결과를 확인합니다.  
-
-![image](https://github.com/kyopark2014/llm-agent/assets/52392004/f75501fd-d3d5-4a3f-9b6c-42b5466bb3f9)
-
-실행 결과는 아래와 같습니다.
+실제 실행한 결과는 아래와 같습니다.
 
 ![image](https://github.com/kyopark2014/llm-agent/assets/52392004/4b2f79cc-6782-4c44-b594-1c5f22472dc7)
 

@@ -1,5 +1,24 @@
 # Agent
 
+### Internet Search
+
+- Google Search
+
+- Tavily Search
+
+[LangChain: Tavily Search API](https://python.langchain.com/v0.1/docs/integrations/retrievers/tavily/)와 [api-tavily-search.ipynb](./api/api-tavily-search.ipynb)을 참조합니다.
+
+  
+
+### Custom 함수
+
+- 현재 날짜, 시간등의 정보 조회하기
+
+- 시스템 시간 (한국)
+
+[api-current-time.ipynb](./api/api-current-time.ipynb)와 같이 구현합니다.
+
+  
 ## API 예제
 
 ### 도서 정보 가져오기

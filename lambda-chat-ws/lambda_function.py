@@ -419,7 +419,7 @@ def get_weather_info(city: str) -> str:
     else:
         place = city
         city = traslation(chat, city, "English", "Korean")
-        print('city (translated): ', place)
+        print('city (translated): ', city)
         
     print('place: ', place)
     

@@ -11,7 +11,7 @@ LLM을 사용할때 다양한 API로 부터 얻은 결과를 사용하고 싶을
 3) Action결과를 관찰(Obseravation)합니다.
 4) 결과가 만족스러운지 확인(Thought) 합니다. 만족하지 않으면 반복합니다.
 
-Agent에 대한 자세한 내용은 [ReAct.md](./agent.md)을 참조합니다.
+Agent에 대한 자세한 내용은 [agent.md](./agent.md)을 참조합니다.
 
 
 

@@ -439,7 +439,7 @@ export class CdkLlmAgentStack extends cdk.Stack {
         connection_url: connection_url,
         debugMessageMode: debugMessageMode,
         LANGCHAIN_TRACING_V2: "true",
-        LANGCHAIN_API_KEY: "",
+        langsmith_api_key: "",
         LANGCHAIN_PROJECT: "agent-"+projectName
       }
     });     

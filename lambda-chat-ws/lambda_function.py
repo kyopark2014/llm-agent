@@ -476,12 +476,12 @@ Thought:{agent_scratchpad}
 
 Use the following format:
 
-Question: input question에 반드시 답변합니다. 
-Thought: 항상 무엇을 해야 할지 생각합니다. 
-Action: 해야 할 action으로 [{tool_names}]중 하나를 선택합니다.
+Question: 답변하여야 할 input question 
+Thought: you should always think about what to do. 
+Action: 해야 할 action으로서 [{tool_names}]중 하나를 선택합니다.
 Action Input: action의 input
 Observation: action의 result
-... (Thought/Action/Action Input/Observation을 N번 반복 할 수 있습니다. 반복은 2번만 합니다.)
+... (Thought/Action/Action Input/Observation을 N번 반복 할 수 있습니다. 반복이 끝날때까지 정답을 찾지 못하면 마지막 result로 답변합니다.)
 ... (반복이 끝날때까지 적절한 답변을 얻지 못하면, 마지막 결과를 Final Answer를 전달합니다. )
 Thought: 나는 이제 Final Answer를 알고 있습니다. 
 Final Answer: original input에 대한 Final Answer
@@ -511,8 +511,8 @@ def run_agent_react(connectionId, requestId, chat, query):
         agent=agent, 
         tools=tools, 
         verbose=True, 
-        handle_parsing_errors=True
-        # max_iterations = 3  # default = 5
+        handle_parsing_errors=True,
+        max_iterations = 5
     )
     
     # run agent

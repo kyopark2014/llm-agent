@@ -325,7 +325,7 @@ def get_product_list(keyword: str) -> str:
             # \n문자를 replace합니다.
             title = prod.text.strip().replace("\n", "")       
             link = prod.get("href")
-            answer = answer + f"{title}, {link}\n"
+            answer = answer + f"{title}, URL: {link}\n"
     
     return answer
     

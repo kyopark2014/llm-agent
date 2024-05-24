@@ -303,28 +303,6 @@ def general_conversation(connectionId, requestId, chat, query):
     
     return msg
 
-"""
-@tool
-def get_product_list(keyword: str) -> list:
-    "" " 
-    Search product list by keyword and then return product list
-    keyword: search keyword
-    return: product list
-    "" "
-
-    url = f"https://search.kyobobook.co.kr/search?keyword={keyword}&gbCode=TOT&target=total"
-    response = requests.get(url)
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.text, "html.parser")
-        prod_info = soup.find_all("a", attrs={"class": "prod_info"})
-        prod_list = [
-            {"title": prod.text.strip(), "link": prod.get("href")} for prod in prod_info
-        ]
-        return prod_list[:5]
-    else:
-        return []
-"""       
-
 @tool 
 def get_product_list(keyword: str) -> str:
     """
@@ -352,13 +330,13 @@ def get_product_list(keyword: str) -> str:
     return answer
     
 @tool
-def get_current_time(format: str = "%Y-%m-%d %H:%M:%S"):
+def get_current_time()->str:
     """Returns the current date and time in the specified format"""
     
+    format: str = "%Y-%m-%d %H:%M:%S"
     timestr = datetime.datetime.now(timezone('Asia/Seoul')).strftime(format)
     # print('timestr:', timestr)
     
-    # return the formatted time
     return timestr
 
 def get_lambda_client(region):

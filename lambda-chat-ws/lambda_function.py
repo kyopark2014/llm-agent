@@ -451,8 +451,9 @@ Action: 해야 할 action으로 [{tool_names}]중 하나를 선택합니다.
 Action Input: action의 input
 Observation: action의 result
 ... (Thought/Action/Action Input/Observation 은 N번 반복 될 수 있습니다.)
+... (action의 result가 original input에 대한 답변이면 Final Answer로 전달합니다.)
 Thought: 나는 이제 Final Answer를 알고 있습니다.
-Final Answer: original input 질문에 대한 Final Answer
+Final Answer: original input에 대한 Final Answer
 
 Begin!
 

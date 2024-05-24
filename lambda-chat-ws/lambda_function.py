@@ -39,6 +39,12 @@ doc_prefix = s3_prefix+'/'
 debugMessageMode = os.environ.get('debugMessageMode', 'false')
 agentLangMode = 'kor'
 
+import os
+langsmith_api_key = os.environ.get('LANGCHAIN_API_KEY')
+print('langsmith_api_key: ', langsmith_api_key)
+if langsmith_api_key:
+    os.environ["LANGCHAIN_API_KEY"] = langsmith_api_key
+
 # api key to get weather information in agent
 secretsmanager = boto3.client('secretsmanager')
 try:

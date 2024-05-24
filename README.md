@@ -39,7 +39,7 @@ Thought -> Action (Search) -> Observation -> Thought - Action (Search) -> Observ
 
 ![image](https://github.com/kyopark2014/llm-agent/assets/52392004/4b2f79cc-6782-4c44-b594-1c5f22472dc7)
 
-- "오늘 날짜 알려줘"를 하면 [시스템 날짜를 확인](./apis.md)하여 알려줍니다. 
+- "오늘 날짜 알려줘"를 하면 [시스템 날짜를 확인](./apis.md#%EB%82%A0%EC%A7%9C%EC%99%80-%EC%8B%9C%EA%B0%84-%EC%A0%95%EB%B3%B4-%EA%B0%80%EC%A0%B8%EC%98%A4%EA%B8%B0)하여 알려줍니다. 
 
 <img width="850" alt="image" src="https://github.com/kyopark2014/llm-agent/assets/52392004/a0190426-33d4-46d3-b9d2-5294f9222b8c">
 

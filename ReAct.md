@@ -103,21 +103,85 @@ Thought:{agent_scratchpad}
 """)
 ```
 
+이를 부분적으로 한글화한 Prompt는 아래와 같습니다. 상세한 코드는 [lambda-chat](./lambda-chat-ws/lambda_function.py)을 참조합니다.
 
+```python
+def get_react_prompt_template(mode: str): # (hwchase17/react) https://smith.langchain.com/hub/hwchase17/react
+    if mode=='eng':
+        return PromptTemplate.from_template("""Answer the following questions as best you can. You have access to the following tools:
 
+{tools}
 
-#### 동작 설명
+Use the following format:
 
-아래는 CloudWatch에서 읽어온 실행 로그입니다. AgentExecutor chain이 동작하면서 먼저 Thought로 여행 관련 도서 검색을 필요하다는것을 인지하면, get_product_list 함수를 이용하여 "여행"을 검색하고 결과를 이용해 답변하게 됩니다.
+Question: the input question you must answer
+Thought: you should always think about what to do
+Action: the action to take, should be one of [{tool_names}]
+Action Input: the input to the action
+Observation: the result of the action
+... (this Thought/Action/Action Input/Observation can repeat N times)
+Thought: I now know the final answer
+Final Answer: the final answer to the original input question
 
-```text
-[1m> Entering new AgentExecutor chain...[0m
-[32;1m[1;3mThought: 이 질문에 대한 답변을 하기 위해서는 여행 관련 도서 목록을 검색해야 합니다.
-Action: get_product_list
-Action Input: 여행[0m
-[33;1m[1;3m[{'title': '[국내도서]\n예약판매\n우리문학의여행.다문화.디아스포라', 'link': 'https://product.kyobobook.co.kr/detail/S000213330319'}, {'title': '[국내도서]\n예약판매\n해시태그 프랑스 소도시여행', 'link': 'https://product.kyobobook.co.kr/detail/S000213329696'}, {'title': '[국내도서]\n예약판매\n지도 위 쏙쏙 세계여행 액티비티북 프랑스', 'link': 'https://product.kyobobook.co.kr/detail/S000213325676'}, {'title': '[국내도서]\n예약판매\n혼자서 국내 여행(2024~2025 최신판)', 'link': 'https://product.kyobobook.co.kr/detail/S000213304266'}, {'title': '[국내도서]\n예약판매\n친구랑 함께한 세계여행', 'link': 'https://product.kyobobook.co.kr/detail/S000213290121'}][0m
+Begin!
+
+Question: {input}
+Thought:{agent_scratchpad}
+""")
+    else: 
+        return PromptTemplate.from_template("""다음은 Human과 Assistant의 친근한 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다.
+
+사용할 수 있는 tools은 아래와 같습니다:
+
+{tools}
+
+Use the following format:
+
+Question: 답변하여야 할 input question 
+Thought: you should always think about what to do. 
+Action: 해야 할 action으로서 [{tool_names}]중 하나를 선택합니다.
+Action Input: action의 input
+Observation: action의 result
+... (Thought/Action/Action Input/Observation을 3번 반복 할 수 있습니다. 반복이 끝날때까지 정답을 찾지 못하면 마지막 result로 답변합니다.)
+... (반복이 끝날때까지 적절한 답변을 얻지 못하면, 마지막 결과를 Final Answer를 전달합니다. )
+Thought: 나는 이제 Final Answer를 알고 있습니다. 
+Final Answer: original input에 대한 Final Answer
+
+When you have a response to say to the Human, or if you do not need to use a tool, you MUST use the format:
+'''
+Thought: Do I need to use a tool? No
+Final Answer: [your response here]
+'''
+
+Begin!
+
+Question: {input}
+Thought:{agent_scratchpad}
+""")
+        
+def run_agent_react(connectionId, requestId, chat, query):
+     # create agent
+    isTyping(connectionId, requestId)
+    agent = create_react_agent(chat, tools, prompt_template)
+    
+    agent_executor = AgentExecutor(
+        agent=agent, 
+        tools=tools, 
+        verbose=True, 
+        handle_parsing_errors=True,
+        max_iterations = 5
+    )
+    
+    # run agent
+    response = agent_executor.invoke({"input": query})
+
+    # streaming    
+    msg = readStreamMsg(connectionId, requestId, response['output'])
+
+    msg = response['output']
+            
+    return msg
 ```
-
 
 
 
@@ -127,7 +191,6 @@ Action Input: 여행[0m
 
 ```python
 def get_react_chat_prompt_template():
-    # Get the react chat prompt template
     return PromptTemplate.from_template("""Assistant is designed to be able to assist with a wide range of tasks, from answering simple questions to providing in-depth explanations and discussions on a wide range of topics. As a language model, Assistant is able to generate human-like text based on the input it receives, allowing it to engage in natural-sounding conversations and provide responses that are coherent and relevant to the topic at hand.
 
 Assistant is constantly learning and improving, and its capabilities are constantly evolving. It is able to process and understand large amounts of text, and can use this knowledge to provide accurate and informative responses to a wide range of questions. Additionally, Assistant is able to generate its own text based on the input it receives, allowing it to engage in discussions and provide explanations and descriptions on a wide range of topics.
@@ -162,4 +225,67 @@ New input: {input}
 {agent_scratchpad}"""
 ```
 
+이를 한글화한 Prompt는 아래와 같습니다. 상세한 코드는 [lambda-chat](./lambda-chat-ws/lambda_function.py)을 참조합니다.
+
+```python
+def get_react_chat_prompt_template():
+    return PromptTemplate.from_template("""다음은 Human과 Assistant의 친근한 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다.
+
+사용할 수 있는 tools은 아래와 같습니다:
+
+{tools}
+
+Use the following format:
+
+Question: 답변하여야 할 input question 
+Thought: you should always think about what to do. 
+Action: 해야 할 action으로서 [{tool_names}]중 하나를 선택합니다.
+Action Input: action의 input
+Observation: action의 result
+... (Thought/Action/Action Input/Observation을 3번 반복 할 수 있습니다. 반복이 끝날때까지 정답을 찾지 못하면 마지막 result로 답변합니다.)
+... (반복이 끝날때까지 적절한 답변을 얻지 못하면, 마지막 결과를 Final Answer를 전달합니다. )
+Thought: 나는 이제 Final Answer를 알고 있습니다. 
+Final Answer: original input에 대한 Final Answer
+
+When you have a response to say to the Human, or if you do not need to use a tool, you MUST use the format:
+'''
+Thought: Do I need to use a tool? No
+Final Answer: [your response here]
+'''
+
+Begin!
+
+Previous conversation history:
+{chat_history}
+
+New input: {input}
+Thought:{agent_scratchpad}
+""")
+    
+def run_agent_react_chat(connectionId, requestId, chat, query):
+    # get template based on react 
+    prompt_template = get_react_chat_prompt_template()
+    print('prompt_template: ', prompt_template)
+    
+    # create agent
+    isTyping(connectionId, requestId)
+    agent = create_react_agent(chat, tools, prompt_template)
+    
+    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
+    
+    history = memory_chain.load_memory_variables({})["chat_history"]
+    
+    # run agent
+    response = agent_executor.invoke({
+        "input": query,
+        "chat_history": history
+    })
+    
+    # streaming
+    msg = readStreamMsg(connectionId, requestId, response['output'])
+
+    msg = response['output']
+            
+    return msg
+```
 

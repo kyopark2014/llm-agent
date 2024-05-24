@@ -437,7 +437,7 @@ Question: {input}
 Thought:{agent_scratchpad}
 """)
     else: 
-        return PromptTemplate.from_template("""다음의 Human과 Assistant의 친근한 이전 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다.
+        return PromptTemplate.from_template("""다음은 Human과 Assistant의 친근한 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다.
 
 사용할 수 있는 tools은 아래와 같습니다:
 
@@ -450,8 +450,7 @@ Thought: 항상 무엇을 해야 할지 생각합니다.
 Action: 해야 할 action으로 [{tool_names}]중 하나를 선택합니다.
 Action Input: action의 input
 Observation: action의 result
-... (Result가 input에 대한 답변이면 Final Answer로 전달합니다. 만약 적절한 답변이 아니면, Thought/Action/Action Input/Observation을 N번 반복 할 수 있습니다.)
-... ()
+... (result가 input에 대한 답변이면 Final Answer로 전달합니다. 만약 적절한 답변이 아니면, Thought/Action/Action Input/Observation을 N번 반복 할 수 있습니다.)
 Thought: 나는 이제 Final Answer를 알고 있습니다.
 Final Answer: original input에 대한 Final Answer
 

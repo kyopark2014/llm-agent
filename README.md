@@ -15,7 +15,13 @@ Agent의 동작은 Action, Observation, Thought와 같은 동작을 반복적으
 
 ## Agent Type
 
-LangChain의 [Agent Type](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/)을 보면, [Tool Calling](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/tool_calling/), [OpenAI tools](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/openai_tools/), [ReAct](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/react/)가 있습니다. ReAct의 경우에 직관적이고 이해가 쉬운 반면에 Multi-Input Tools, Parallel Function Calling과 같은 기능을 제공하지 않고 있습니다. 반면에 OpenAI tools는 가장 많이 사용되고 있고, 다양한 사례를 가지고 있습니다. Tool Calling은 OpenAI tools와 유사한 방식으로 Anthropic, Gemini등을 지원하고 있습니다. 여기에서는 Bedrock의 Anthropic Model을 이용하여 Agent를 구성합니다. 따라서, ReAct와 Tool calling agent를 모두 설명합니다. 
+LangChain의 [Agent Type](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/)을 보면, [Tool Calling](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/tool_calling/), [OpenAI tools](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/openai_tools/), [ReAct](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/react/)가 있습니다. 
+
+- ReAct의 경우에 직관적이고 이해가 쉬운 반면에 Multi-Input Tools, Parallel Function Calling과 같은 기능을 제공하지 않고 있습니다.
+- OpenAI tools는 가장 많이 사용되고 있고, 다양한 사례를 가지고 있습니다.
+- Tool Calling은 OpenAI tools와 유사한 방식으로 Anthropic, Gemini등을 지원하고 있습니다.
+
+여기에서는 ReAct와 Tool calling agent에 대해 설명합니다. 
 
 ### ReAct
 

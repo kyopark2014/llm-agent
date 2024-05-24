@@ -139,6 +139,37 @@ print(response)
 ```
 
 
+## Google Search
 
+필요한 패키지는 아래와 같이 설치합니다.
 
+```text
+pip install google-api-python-client>=2.100.0
+```
+
+```python
+from langchain_community.utilities import GoogleSearchAPIWrapper
+from langchain.agents import Tool, AgentExecutor, create_react_agent
+
+search = GoogleSearchAPIWrapper(
+    google_api_key=GOOGLE_API_KEY,
+    google_cse_id='a6cd8c517fbd64b72',
+    k=5,
+    siterestrict=False
+)
+
+google_tool = Tool(
+    name="Google Search",
+    func=search.run,
+    description="Use for when you need to perform an internet search to find information that another tool can not provide.",
+)
+
+search.run('langchain의 agent는 무엇이야?')
+```
+
+이때의 결과는 아래와 같습니다. 썩 좋은 결과는 아닌것으로 보여집니다.
+
+```text
+'"Olivia Wilde의 남자 친구인 Harry Styles는 29 세이고, 그의 나이에 0.23 거듭제곱한 값은 2.169459462491557 이야." 이 예제는 LangChain 문서\xa0... Jul 16, 2023 ... Langchain 이란? Langchain은 language model 기반의 ... 사실 간단한 챗이야 ... AgentType 을 보면 감이 오시겠지만, 우리는 다양한 종류의 Agent를\xa0... Agent 활용에서는 LangChain의 ReAct Agent를 정의합니다. ... "엔씨의 Lex 서비스는 무엇인지 설명해줘."와 같이 ... 메뉴에서 "Timestamp Extraction"을 선택하고, "지금은\xa0... Aug 16, 2023 ... ... 의 답변을 받을 수는 있어도 상세한 정보를 얻을 수는 없다. 이러한 한계를 극복하기 위해 LangChain에서는 검색을 통해 언어모델에 지식을 보완하는\xa0... Jul 3, 2023 ... 현재 LangChain에서 사용되는 에이전트 체인은 사용자와 AI의 요청과 응답으로 구성된 구성된 프롬프트 처리를 지원하지 않습니다. 우리는 주로 이를 모델\xa0...'
+```
 

@@ -598,7 +598,7 @@ def run_agent_react_chat(connectionId, requestId, chat, query):
             
     return msg
 
-def get_react_chat_prompt_template(mode: str): # (hwchase17/react) https://smith.langchain.com/hub/hwchase17/react
+def get_react_chat_prompt_template():
     # Get the react prompt template
 
     return PromptTemplate.from_template("""다음은 Human과 Assistant의 친근한 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다.

@@ -11,7 +11,7 @@
 ![image](https://github.com/kyopark2014/llm-agent/assets/52392004/f75501fd-d3d5-4a3f-9b6c-42b5466bb3f9)
 
 
-아래와 같은 질문이 있을때 결과는 [아래와 같은 순서](https://github.com/samwit/langchain-tutorials/blob/main/agents/YT_LangChain_Agents.ipynb)로 처리 됩니다. 
+동작 방식을 이해하기 위하여 [YT_LangChain_Agents.ipynb](https://github.com/samwit/langchain-tutorials/blob/main/agents/YT_LangChain_Agents.ipynb)와 같이 agent를 실행합니다.
 
 ```text
 agent.run("Who is the United States President? What is his current age raised divided by 2?")

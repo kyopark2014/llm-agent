@@ -97,7 +97,7 @@ def get_weather_info(city: str) -> str:
         print('error message: ', err_msg)                    
     
     return weather_str
-
+```
 
 ### Lambda Agent
 

@@ -430,7 +430,8 @@ def get_weather_info(city: str) -> str:
     weather_str: str = ""
     try:
         result = requests.get(api)
-        result = json.loads(result.text)
+        result = json.loads(result.text)        
+        print('result: ', result)
     
         overall = result['weather'][0]['main']
         current_temp = result['main']['temp']

@@ -120,28 +120,18 @@ def get_weather_info(city: str) -> str:
 
 ### Tavily Search 
 
-[Teddylee 가이드](https://teddylee777.github.io/langchain/langchain-agent/)
-
-[Travily](https://wikidocs.net/234282)
+아래와 같이 [Travily Search](https://app.tavily.com/home)를 이용해 검색합니다. 이를 위해서는 API Key를 미리 발급 받아서 아래와 같이 TAVILY_API_KEY로 등록하여야 합니다.
 
 ```python
+os.environ["TAVILY_API_KEY"] = api_key
+
 from langchain_community.tools.tavily_search import TavilySearchResults
 search = TavilySearchResults(k=5)
 
-search.invoke("판교 카카오 프렌즈샵 아지트점의 전화번호는 무엇인가요?")
-
-tools = [search, retriever_tool]
-
-from langchain_openai import ChatOpenAI
-llm = ChatOpenAI(model="gpt-4-turbo-preview", temperature=0)
-agent = create_openai_functions_agent(llm, tools, prompt)
-
-from langchain.agents import AgentExecutor
-agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
-
-response = agent_executor.invoke({"input": "안녕, 반가워!"})
-print(f'답변: {response["output"]}')
+search.invoke("제주도 여행지?")
 ```
+
+
 
 ## Google Search
 

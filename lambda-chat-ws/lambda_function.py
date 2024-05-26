@@ -369,11 +369,7 @@ def get_book_list(keyword: str) -> str:
     
 @tool
 def get_current_time (format: str = f"%Y-%m-%d %H:%M:%S")->str:
-    """
-    retrive system time to earn current date and time
-    format: the format of date and time to retrieve
-    return: current date and time by the given format
-    """
+    """Returns the current date and time in the specified format"""
     
     format = format.replace('\'','')
     

@@ -83,7 +83,7 @@ try:
     secret = json.loads(get_tavily_api_secret['SecretString'])
     #print('secret: ', secret)
     tavily_api_key = secret['tavily_api_key']
-except Exception as e:
+except Exception as e: 
     raise e
 
 if tavily_api_key:

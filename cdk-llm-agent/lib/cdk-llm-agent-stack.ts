@@ -429,7 +429,7 @@ export class CdkLlmAgentStack extends cdk.Stack {
       secretObjectValue: {
         langchain_project: cdk.SecretValue.unsafePlainText('agent-'+projectName),
         langsmith_api_key: cdk.SecretValue.unsafePlainText(''),
-      },
+      }, 
     });
     langsmithApiSecret.grantRead(roleLambdaWebsocket) 
 

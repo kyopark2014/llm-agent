@@ -346,6 +346,8 @@ def get_book_list(keyword: str) -> str:
     keyword: search keyword
     return: book list
     """
+    
+    keyword = keyword.replace('\'','')
 
     answer = ""
     url = f"https://search.kyobobook.co.kr/search?keyword={keyword}&gbCode=TOT&target=total"
@@ -485,6 +487,8 @@ def search_by_tavily(keyword: str) -> str:
     keyword: search keyword
     return: the information of keyword
     """    
+    
+    keyword = keyword.replace('\'','')
     
     search = TavilySearchResults(k=5)
                 

@@ -72,6 +72,22 @@ if langsmith_api_key:
     os.environ["LANGCHAIN_API_KEY"] = langsmith_api_key
     os.environ["LANGCHAIN_TRACING_V2"] = "true"
     os.environ["LANGCHAIN_PROJECT"] = langchain_project
+
+# api key to use Tavily Search
+tavily_api_key = ""
+try:
+    get_tavily_api_secret = secretsmanager.get_secret_value(
+        SecretId='tavilyapikey'
+    )
+    #print('get_tavily_api_secret: ', get_tavily_api_secret)
+    secret = json.loads(get_tavily_api_secret['SecretString'])
+    #print('secret: ', secret)
+    tavily_api_key = secret['tavily_api_key']
+except Exception as e:
+    raise e
+
+if tavily_api_key:
+    os.environ["TAVILY_API_KEY"] = tavily_api_key
    
 # websocket
 connection_url = os.environ.get('connection_url')

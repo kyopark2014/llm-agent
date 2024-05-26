@@ -367,7 +367,12 @@ def get_book_list(keyword: str) -> str:
     
 @tool
 def get_current_time(format: str = f"%Y-%m-%d %H:%M:%S")->str:
-    """Returns the current date and time in the specified format"""
+    #"""Returns the current date and time in the specified format"""
+    """
+    get current date and time by specific format and then return a string of given format
+    format: the format of date and time
+    return: a string of date and time
+    """
     
     timestr = datetime.datetime.now(timezone('Asia/Seoul')).strftime(format)
     # print('timestr:', timestr)
@@ -681,7 +686,6 @@ def run_agent_react_chat_using_revised_question(connectionId, requestId, chat, q
     return msg
 
 def run_agent_tool_calling(connectionId, requestId, chat, query):
-    # toolList = "get_current_time, get_book_list, get_weather_info"
     toolList = ", ".join((t.name for t in tools))
     
     system = f"You are a helpful assistant. Make sure to use the {toolList} tools for information."
@@ -718,7 +722,6 @@ def run_agent_tool_calling(connectionId, requestId, chat, query):
     return output
 
 def run_agent_tool_calling_chat(connectionId, requestId, chat, query):
-    toolList = "get_current_time, get_book_list, get_weather_info"
     # system = f"You are a helpful assistant. Make sure to use the {toolList} tools for information."
     system = f"다음의 Human과 Assistant의 친근한 이전 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다. 답변에 필요한 정보는 다움의 tools를 이용해 수집하세요. Tools: {toolList}"
             

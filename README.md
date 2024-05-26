@@ -47,6 +47,10 @@ Thought -> Action (Search) -> Observation -> Thought - Action (Search) -> Observ
 
 <img width="849" alt="image" src="https://github.com/kyopark2014/llm-agent/assets/52392004/e62b4654-ba18-40e6-86ae-2152b241aa04">
 
+- 오늘 날짜를 알수 있으므로 "올해 크리스마스까지 몇일이 남아 있어?"와 같은 질문에 정확히 답변할 수 있습니다.
+
+![image](https://github.com/kyopark2014/llm-agent/assets/52392004/8905c677-7a26-4a4e-9e14-ee8af8a481cf)
+
 
 - "서울과 부산의 날씨를 알려줘"와 같이 서울과 부산의 결과를 모두 기대하고 입력시에 아래와 같은 결과를 얻습니다. 
 

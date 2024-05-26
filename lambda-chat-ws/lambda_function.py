@@ -498,12 +498,6 @@ Observation: action의 result
 Thought: 나는 이제 Final Answer를 알고 있습니다. 
 Final Answer: original input에 대한 Final Answer
 
-When you have a response to say to the Human, or if you do not need to use a tool, you MUST use the format:
-'''
-Thought: Do I need to use a tool? No
-Final Answer: [your response here]
-'''
-
 Begin!
 
 Question: {input}
@@ -711,8 +705,6 @@ def run_agent_tool_calling_chat(connectionId, requestId, chat, query):
             
     return output
 
-#input_language = "Korean"
-#output_language = "English"
 def traslation(chat, text, input_language, output_language):
     system = (
         "You are a helpful assistant that translates {input_language} to {output_language} in <article> tags. Put it in <result> tags."

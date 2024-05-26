@@ -342,9 +342,9 @@ def general_conversation(connectionId, requestId, chat, query):
 @tool 
 def get_product_list(keyword: str) -> str:
     """
-    Search product list by keyword and then return product list
+    Search book list by keyword and then return book list
     keyword: search keyword
-    return: product list
+    return: book list
     """
 
     answer = ""
@@ -473,17 +473,17 @@ def get_weather_info(city: str) -> str:
     return weather_str
 
 @tool
-def search_by_tavily(query: str) -> str:
+def search_by_tavily(keyword: str) -> str:
     """
-    Search general information and then return the result as a string.
-    query: the question to know 
-    return: the information of query
+    Search general information by keyword and then return the result as a string.
+    keyword: search keyword
+    return: the information of keyword
     """    
     
     search = TavilySearchResults(k=5)
                 
     answer = ""
-    output = search.invoke(query)
+    output = search.invoke(keyword)
     print('tavily output: ', output)
     
     for result in output[:5]:

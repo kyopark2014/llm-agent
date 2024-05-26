@@ -368,7 +368,7 @@ def get_book_list(keyword: str) -> str:
     return answer
     
 @tool
-def get_current_time(format: str = f"%Y-%m-%d %H:%M:%S")->str:
+def get_current_time (format: str = f"%Y-%m-%d %H:%M:%S")->str:
     """
     retrive system time to earn current date and time
     format: the format of date and time to retrieve

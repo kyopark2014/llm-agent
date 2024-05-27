@@ -494,7 +494,7 @@ def search_by_tavily(keyword: str) -> str:
         output = search.invoke(keyword)
         print('tavily output: ', output)
         
-        for result in output[:5]:
+        for result in output[:3]:
             content = result.get("content")
             url = result.get("url")
             

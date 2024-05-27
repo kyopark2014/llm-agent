@@ -31,12 +31,14 @@ import requests
 from bs4 import BeautifulSoup
 
 @tool 
-def get_product_list(keyword: str) -> str:
+def get_book_list(keyword: str) -> str:
     """
-    Search product list by keyword and then return product list
+    Search book list by keyword and then return book list
     keyword: search keyword
-    return: product list
+    return: book list
     """
+    
+    keyword = keyword.replace('\'','')
 
     answer = ""
     url = f"https://search.kyobobook.co.kr/search?keyword={keyword}&gbCode=TOT&target=total"
@@ -49,10 +51,9 @@ def get_product_list(keyword: str) -> str:
             answer = "추천 도서는 아래와 같습니다.\n"
             
         for prod in prod_info[:5]:
-            # \n문자를 replace합니다.
             title = prod.text.strip().replace("\n", "")       
             link = prod.get("href")
-            answer = answer + f"{title}, URL: {link}\n"
+            answer = answer + f"{title}, URL: {link}\n\n"
     
     return answer
 ```
@@ -61,11 +62,11 @@ def get_product_list(keyword: str) -> str:
 
 ```python
 @tool
-def get_current_time(format: str = "%Y-%m-%d %H:%M:%S")->str:
+def get_current_time(format: str)->str:
     """Returns the current date and time in the specified format"""
     
+    format = format.replace('\'','')
     timestr = datetime.datetime.now(timezone('Asia/Seoul')).strftime(format)
-    # print('timestr:', timestr)
     
     return timestr
 ```
@@ -83,38 +84,46 @@ def get_weather_info(city: str) -> str:
     
     city = city.replace('\n','')
     city = city.replace('\'','')
+    
+    chat = get_chat(LLM_for_chat, selected_LLM)
                 
     if isKorean(city):
-        place = traslation_to_english(chat, city)
+        place = traslation(chat, city, "Korean", "English")
         print('city (translated): ', place)
     else:
         place = city
-    
-    apiKey = weather_api_key
-    lang = 'en' 
-    units = 'metric' 
-    api = f"https://api.openweathermap.org/data/2.5/weather?q={place}&APPID={apiKey}&lang={lang}&units={units}"
+        city = traslation(chat, city, "English", "Korean")
+        print('city (translated): ', city)
+        
+    print('place: ', place)
     
     weather_str: str = f"{city}에 대한 날씨 정보가 없습니다."
-            
-    try:
-        result = requests.get(api)
-        result = json.loads(result.text)
-    
-        if 'weather' in result:
-            overall = result['weather'][0]['main']
-            current_temp = result['main']['temp']
-            min_temp = result['main']['temp_min']
-            max_temp = result['main']['temp_max']
-            humidity = result['main']['humidity']
-            wind_speed = result['wind']['speed']
-            cloud = result['clouds']['all']
-            
-            weather_str = f"{city}의 현재 날씨의 특징은 {overall}이며, 현재 온도는 {current_temp}도 이고, 최저온도는 {min_temp}도, 최고 온도는 {max_temp}도 입니다. 현재 습도는 {humidity}% 이고, 바람은 초당 {wind_speed} 미터 입니다. 구름은 {cloud}% 입니다."
-    except Exception:
-        err_msg = traceback.format_exc()
-        print('error message: ', err_msg)                    
-    
+    if weather_api_key:
+        apiKey = weather_api_key
+        lang = 'en' 
+        units = 'metric' 
+        api = f"https://api.openweathermap.org/data/2.5/weather?q={place}&APPID={apiKey}&lang={lang}&units={units}"
+                
+        try:
+            result = requests.get(api)
+            result = json.loads(result.text)
+            print('result: ', result)
+        
+            if 'weather' in result:
+                overall = result['weather'][0]['main']
+                current_temp = result['main']['temp']
+                min_temp = result['main']['temp_min']
+                max_temp = result['main']['temp_max']
+                humidity = result['main']['humidity']
+                wind_speed = result['wind']['speed']
+                cloud = result['clouds']['all']
+                
+                weather_str = f"{city}의 현재 날씨의 특징은 {overall}이며, 현재 온도는 {current_temp}도 이고, 최저온도는 {min_temp}도, 최고 온도는 {max_temp}도 입니다. 현재 습도는 {humidity}% 이고, 바람은 초당 {wind_speed} 미터 입니다. 구름은 {cloud}% 입니다."
+        except Exception:
+            err_msg = traceback.format_exc()
+            print('error message: ', err_msg)                    
+        
+    print('weather_str: ', weather_str)                            
     return weather_str
 ```
 
@@ -125,15 +134,85 @@ def get_weather_info(city: str) -> str:
 ```python
 os.environ["TAVILY_API_KEY"] = api_key
 
-from langchain_community.tools.tavily_search import TavilySearchResults
-search = TavilySearchResults(k=5)
+@tool
+def search_by_tavily(keyword: str) -> str:
+    """
+    Search general information by keyword and then return the result as a string.
+    keyword: search keyword
+    return: the information of keyword
+    """    
+    
+    answer = ""
+    
+    if tavily_api_key:
+        keyword = keyword.replace('\'','')
+        
+        search = TavilySearchResults(k=5)
+                    
+        output = search.invoke(keyword)
+        print('tavily output: ', output)
+        
+        for result in output[:3]:
+            content = result.get("content")
+            url = result.get("url")
+            
+            answer = answer + f"{content}, URL: {url}\n\n"
+    
+    return answer
+```
 
-search.invoke("제주도 여행지?")
+### OpenSearch
+
+OpenSearch를 이용해 RAG를 구성하고 필요한 정보를 검색하여 사용합니다.
+
+```python
+def search_by_opensearch(keyword: str) -> str:
+    """
+    Search technical information by keyword and then return the result as a string.
+    keyword: search keyword
+    return: the technical information of keyword
+    """    
+    
+    print('keyword: ', keyword)
+    keyword = keyword.replace('\'','')
+    keyword = keyword.replace('|','')
+    keyword = keyword.replace('\n','')
+    print('modified keyword: ', keyword)
+    
+    bedrock_embedding = get_embedding()
+        
+    vectorstore_opensearch = OpenSearchVectorSearch(
+        index_name = "idx-*", # all
+        is_aoss = False,
+        ef_search = 1024, # 512(default)
+        m=48,
+        #engine="faiss",  # default: nmslib
+        embedding_function = bedrock_embedding,
+        opensearch_url=opensearch_url,
+        http_auth=(opensearch_account, opensearch_passwd), # http_auth=awsauth,
+    ) 
+    
+    answer = ""
+    top_k = 3   
+    relevant_documents = vectorstore_opensearch.similarity_search_with_score(
+        query = keyword,
+        k = top_k,
+    )
+
+    for i, document in enumerate(relevant_documents):
+        print(f'## Document(opensearch-vector) {i+1}: {document}')
+
+        excerpt = document[0].page_content        
+        uri = document[0].metadata['uri']
+                    
+        answer = answer + f"{excerpt}, URL: {uri}\n\n"
+    
+    return answer
 ```
 
 
 
-## Google Search
+### Google Search
 
 필요한 패키지는 아래와 같이 설치합니다.
 

@@ -11,7 +11,7 @@ Agent의 동작은 Action, Observation, Thought와 같은 동작을 반복적으
 3) Action결과를 관찰(Observation)합니다.
 4) 결과가 만족스러운지 확인(Thought) 합니다. 만족하지 않으면 반복합니다.
 
-[LLM-powered autonomous agent system(https://lilianweng.github.io/posts/2023-06-23-agent/)으로 부터 구현된 Agent는 다음과 같습니다. 
+[LLM-powered autonomous agent system](https://lilianweng.github.io/posts/2023-06-23-agent/)으로 부터 구현된 Agent는 다음과 같습니다. 
 
 
 ## Agent Type

@@ -411,7 +411,7 @@ export class CdkLlmAgentStack extends cdk.Stack {
     const weatherApiSecret = new secretsmanager.Secret(this, `weather-api-secret-for-${projectName}`, {
       description: 'secret for weather api key', // openweathermap
       removalPolicy: cdk.RemovalPolicy.DESTROY,
-      secretName: 'openweathermap',
+      secretName: `openweathermap-${projectName}`,
       generateSecretString: {
         secretStringTemplate: JSON.stringify({ 
           api_name: 'weather'
@@ -425,7 +425,7 @@ export class CdkLlmAgentStack extends cdk.Stack {
     const langsmithApiSecret = new secretsmanager.Secret(this, `weather-langsmith-secret-for-${projectName}`, {
       description: 'secret for lamgsmith api key', // openweathermap
       removalPolicy: cdk.RemovalPolicy.DESTROY,
-      secretName: 'langsmithapikey',
+      secretName: `langsmithapikey-${projectName}`,
       secretObjectValue: {
         langchain_project: cdk.SecretValue.unsafePlainText('agent-'+projectName),
         langsmith_api_key: cdk.SecretValue.unsafePlainText(''),
@@ -436,14 +436,13 @@ export class CdkLlmAgentStack extends cdk.Stack {
     const tavilyApiSecret = new secretsmanager.Secret(this, `weather-tavily-secret-for-${projectName}`, {
       description: 'secret for lamgsmith api key', // openweathermap
       removalPolicy: cdk.RemovalPolicy.DESTROY,
-      secretName: 'tavilyapikey',
+      secretName: `tavilyapikey-${projectName}`,
       secretObjectValue: {
-        project_name: cdk.SecretValue.unsafePlainText('agent-'+projectName),
+        project_name: cdk.SecretValue.unsafePlainText(projectName),
         tavily_api_key: cdk.SecretValue.unsafePlainText(''),
       },
     });
     tavilyApiSecret.grantRead(roleLambdaWebsocket) 
-
 
     const lambdaChatWebsocket = new lambda.DockerImageFunction(this, `lambda-chat-ws-for-${projectName}`, {
       description: 'lambda for chat using websocket',
@@ -460,7 +459,8 @@ export class CdkLlmAgentStack extends cdk.Stack {
         path: 'https://'+distribution.domainName+'/',   
         callLogTableName: callLogTableName,
         connection_url: connection_url,
-        debugMessageMode: debugMessageMode        
+        debugMessageMode: debugMessageMode,
+        projectName: projectName        
       }
     });     
     lambdaChatWebsocket.grantInvoke(new iam.ServicePrincipal('apigateway.amazonaws.com'));  

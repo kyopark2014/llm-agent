@@ -412,12 +412,9 @@ export class CdkLlmAgentStack extends cdk.Stack {
       description: 'secret for weather api key', // openweathermap
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       secretName: `openweathermap-${projectName}`,
-      generateSecretString: {
-        secretStringTemplate: JSON.stringify({ 
-          api_name: 'weather'
-        }),
-        generateStringKey: 'api_key',
-        excludeCharacters: '/@"',
+      secretObjectValue: {
+        project_name: cdk.SecretValue.unsafePlainText(projectName),
+        weather_api_key: cdk.SecretValue.unsafePlainText(''),
       },
     });
     weatherApiSecret.grantRead(roleLambdaWebsocket) 

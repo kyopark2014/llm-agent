@@ -50,7 +50,7 @@ try:
     #print('get_weather_api_secret: ', get_weather_api_secret)
     secret = json.loads(get_weather_api_secret['SecretString'])
     #print('secret: ', secret)
-    weather_api_key = secret['api_key']
+    weather_api_key = secret['weather_api_key']
 
 except Exception as e:
     raise e

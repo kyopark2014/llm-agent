@@ -369,11 +369,10 @@ def get_book_list(keyword: str) -> str:
     return answer
     
 @tool
-def get_current_time (format: str = f"%Y-%m-%d %H:%M:%S")->str:
+def get_current_time(format: str = f"%Y-%m-%d %H:%M:%S")->str:
     """Returns the current date and time in the specified format"""
     
     format = format.replace('\'','')
-    
     timestr = datetime.datetime.now(timezone('Asia/Seoul')).strftime(format)
     # print('timestr:', timestr)
     

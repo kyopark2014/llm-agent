@@ -182,14 +182,13 @@ def search_by_opensearch(keyword: str) -> str:
     bedrock_embedding = get_embedding()
         
     vectorstore_opensearch = OpenSearchVectorSearch(
-        index_name = "idx-*", # all
+        index_name = "idx-*",
         is_aoss = False,
-        ef_search = 1024, # 512(default)
+        ef_search = 1024,
         m=48,
-        #engine="faiss",  # default: nmslib
         embedding_function = bedrock_embedding,
         opensearch_url=opensearch_url,
-        http_auth=(opensearch_account, opensearch_passwd), # http_auth=awsauth,
+        http_auth=(opensearch_account, opensearch_passwd), 
     ) 
     
     answer = ""
@@ -226,7 +225,7 @@ from langchain.agents import Tool, AgentExecutor, create_react_agent
 
 search = GoogleSearchAPIWrapper(
     google_api_key=GOOGLE_API_KEY,
-    google_cse_id='a6cd8c517fbd64b72',
+    google_cse_id=GOOGLE_CSE_ID,
     k=5,
     siterestrict=False
 )

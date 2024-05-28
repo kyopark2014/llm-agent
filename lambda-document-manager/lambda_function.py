@@ -22,8 +22,8 @@ from multiprocessing import Process, Pipe
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_aws import ChatBedrock
 from langchain_core.messages import HumanMessage, SystemMessage
-s3 = boto3.client('s3')
 
+s3_client = boto3.client('s3')  
 s3_bucket = os.environ.get('s3_bucket') # bucket name
 s3_prefix = os.environ.get('s3_prefix')
 meta_prefix = "metadata/"
@@ -41,7 +41,6 @@ selected_multimodal = 0
 LLM_for_embedding = json.loads(os.environ.get('LLM_for_embedding'))
 selected_embedding = 0
 sqs = boto3.client('sqs')
-s3_client = boto3.client('s3')  
 
 roleArn = os.environ.get('roleArn') 
 path = os.environ.get('path')
@@ -172,12 +171,12 @@ def get_embedding():
     profile = LLM_for_embedding[selected_embedding]
     bedrock_region =  profile['bedrock_region']
     model_id = profile['model_id']
-    print(f'Embedding: {selected_embedding}, bedrock_region: {bedrock_region}')
+    print(f'selected_embedding: {selected_embedding}, bedrock_region: {bedrock_region}, model_id:{model_id}')
     
     # bedrock   
     boto3_bedrock = boto3.client(
         service_name='bedrock-runtime',
-        # region_name=bedrock_region,  # use default
+        region_name=bedrock_region,  
         config=Config(
             retries = {
                 'max_attempts': 30
@@ -628,7 +627,7 @@ def lambda_handler(event, context):
 
                 documentId = ""
                 try: 
-                    metadata_obj = s3.get_object(Bucket=bucket, Key=metadata_key)
+                    metadata_obj = s3_client.get_object(Bucket=bucket, Key=metadata_key)
                     metadata_body = metadata_obj['Body'].read().decode('utf-8')
                     metadata = json.loads(metadata_body)
                     print('metadata: ', metadata)
@@ -645,7 +644,7 @@ def lambda_handler(event, context):
                         delete_document_if_exist(metadata_key)
                         
                         print('delete metadata: ', metadata_key)                        
-                        result = s3.delete_object(Bucket=bucket, Key=metadata_key)
+                        result = s3_client.delete_object(Bucket=bucket, Key=metadata_key)
                         # print('result of metadata deletion: ', result)
                         
                     except Exception:
@@ -658,12 +657,12 @@ def lambda_handler(event, context):
         elif eventName == "ObjectCreated:Put":            
             size = 0
             try:
-                s3obj = s3.get_object(Bucket=bucket, Key=key)
+                s3obj = s3_client.get_object(Bucket=bucket, Key=key)
                 print(f"Got object: {s3obj}")        
                 size = int(s3obj['ContentLength'])    
                 
                 #attributes = ['ETag', 'Checksum', 'ObjectParts', 'StorageClass', 'ObjectSize']
-                #result = s3.get_object_attributes(Bucket=bucket, Key=key, ObjectAttributes=attributes)  
+                #result = s3_client.get_object_attributes(Bucket=bucket, Key=key, ObjectAttributes=attributes)  
                 #print('result: ', result)            
                 #size = int(result['ObjectSize'])
                 print('object size: ', size)
@@ -797,7 +796,7 @@ def lambda_handler(event, context):
             else: # delete if the object is unsupported one for format or size
                 try:
                     print('delete the unsupported file: ', key)                                
-                    result = s3.delete_object(Bucket=bucket, Key=key)
+                    result = s3_client.delete_object(Bucket=bucket, Key=key)
                     print('result of deletion of the unsupported file: ', result)
                             
                 except Exception:

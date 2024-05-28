@@ -36,7 +36,7 @@ def lambda_handler(event, context):
                 QueueUrl=sqsUrl
             )
             
-            #sqs_client.send_message(  # fofo
+            #sqs_client.send_message(  # fifo
             #    QueueUrl=sqsUrl, 
             #    MessageAttributes={},
             #    MessageDeduplicationId=eventId,

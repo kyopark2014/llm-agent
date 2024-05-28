@@ -12,6 +12,7 @@ RUN /var/lang/bin/python3 -m pip install PyPDF2
 RUN /var/lang/bin/python3 -m pip install langchain
 RUN /var/lang/bin/python3 -m pip install langchain-community
 RUN /var/lang/bin/python3 -m pip install langchain-aws
+RUN /var/lang/bin/python3 -m pip install opensearch-py
 RUN /var/lang/bin/python3 -m pip install unstructured
 RUN /var/lang/bin/python3 -m pip install anthropic
 RUN /var/lang/bin/python3 -m pip install python-pptx

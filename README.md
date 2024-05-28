@@ -40,9 +40,50 @@ Thought -> Action (Search) -> Observation -> Thought - Action (Search) -> Observ
 
 [LLM-powered autonomous agent system](https://lilianweng.github.io/posts/2023-06-23-agent/)으로 부터 구현된 Agent는 다음과 같습니다. 
 
-### 실행 결과
 
-실제 실행한 결과는 아래와 같습니다.
+### Prompt 
+
+ReAct를 위한 Prompt 에제는 [prompt.md](./prompt.md)을 참조합니다.
+
+### 외부 API 
+
+[apis.md](./apis.md)에서는 도서 검색, 날씨, 시간과 같은 유용한 검색 API에 대해 설명하고 있습니다.
+
+### LangSmith 사용 설정
+
+[langsmith.md](./langsmith.md)은 [LangSmith](https://smith.langchain.com/)에서 발급한 api key를 설정하여, agent의 동작을 디버깅할 수 있도록 해줍니다. 
+
+### LLM의 선택
+
+Agent 사용시 Tool을 선택하고, Observation과 Thought을 통해 Action으로 얻어진 결과가 만족스러운지 확인하는 과정이 필요합니다. 따라서 LLM의 성능은 Agent의 결과와 밀접한 관계가 있습니다. Claude Sonnet으로 Agent를 만든 결과가 일반적으로 Claude Haiku보다 우수하여, Sonnet을 추천합니다.
+
+
+## Tool calling agent
+
+LangChain의 [Tool calling agent](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/tool_calling/)은 Multi-Input Tools, Parallel Function Calling와 같은 다양한 기능을 제공하고 있습니다. 상세한 내용은 [toolcalling.md](https://github.com/kyopark2014/llm-agent/blob/main/toolcalling.md)을 참조합니다. 
+
+- [Chat models](https://python.langchain.com/v0.1/docs/integrations/chat/)에 따르면, BedrockChat은 Tool calling agent을 지원하고 있지 않습니다.
+- ChatBedrock API는 Agent를 선언할 수 있으나, 아래의 LangSmith 결과와 같이 Tool Calling에 대한 응답을 얻지 못하고 있습니다.
+- Tool calling은 ReAct에서 지원하지 못하고 있는 Multi-Input Tools, Parallel Function Calling등을 지원하고 있으므로, 향후 지원을 기대해 봅니다.
+  
+![image](https://github.com/kyopark2014/llm-agent/assets/52392004/86364b1b-0f52-4faa-b370-dd6660d4974f)
+
+
+## 직접 실습 해보기
+
+### 사전 준비 사항
+
+이 솔루션을 사용하기 위해서는 사전에 아래와 같은 준비가 되어야 합니다.
+
+- [AWS Account 생성](https://repost.aws/ko/knowledge-center/create-and-activate-aws-account)에 따라 계정을 준비합니다.
+
+### CDK를 이용한 인프라 설치
+
+본 실습에서는 Seoul 리전 (ap-northeast-2)을 사용합니다. [인프라 설치](./deployment.md)에 따라 CDK로 인프라 설치를 진행합니다. 
+
+## 실행결과
+
+실행한 결과는 아래와 같습니다.
 
 - "오늘 날씨 알려줘"를 입력하면 현재의 [날씨 정보를 조회](./apis.md#%EB%82%A0%EC%94%A8-%EC%A0%95%EB%B3%B4-%EA%B0%80%EC%A0%B8%EC%98%A4%EA%B8%B0)하여 알려줍니다. 
 
@@ -116,47 +157,6 @@ Final Answer: 미국 여행을 계획할 때는 다음 사항들을 고려하는
 
 <img width="858" alt="image" src="https://github.com/kyopark2014/llm-agent/assets/52392004/75987226-b3d2-481c-a9ba-efc62bfbe4ca">
 
-### Prompt 
-
-ReAct를 위한 Prompt 에제는 [prompt.md](./prompt.md)을 참조합니다.
-
-### 외부 API 
-
-[apis.md](./apis.md)에서는 도서 검색, 날씨, 시간과 같은 유용한 검색 API에 대해 설명하고 있습니다.
-
-### LangSmith 사용 설정
-
-[langsmith.md](./langsmith.md)은 [LangSmith](https://smith.langchain.com/)에서 발급한 api key를 설정하여, agent의 동작을 디버깅할 수 있도록 해줍니다. 
-
-### LLM의 선택
-
-Agent 사용시 Tool을 선택하고, Observation과 Thought을 통해 Action으로 얻어진 결과가 만족스러운지 확인하는 과정이 필요합니다. 따라서 LLM의 성능은 Agent의 결과와 밀접한 관계가 있습니다. Claude Sonnet으로 Agent를 만든 결과가 일반적으로 Claude Haiku보다 우수하여, Sonnet을 추천합니다.
-
-
-## Tool calling agent
-
-LangChain의 [Tool calling agent](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/tool_calling/)은 Multi-Input Tools, Parallel Function Calling와 같은 다양한 기능을 제공하고 있습니다. 상세한 내용은 [toolcalling.md](https://github.com/kyopark2014/llm-agent/blob/main/toolcalling.md)을 참조합니다. 
-
-- [Chat models](https://python.langchain.com/v0.1/docs/integrations/chat/)에 따르면, BedrockChat은 Tool calling agent을 지원하고 있지 않습니다.
-- ChatBedrock API는 Agent를 선언할 수 있으나, 아래의 LangSmith 결과와 같이 Tool Calling에 대한 응답을 얻지 못하고 있습니다.
-- Tool calling은 ReAct에서 지원하지 못하고 있는 Multi-Input Tools, Parallel Function Calling등을 지원하고 있으므로, 향후 지원을 기대해 봅니다.
-  
-![image](https://github.com/kyopark2014/llm-agent/assets/52392004/86364b1b-0f52-4faa-b370-dd6660d4974f)
-
-
-## 직접 실습 해보기
-
-### 사전 준비 사항
-
-이 솔루션을 사용하기 위해서는 사전에 아래와 같은 준비가 되어야 합니다.
-
-- [AWS Account 생성](https://repost.aws/ko/knowledge-center/create-and-activate-aws-account)에 따라 계정을 준비합니다.
-
-### CDK를 이용한 인프라 설치
-
-본 실습에서는 Seoul 리전 (ap-northeast-2)을 사용합니다. [인프라 설치](./deployment.md)에 따라 CDK로 인프라 설치를 진행합니다. 
-
-## 실행결과
 
 
 ## 리소스 정리하기 
@@ -174,7 +174,7 @@ cd ~/environment/llm-agent/cdk-llm-agent/ && cdk destroy --all
 
 ## 결론
 
-LangChain의 Agent를 이용하여 Llama3로 한국어 Chatbot을 만들었습니다. Llama2에서는 지원하지 않던 한국어가 괜찮은 성능으로 제공되고 있으며, 문서 요약 성능도 우수한것으로 보여집니다. 추가 테스트를 통해 활용방안을 확인할 예정입니다.
+LangChain의 Agent를 이용하여 Llama3로 한국어 Chatbot을 만들었습니다. Agent를 사용함으로써 다양한 API를 낮은 지연시간으로 활용할 수 있었습니다. 다만 API를 여러번 호출함으로 인한 지연시간으로 증가는 사용성을 나쁘게 하고, prompt에 넣을 수 있는 길이의 제한이 있어서 검색이나 RAG 결과를 많이 넣지 못하는 단점이 있습니다.
 
 ## Reference
 

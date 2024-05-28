@@ -8,6 +8,7 @@ import csv
 import re
 import traceback
 import requests
+import base64
 
 from botocore.config import Config
 from botocore.exceptions import ClientError
@@ -21,6 +22,7 @@ from langchain.memory import ConversationBufferWindowMemory
 from langchain_aws import ChatBedrock
 from langchain_community.vectorstores.opensearch_vector_search import OpenSearchVectorSearch
 from langchain_community.embeddings import BedrockEmbeddings
+from langchain_core.messages import HumanMessage, SystemMessage
 
 from langchain.agents import tool
 from langchain.agents import AgentExecutor, create_react_agent
@@ -29,6 +31,7 @@ from langchain.prompts import PromptTemplate
 from langchain.agents import AgentExecutor, create_tool_calling_agent
 from pytz import timezone
 from langchain_community.tools.tavily_search import TavilySearchResults
+from PIL import Image
 
 s3 = boto3.client('s3')
 s3_bucket = os.environ.get('s3_bucket') # bucket name
@@ -148,6 +151,40 @@ def get_chat():
         selected_LLM = 0
     
     return chat
+
+def get_multimodal(LLM_for_multimodal, selected_LLM):
+    profile = LLM_for_multimodal[selected_LLM]
+    bedrock_region =  profile['bedrock_region']
+    modelId = profile['model_id']
+    print(f'LLM: {selected_LLM}, bedrock_region: {bedrock_region}, modelId: {modelId}')
+    maxOutputTokens = int(profile['maxOutputTokens'])
+                          
+    # bedrock   
+    boto3_bedrock = boto3.client(
+        service_name='bedrock-runtime',
+        region_name=bedrock_region,
+        config=Config(
+            retries = {
+                'max_attempts': 30
+            }
+        )
+    )
+    parameters = {
+        "max_tokens":maxOutputTokens,     
+        "temperature":0.1,
+        "top_k":250,
+        "top_p":0.9,
+        "stop_sequences": [HUMAN_PROMPT]
+    }
+    # print('parameters: ', parameters)
+
+    multimodal = ChatBedrock(   # new chat model
+        model_id=modelId,
+        client=boto3_bedrock, 
+        model_kwargs=parameters,
+    )    
+    
+    return multimodal
 
 def get_embedding():
     global selected_embedding
@@ -908,6 +945,42 @@ def traslation(chat, text, input_language, output_language):
 
     return msg[msg.find('<result>')+8:len(msg)-9] # remove <result> tag
 
+def summary_of_code(chat, code, mode):
+    if mode == 'py':
+        system = (
+            "다음의 <article> tag에는 python code가 있습니다. code의 전반적인 목적에 대해 설명하고, 각 함수의 기능과 역할을 자세하게 한국어 500자 이내로 설명하세요."
+        )
+    elif mode == 'js':
+        system = (
+            "다음의 <article> tag에는 node.js code가 있습니다. code의 전반적인 목적에 대해 설명하고, 각 함수의 기능과 역할을 자세하게 한국어 500자 이내로 설명하세요."
+        )
+    else:
+        system = (
+            "다음의 <article> tag에는 code가 있습니다. code의 전반적인 목적에 대해 설명하고, 각 함수의 기능과 역할을 자세하게 한국어 500자 이내로 설명하세요."
+        )
+    
+    human = "<article>{code}</article>"
+    
+    prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
+    print('prompt: ', prompt)
+    
+    chain = prompt | chat    
+    try: 
+        result = chain.invoke(
+            {
+                "code": code
+            }
+        )
+        
+        summary = result.content
+        print('result of code summarization: ', summary)
+    except Exception:
+        err_msg = traceback.format_exc()
+        print('error message: ', err_msg)                    
+        raise Exception ("Not able to request to LLM")
+    
+    return summary
+
 def revise_question(connectionId, requestId, chat, query):    
     global history_length, token_counter_history    
     history_length = token_counter_history = 0
@@ -1188,6 +1261,72 @@ def check_grammer(chat, text):
     
     return msg
 
+def use_multimodal(img_base64, query):    
+    multimodal = get_multimodal(LLM_for_multimodal, selected_LLM)
+    
+    if query == "":
+        query = "그림에 대해 상세히 설명해줘."
+    
+    messages = [
+        SystemMessage(content="답변은 500자 이내의 한국어로 설명해주세요."),
+        HumanMessage(
+            content=[
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/png;base64,{img_base64}", 
+                    },
+                },
+                {
+                    "type": "text", "text": query
+                },
+            ]
+        )
+    ]
+    
+    try: 
+        result = multimodal.invoke(messages)
+        
+        summary = result.content
+        print('result of code summarization: ', summary)
+    except Exception:
+        err_msg = traceback.format_exc()
+        print('error message: ', err_msg)                    
+        raise Exception ("Not able to request to LLM")
+    
+    return summary
+
+def extract_text(chat, img_base64):    
+    query = "텍스트를 추출해서 utf8로 변환하세요. <result> tag를 붙여주세요."
+    
+    messages = [
+        HumanMessage(
+            content=[
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/png;base64,{img_base64}", 
+                    },
+                },
+                {
+                    "type": "text", "text": query
+                },
+            ]
+        )
+    ]
+    
+    try: 
+        result = chat.invoke(messages)
+        
+        extracted_text = result.content
+        print('result of text extraction from an image: ', extracted_text)
+    except Exception:
+        err_msg = traceback.format_exc()
+        print('error message: ', err_msg)                    
+        raise Exception ("Not able to request to LLM")
+    
+    return extracted_text
+
 def getResponse(connectionId, jsonBody):
     print('jsonBody: ', jsonBody)
     
@@ -1205,7 +1344,16 @@ def getResponse(connectionId, jsonBody):
     print('convType: ', convType)
     
     global map_chain, memory_chain
-
+    
+    # Multi-LLM
+    profile = LLM_for_chat[selected_LLM]
+    bedrock_region =  profile['bedrock_region']
+    modelId = profile['model_id']
+    print(f'selected_LLM: {selected_LLM}, bedrock_region: {bedrock_region}, modelId: {modelId}')
+    # print('profile: ', profile)
+    
+    chat = get_chat(LLM_for_chat, selected_LLM)    
+    
     # create memory
     if userId in map_chain:  
         print('memory exist. reuse it!')        
@@ -1320,6 +1468,64 @@ def getResponse(connectionId, jsonBody):
                 print('contexts: ', contexts)
 
                 msg = get_summary(chat, contexts)
+                
+            elif file_type == 'py' or file_type == 'js':
+                s3r = boto3.resource("s3")
+                doc = s3r.Object(s3_bucket, s3_prefix+'/'+object)
+                
+                contents = doc.get()['Body'].read().decode('utf-8')
+                
+                #contents = load_code(file_type, object)                
+                                
+                msg = summary_of_code(chat, contents, file_type)                  
+                
+            elif file_type == 'png' or file_type == 'jpeg' or file_type == 'jpg':
+                print('multimodal: ', object)
+                
+                s3_client = boto3.client('s3') 
+                    
+                image_obj = s3_client.get_object(Bucket=s3_bucket, Key=s3_prefix+'/'+object)
+                # print('image_obj: ', image_obj)
+                
+                image_content = image_obj['Body'].read()
+                img = Image.open(BytesIO(image_content))
+                
+                width, height = img.size 
+                print(f"width: {width}, height: {height}, size: {width*height}")
+                
+                isResized = False
+                while(width*height > 5242880):                    
+                    width = int(width/2)
+                    height = int(height/2)
+                    isResized = True
+                    print(f"width: {width}, height: {height}, size: {width*height}")
+                
+                if isResized:
+                    img = img.resize((width, height))
+                
+                buffer = BytesIO()
+                img.save(buffer, format="PNG")
+                img_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+                
+                commend  = jsonBody['commend']
+                print('commend: ', commend)
+                
+                # verify the image
+                msg = use_multimodal(img_base64, commend)       
+                
+                # extract text from the image
+                text = extract_text(chat, img_base64)
+                extracted_text = text[text.find('<result>')+8:len(text)-9] # remove <result> tag
+                print('extracted_text: ', extracted_text)
+                if len(extracted_text)>10:
+                    msg = msg + f"\n\n[추출된 Text]\n{extracted_text}\n"
+                
+                memory_chain.chat_memory.add_user_message(f"{object}에서 텍스트를 추출하세요.")
+                memory_chain.chat_memory.add_ai_message(extracted_text)
+            
+            else:
+                msg = "uploaded file: "+object
+            
                 
         elapsed_time = int(time.time()) - start
         print("total run time(sec): ", elapsed_time)

@@ -619,50 +619,6 @@ def search_by_opensearch(keyword: str) -> str:
     
     return answer
 
-def search_by_opensearch_test(keyword: str) -> str:
-    """
-    Search technical information by keyword and then return the result as a string.
-    keyword: search keyword
-    return: the technical information of keyword
-    """    
-    
-    print('keyword: ', keyword)
-    keyword = keyword.replace('\'','')
-    keyword = keyword.replace('|','')
-    keyword = keyword.replace('\n','')
-    print('modified keyword: ', keyword)
-    
-    bedrock_embedding = get_embedding()
-        
-    vectorstore_opensearch = OpenSearchVectorSearch(
-        index_name = "idx-*", # all
-        is_aoss = False,
-        ef_search = 1024, # 512(default)
-        m=48,
-        #engine="faiss",  # default: nmslib
-        embedding_function = bedrock_embedding,
-        opensearch_url=opensearch_url,
-        http_auth=(opensearch_account, opensearch_passwd), # http_auth=awsauth,
-    ) 
-    
-    answer = ""
-    top_k = 2
-    relevant_documents = vectorstore_opensearch.similarity_search_with_score(
-        query = keyword,
-        k = top_k,
-    )
-    print('length: ', len(relevant_documents))
-
-    for i, document in enumerate(relevant_documents):
-        print(f'## Document(opensearch-vector) {i+1}: {document}')
-
-        excerpt = document[0].page_content
-        uri = document[0].metadata['uri']
-                    
-        answer = answer + f"{excerpt}, URL: {uri}\n\n"
-    
-    return answer
-
 # define tools
 tools = [get_current_time, get_book_list, get_weather_info, search_by_tavily, search_by_opensearch]        
 
@@ -758,10 +714,41 @@ def run_agent_react(connectionId, requestId, chat, query):
             
     return msg
 
-def get_react_chat_prompt_template():
+def get_react_chat_prompt_template(mode: str):
     # Get the react prompt template
+    if mode=='eng':
+        return PromptTemplate.from_template("""Answer the following questions as best you can. You have access to the following tools:
 
-    return PromptTemplate.from_template("""다음은 Human과 Assistant의 친근한 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다.
+{tools}
+
+Use the following format:
+
+Question: the input question you must answer
+Thought: you should always think about what to do
+Action: the action to take, should be one of [{tool_names}]
+Action Input: the input to the action
+Observation: the result of the action
+... (this Thought/Action/Action Input/Observation can repeat N times)
+Thought: I now know the final answer
+Final Answer: the final answer to the original input question
+
+When you have a response to say to the Human, or if you do not need to use a tool, you MUST use the format:
+'''
+Thought: Do I need to use a tool? No
+Final Answer: [your response here]
+'''
+
+Begin!
+
+Previous conversation history:
+{chat_history}
+
+New input: {input}
+Thought:{agent_scratchpad}
+""")
+    else: 
+
+        return PromptTemplate.from_template("""다음은 Human과 Assistant의 친근한 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다.
 
 사용할 수 있는 tools은 아래와 같습니다:
 
@@ -795,7 +782,7 @@ Thought:{agent_scratchpad}
     
 def run_agent_react_chat(connectionId, requestId, chat, query):
     # get template based on react 
-    prompt_template = get_react_chat_prompt_template()
+    prompt_template = get_react_chat_prompt_template(agentLangMode)
     print('prompt_template: ', prompt_template)
     
     # create agent

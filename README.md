@@ -1,6 +1,6 @@
 # LangChain의 Agent 사용하기
 
-LLM을 사용할때 다양한 API로 부터 얻은 결과를 사용하여 더 정확한 결과를 얻고 싶을때에 Agent를 사용합니다. Agent를 사용하는 대표적인 Architecture는 아래와 같습니다. 
+LLM을 사용할때 다양한 API로 부터 얻은 결과를 사용하여 더 정확한 결과를 얻고 싶을때에 Agent를 사용합니다. Agent를 사용한 한국어 Chatbot의 Architecture는 아래와 같습니다. 
 
 1) 사용자가 채팅창에서 질문을 입력하면 WebSocket 방식으로 Lambda(chat)에 전달됩니다.
 2) Lambda(chat)은 Agent 동작을 수행하는데, Action - Observation - Thought - Final Answer의 동작을 수행합니다. 만약 Thought에서 Final Answer를 얻지 못하면 Action을 추가 수행합니다.

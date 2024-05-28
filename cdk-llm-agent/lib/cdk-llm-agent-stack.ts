@@ -41,7 +41,7 @@ const claude3_sonnet = [
     "bedrock_region": "us-west-2", // Oregon
     "model_type": "claude3",
     "model_id": "anthropic.claude-3-sonnet-20240229-v1:0",   
-    "maxOutputTokens": "8196"
+    "maxOutputTokens": "4096"
   }
 ];
 

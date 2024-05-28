@@ -46,6 +46,7 @@ opensearch_account = os.environ.get('opensearch_account')
 opensearch_passwd = os.environ.get('opensearch_passwd')
 opensearch_url = os.environ.get('opensearch_url')
 LLM_for_chat = json.loads(os.environ.get('LLM_for_chat'))
+LLM_for_multimodal= json.loads(os.environ.get('LLM_for_multimodal'))
 LLM_for_embedding = json.loads(os.environ.get('LLM_for_embedding'))
 selected_LLM = 0
 selected_embedding = 0
@@ -615,7 +616,7 @@ def search_by_opensearch_test(keyword: str) -> str:
     for i, document in enumerate(relevant_documents):
         print(f'## Document(opensearch-vector) {i+1}: {document}')
 
-        excerpt = document[0].page_content        
+        excerpt = document[0].page_content
         uri = document[0].metadata['uri']
                     
         answer = answer + f"{excerpt}, URL: {uri}\n\n"

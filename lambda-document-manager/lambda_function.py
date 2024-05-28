@@ -21,6 +21,7 @@ from pptx import Presentation
 from multiprocessing import Process, Pipe
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_aws import ChatBedrock
+from langchain_core.messages import HumanMessage, SystemMessage
 
 s3 = boto3.client('s3')
 
@@ -28,6 +29,7 @@ s3_bucket = os.environ.get('s3_bucket') # bucket name
 s3_prefix = os.environ.get('s3_prefix')
 meta_prefix = "metadata/"
 profile_of_LLMs = json.loads(os.environ.get('profile_of_LLMs'))
+selected_LLM = 0
 enableParallelSummay = os.environ.get('enableParallelSummay')
 
 opensearch_account = os.environ.get('opensearch_account')
@@ -35,7 +37,9 @@ opensearch_passwd = os.environ.get('opensearch_passwd')
 opensearch_url = os.environ.get('opensearch_url')
 sqsUrl = os.environ.get('sqsUrl')
 doc_prefix = s3_prefix+'/'
+LLM_for_multimodal= json.loads(os.environ.get('LLM_for_multimodal'))
 LLM_for_embedding = json.loads(os.environ.get('LLM_for_embedding'))
+selected_embedding = 0
 sqs = boto3.client('sqs')
 s3_client = boto3.client('s3')  
 
@@ -726,9 +730,9 @@ def lambda_handler(event, context):
                     buffer = BytesIO()
                     img.save(buffer, format="PNG")
                     img_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
-                                                    
+               
                     # extract text from the image
-                    chat = get_chat(profile_of_LLMs, 0)    
+                    chat = get_chat(LLM_for_multimodal, 0)    
                     text = extract_text(chat, img_base64)
                     extracted_text = text[text.find('<result>')+8:len(text)-9] # remove <result> tag
                     print('extracted_text: ', extracted_text)

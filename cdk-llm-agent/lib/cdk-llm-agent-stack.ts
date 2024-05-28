@@ -665,6 +665,7 @@ export class CdkLlmAgentStack extends cdk.Stack {
           max_object_size: String(max_object_size),
           supportedFormat: supportedFormat,
           profile_of_LLMs: JSON.stringify(profile_of_LLMs),
+          LLM_for_multimodal:JSON.stringify(claude3_sonnet),        
           LLM_for_embedding: JSON.stringify(titan_embedding_v1),
           enableParallelSummay: enableParallelSummay
         }

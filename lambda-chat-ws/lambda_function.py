@@ -1359,8 +1359,6 @@ def getResponse(connectionId, jsonBody):
     # print('profile: ', profile)
     
     chat = get_chat()    
-    answer = search_by_opensearch_test('보일러 에러코드')
-    print('answer: ', answer)
     
     # create memory
     if userId in map_chain:  

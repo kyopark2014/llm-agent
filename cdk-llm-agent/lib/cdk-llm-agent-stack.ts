@@ -12,6 +12,10 @@ import * as s3Deploy from "aws-cdk-lib/aws-s3-deployment";
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as apigatewayv2 from 'aws-cdk-lib/aws-apigatewayv2';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
+import * as opensearch from 'aws-cdk-lib/aws-opensearchservice';
+import * as sqs from 'aws-cdk-lib/aws-sqs';
+import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
+import * as lambdaEventSources from 'aws-cdk-lib/aws-lambda-event-sources';
 
 const region = process.env.CDK_DEFAULT_REGION;    
 const accountId = process.env.CDK_DEFAULT_ACCOUNT;
@@ -21,9 +25,34 @@ const s3_prefix = 'docs';
 const model_id = "anthropic.claude-3-sonnet-20240229-v1:0"; // anthropic.claude-3-sonnet-20240229-v1:0  anthropic.claude-3-haiku-20240307-v1:0
 const projectName = `llm-agent`; 
 
+const opensearch_account = "admin";
+const opensearch_passwd = "Wifi1234!";
+let opensearch_url = "";
 const bucketName = `storage-for-${projectName}-${accountId}-${region}`; 
 const bedrock_region = "us-east-1";  // "us-east-1" "us-west-2" 
 const debugMessageMode = 'true'; // if true, debug messages will be delivered to the client.
+const max_object_size = 102400000; // 100 MB max size of an object, 50MB(default)
+const enableParallelSummay = 'true';
+const supportedFormat = JSON.stringify(["pdf", "txt", "csv", "pptx", "ppt", "docx", "doc", "xlsx", "py", "js", "md", "jpeg", "jpg", "png"]);  
+
+const claude3_sonnet = [
+  {
+    "bedrock_region": "us-west-2", // Oregon
+    "model_type": "claude3",
+    "model_id": "anthropic.claude-3-sonnet-20240229-v1:0",   
+    "maxOutputTokens": "8196"
+  }
+];
+
+const titan_embedding_v1 = [
+  {
+    "bedrock_region": "us-west-2", // Oregon
+    "model_type": "titan",
+    "model_id": "anthropic.claude-3-sonnet-20240229-v1:0"
+  }
+];
+
+const profile_of_LLMs = claude3_sonnet;
 
 export class CdkLlmAgentStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -394,6 +423,70 @@ export class CdkLlmAgentStack extends cdk.Stack {
       }),
     );  
 
+    // opensearch
+    // Permission for OpenSearch
+    const domainName = projectName
+    const accountId = process.env.CDK_DEFAULT_ACCOUNT;
+    const resourceArn = `arn:aws:es:${region}:${accountId}:domain/${domainName}/*`
+    if(debug) {
+      new cdk.CfnOutput(this, `resource-arn-for-${projectName}`, {
+        value: resourceArn,
+        description: 'The arn of resource',
+      }); 
+    }
+
+    const OpenSearchAccessPolicy = new iam.PolicyStatement({        
+      resources: [resourceArn],      
+      actions: ['es:*'],
+      effect: iam.Effect.ALLOW,
+      principals: [new iam.AnyPrincipal()],      
+    });  
+
+    const domain = new opensearch.Domain(this, 'Domain', {
+      version: opensearch.EngineVersion.OPENSEARCH_2_3,
+      
+      domainName: domainName,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      enforceHttps: true,
+      fineGrainedAccessControl: {
+        masterUserName: opensearch_account,
+        // masterUserPassword: cdk.SecretValue.secretsManager('opensearch-private-key'),
+        masterUserPassword:cdk.SecretValue.unsafePlainText(opensearch_passwd)
+      },
+      capacity: {
+        masterNodes: 3,
+        masterNodeInstanceType: 'r6g.large.search',
+        // multiAzWithStandbyEnabled: false,
+        dataNodes: 3,
+        dataNodeInstanceType: 'r6g.large.search',        
+        // warmNodes: 2,
+        // warmInstanceType: 'ultrawarm1.medium.search',
+      },
+      accessPolicies: [OpenSearchAccessPolicy],      
+      ebs: {
+        volumeSize: 100,
+        volumeType: ec2.EbsDeviceVolumeType.GP3,
+      },
+      nodeToNodeEncryption: true,
+      encryptionAtRest: {
+        enabled: true,
+      },
+      zoneAwareness: {
+        enabled: true,
+        availabilityZoneCount: 3,        
+      }
+    });
+    new cdk.CfnOutput(this, `Domain-of-OpenSearch-for-${projectName}`, {
+      value: domain.domainArn,
+      description: 'The arm of OpenSearch Domain',
+    });
+    new cdk.CfnOutput(this, `Endpoint-of-OpenSearch-for-${projectName}`, {
+      value: 'https://'+domain.domainEndpoint,
+      description: 'The endpoint of OpenSearch Domain',
+    });
+    opensearch_url = 'https://'+domain.domainEndpoint;
+
+
     const apiInvokePolicy = new iam.PolicyStatement({ 
       // resources: ['arn:aws:execute-api:*:*:*'],
       resources: ['*'],
@@ -455,6 +548,9 @@ export class CdkLlmAgentStack extends cdk.Stack {
         s3_prefix: s3_prefix,
         path: 'https://'+distribution.domainName+'/',   
         callLogTableName: callLogTableName,
+        opensearch_account: opensearch_account,
+        opensearch_passwd: opensearch_passwd,
+        opensearch_url: opensearch_url,
         connection_url: connection_url,
         debugMessageMode: debugMessageMode,
         projectName: projectName        
@@ -511,6 +607,81 @@ export class CdkLlmAgentStack extends cdk.Stack {
       stageName: stage
     }); 
 
+    // S3 - Lambda(S3 event) - SQS(fifo) - Lambda(document)
+    // SQS for S3 event (fifo) 
+    let queueUrl:string[] = [];
+    let queue:any[] = [];
+    for(let i=0;i<profile_of_LLMs.length;i++) {
+      queue[i] = new sqs.Queue(this, 'QueueS3EventFifo'+i, {
+        visibilityTimeout: cdk.Duration.seconds(600),
+        queueName: `queue-s3-event-for-${projectName}-${i}.fifo`,  
+        fifo: true,
+        contentBasedDeduplication: false,
+        deliveryDelay: cdk.Duration.millis(0),
+        retentionPeriod: cdk.Duration.days(2),
+      });
+      queueUrl.push(queue[i].queueUrl);
+    }
+
+    // Lambda for s3 event manager
+    const lambdaS3eventManager = new lambda.Function(this, `lambda-s3-event-manager-for-${projectName}`, {
+      description: 'lambda for s3 event manager',
+      functionName: `lambda-s3-event-manager-for-${projectName}`,
+      handler: 'lambda_function.lambda_handler',
+      runtime: lambda.Runtime.PYTHON_3_11,
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-s3-event-manager')),
+      timeout: cdk.Duration.seconds(60),      
+      environment: {
+        sqsFifoUrl: JSON.stringify(queueUrl),
+        nqueue: String(profile_of_LLMs.length)
+      }
+    });
+    for(let i=0;i<profile_of_LLMs.length;i++) {
+      queue[i].grantSendMessages(lambdaS3eventManager); // permision for SQS putItem
+    }
+
+    // Lambda for document manager
+    let lambdDocumentManager:any[] = [];
+    for(let i=0;i<profile_of_LLMs.length;i++) {
+      lambdDocumentManager[i] = new lambda.DockerImageFunction(this, `lambda-document-manager-for-${projectName}-${i}`, {
+        description: 'S3 document manager',
+        functionName: `lambda-document-manager-for-${projectName}-${i}`,
+        role: roleLambdaWebsocket,
+        code: lambda.DockerImageCode.fromImageAsset(path.join(__dirname, '../../lambda-document-manager')),
+        timeout: cdk.Duration.seconds(600),
+        memorySize: 8192,
+        environment: {
+          bedrock_region: profile_of_LLMs[i].bedrock_region,
+          s3_bucket: s3Bucket.bucketName,
+          s3_prefix: s3_prefix,
+          opensearch_account: opensearch_account,
+          opensearch_passwd: opensearch_passwd,
+          opensearch_url: opensearch_url,
+          roleArn: roleLambdaWebsocket.roleArn,
+          path: 'https://'+distribution.domainName+'/', 
+          sqsUrl: queueUrl[i],
+          max_object_size: String(max_object_size),
+          supportedFormat: supportedFormat,
+          profile_of_LLMs: JSON.stringify(profile_of_LLMs),
+          enableParallelSummay: enableParallelSummay
+        }
+      });         
+      s3Bucket.grantReadWrite(lambdDocumentManager[i]); // permission for s3
+      lambdDocumentManager[i].addEventSource(new SqsEventSource(queue[i])); // permission for SQS
+    }
+    
+    // s3 event source
+    const s3PutEventSource = new lambdaEventSources.S3EventSource(s3Bucket, {
+      events: [
+        s3.EventType.OBJECT_CREATED_PUT,
+        s3.EventType.OBJECT_REMOVED_DELETE
+      ],
+      filters: [
+        { prefix: s3_prefix+'/' },
+      ]
+    });
+    lambdaS3eventManager.addEventSource(s3PutEventSource); 
+
     // lambda - provisioning
     const lambdaProvisioning = new lambda.Function(this, `lambda-provisioning-for-${projectName}`, {
       description: 'lambda to earn provisioning info',
@@ -550,21 +721,6 @@ export class CdkLlmAgentStack extends cdk.Stack {
       allowedMethods: cloudFront.AllowedMethods.ALLOW_ALL,  
       viewerProtocolPolicy: cloudFront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
     });
-
-    /*
-    {
-      "Version": "2012-10-17",
-      "Statement": [
-          {
-              "Sid": "Invoke",
-              "Effect": "Allow",
-              "Action": [
-                  "lambda:InvokeFunction"
-              ],
-              "Resource": "*"
-          }
-      ]
-    } */
 
     // lambda - datetime
     const lambdaDateTime = new lambda.DockerImageFunction(this, `lambda-datetime-for-${projectName}`, {

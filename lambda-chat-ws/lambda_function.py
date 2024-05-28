@@ -19,6 +19,7 @@ from langchain.chains.summarize import load_summarize_chain
 from langchain_core.prompts import MessagesPlaceholder, ChatPromptTemplate
 from langchain.memory import ConversationBufferWindowMemory
 from langchain_aws import ChatBedrock
+from langchain_community.vectorstores.opensearch_vector_search import OpenSearchVectorSearch
 
 from langchain.agents import tool
 from langchain.agents import AgentExecutor, create_react_agent
@@ -40,6 +41,9 @@ doc_prefix = s3_prefix+'/'
 debugMessageMode = os.environ.get('debugMessageMode', 'false')
 agentLangMode = 'kor'
 projectName = os.environ.get('projectName')
+opensearch_account = os.environ.get('opensearch_account')
+opensearch_passwd = os.environ.get('opensearch_passwd')
+opensearch_url = os.environ.get('opensearch_url')
 
 # api key to get weather information in agent
 secretsmanager = boto3.client('secretsmanager')

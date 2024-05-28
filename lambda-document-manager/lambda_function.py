@@ -88,11 +88,90 @@ def delete_document_if_exist(metadata_key):
         print('error message: ', err_msg)        
         raise Exception ("Not able to create meta file")
 
-# embedding for RAG
+def get_chat():
+    global selected_chat
+    profile = LLM_for_chat[selected_chat]
+    bedrock_region =  profile['bedrock_region']
+    modelId = profile['model_id']
+    print(f'LLM: {selected_chat}, bedrock_region: {bedrock_region}, modelId: {modelId}')
+    maxOutputTokens = int(profile['maxOutputTokens'])
+                          
+    # bedrock   
+    boto3_bedrock = boto3.client(
+        service_name='bedrock-runtime',
+        region_name=bedrock_region,
+        config=Config(
+            retries = {
+                'max_attempts': 30
+            }
+        )
+    )
+    parameters = {
+        "max_tokens":maxOutputTokens,     
+        "temperature":0.1,
+        "top_k":250,
+        "top_p":0.9,
+        "stop_sequences": [HUMAN_PROMPT]
+    }
+    # print('parameters: ', parameters)
+
+    chat = ChatBedrock(   # new chat model
+        model_id=modelId,
+        client=boto3_bedrock, 
+        model_kwargs=parameters,
+    )    
+    
+    selected_chat = selected_chat + 1
+    if selected_chat == len(selected_chat):
+        selected_chat = 0
+    
+    return chat
+
+def get_multimodal():
+    global selected_multimodal
+    
+    profile = LLM_for_multimodal[selected_multimodal]
+    bedrock_region =  profile['bedrock_region']
+    modelId = profile['model_id']
+    print(f'LLM: {selected_multimodal}, bedrock_region: {bedrock_region}, modelId: {modelId}')
+    maxOutputTokens = int(profile['maxOutputTokens'])
+                          
+    # bedrock   
+    boto3_bedrock = boto3.client(
+        service_name='bedrock-runtime',
+        region_name=bedrock_region,
+        config=Config(
+            retries = {
+                'max_attempts': 30
+            }
+        )
+    )
+    parameters = {
+        "max_tokens":maxOutputTokens,     
+        "temperature":0.1,
+        "top_k":250,
+        "top_p":0.9,
+        "stop_sequences": [HUMAN_PROMPT]
+    }
+    # print('parameters: ', parameters)
+
+    multimodal = ChatBedrock(   # new chat model
+        model_id=modelId,
+        client=boto3_bedrock, 
+        model_kwargs=parameters,
+    )    
+    
+    selected_multimodal = selected_multimodal + 1
+    if selected_multimodal == len(selected_multimodal):
+        selected_multimodal = 0
+    
+    return multimodal
+
 def get_embedding():
     global selected_embedding
     profile = LLM_for_embedding[selected_embedding]
     bedrock_region =  profile['bedrock_region']
+    model_id = profile['model_id']
     print(f'Embedding: {selected_embedding}, bedrock_region: {bedrock_region}')
     
     # bedrock   
@@ -109,7 +188,7 @@ def get_embedding():
     bedrock_embedding = BedrockEmbeddings(
         client=boto3_bedrock,
         region_name = bedrock_region,
-        model_id = 'amazon.titan-embed-text-v1' 
+        model_id = model_id
     )  
     
     if selected_embedding >= len(LLM_for_embedding)-1:
@@ -233,7 +312,7 @@ def load_document(file_type, key):
                 if(para.text):
                     texts.append(para.text)
                     # print(f"{i}: {para.text}")        
-            contents = '\n'.join(texts)            
+            contents = '\n'.join(texts)
             # print('contents: ', contents)
         except Exception:
                 err_msg = traceback.format_exc()
@@ -324,116 +403,6 @@ def get_parameter(model_type, maxOutputTokens):
             "stop_sequences": [HUMAN_PROMPT]            
         }
         
-# Multi-LLM
-def get_chat():
-    global selected_chat
-    profile = LLM_for_chat[selected_chat]
-    bedrock_region =  profile['bedrock_region']
-    modelId = profile['model_id']
-    print(f'LLM: {selected_chat}, bedrock_region: {bedrock_region}, modelId: {modelId}')
-    maxOutputTokens = int(profile['maxOutputTokens'])
-                          
-    # bedrock   
-    boto3_bedrock = boto3.client(
-        service_name='bedrock-runtime',
-        region_name=bedrock_region,
-        config=Config(
-            retries = {
-                'max_attempts': 30
-            }
-        )
-    )
-    parameters = {
-        "max_tokens":maxOutputTokens,     
-        "temperature":0.1,
-        "top_k":250,
-        "top_p":0.9,
-        "stop_sequences": [HUMAN_PROMPT]
-    }
-    # print('parameters: ', parameters)
-
-    chat = ChatBedrock(   # new chat model
-        model_id=modelId,
-        client=boto3_bedrock, 
-        model_kwargs=parameters,
-    )    
-    
-    selected_chat = selected_chat + 1
-    if selected_chat == len(selected_chat):
-        selected_chat = 0
-    
-    return chat
-
-def get_multimodal():
-    global selected_multimodal
-    
-    profile = LLM_for_multimodal[selected_multimodal]
-    bedrock_region =  profile['bedrock_region']
-    modelId = profile['model_id']
-    print(f'LLM: {selected_multimodal}, bedrock_region: {bedrock_region}, modelId: {modelId}')
-    maxOutputTokens = int(profile['maxOutputTokens'])
-                          
-    # bedrock   
-    boto3_bedrock = boto3.client(
-        service_name='bedrock-runtime',
-        region_name=bedrock_region,
-        config=Config(
-            retries = {
-                'max_attempts': 30
-            }
-        )
-    )
-    parameters = {
-        "max_tokens":maxOutputTokens,     
-        "temperature":0.1,
-        "top_k":250,
-        "top_p":0.9,
-        "stop_sequences": [HUMAN_PROMPT]
-    }
-    # print('parameters: ', parameters)
-
-    multimodal = ChatBedrock(   # new chat model
-        model_id=modelId,
-        client=boto3_bedrock, 
-        model_kwargs=parameters,
-    )    
-    
-    selected_multimodal = selected_multimodal + 1
-    if selected_multimodal == len(selected_multimodal):
-        selected_multimodal = 0
-    
-    return multimodal
-
-def get_embedding():
-    global selected_embedding
-    profile = LLM_for_embedding[selected_embedding]
-    bedrock_region =  profile['bedrock_region']
-    print(f'Embedding: {selected_embedding}, bedrock_region: {bedrock_region}')
-    
-    # bedrock   
-    boto3_bedrock = boto3.client(
-        service_name='bedrock-runtime',
-        # region_name=bedrock_region,  # use default
-        config=Config(
-            retries = {
-                'max_attempts': 30
-            }
-        )
-    )
-    
-    bedrock_embedding = BedrockEmbeddings(
-        client=boto3_bedrock,
-        region_name = bedrock_region,
-        model_id = 'amazon.titan-embed-text-v1' 
-    )  
-    
-    if selected_embedding >= len(LLM_for_embedding)-1:
-        selected_embedding = 0
-    else:
-        selected_embedding = selected_embedding + 1
-    
-    return bedrock_embedding
-
 def summary_of_code(chat, code, mode):
     if mode == 'py': 
         system = (

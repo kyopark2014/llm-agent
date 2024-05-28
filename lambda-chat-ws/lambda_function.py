@@ -48,7 +48,8 @@ opensearch_url = os.environ.get('opensearch_url')
 LLM_for_chat = json.loads(os.environ.get('LLM_for_chat'))
 LLM_for_multimodal= json.loads(os.environ.get('LLM_for_multimodal'))
 LLM_for_embedding = json.loads(os.environ.get('LLM_for_embedding'))
-selected_LLM = 0
+selected_chat = 0
+selected_multimodal = 0
 selected_embedding = 0
 
 # api key to get weather information in agent
@@ -113,12 +114,12 @@ MSG_LENGTH = 100
 
 # Multi-LLM
 def get_chat():
-    global selected_LLM
+    global selected_chat
     
-    profile = LLM_for_chat[selected_LLM]
+    profile = LLM_for_chat[selected_chat]
     bedrock_region =  profile['bedrock_region']
     modelId = profile['model_id']
-    print(f'LLM: {selected_LLM}, bedrock_region: {bedrock_region}, modelId: {modelId}')
+    print(f'selected_chat: {selected_chat}, bedrock_region: {bedrock_region}, modelId: {modelId}')
     maxOutputTokens = int(profile['maxOutputTokens'])
                           
     # bedrock   
@@ -146,17 +147,17 @@ def get_chat():
         model_kwargs=parameters,
     )    
     
-    selected_LLM = selected_LLM + 1
-    if selected_LLM == len(LLM_for_chat):
-        selected_LLM = 0
+    selected_chat = selected_chat + 1
+    if selected_chat == len(LLM_for_chat):
+        selected_chat = 0
     
     return chat
 
-def get_multimodal(LLM_for_multimodal, selected_LLM):
-    profile = LLM_for_multimodal[selected_LLM]
+def get_multimodal():
+    profile = LLM_for_multimodal[selected_multimodal]
     bedrock_region =  profile['bedrock_region']
     modelId = profile['model_id']
-    print(f'LLM: {selected_LLM}, bedrock_region: {bedrock_region}, modelId: {modelId}')
+    print(f'selected_multimodal: {selected_multimodal}, bedrock_region: {bedrock_region}, modelId: {modelId}')
     maxOutputTokens = int(profile['maxOutputTokens'])
                           
     # bedrock   
@@ -183,6 +184,10 @@ def get_multimodal(LLM_for_multimodal, selected_LLM):
         client=boto3_bedrock, 
         model_kwargs=parameters,
     )    
+    
+    selected_multimodal = selected_multimodal + 1
+    if selected_multimodal == len(LLM_for_multimodal):
+        selected_multimodal = 0
     
     return multimodal
 
@@ -1262,7 +1267,7 @@ def check_grammer(chat, text):
     return msg
 
 def use_multimodal(img_base64, query):    
-    multimodal = get_multimodal(LLM_for_multimodal, selected_LLM)
+    multimodal = get_multimodal()
     
     if query == "":
         query = "그림에 대해 상세히 설명해줘."
@@ -1346,13 +1351,13 @@ def getResponse(connectionId, jsonBody):
     global map_chain, memory_chain
     
     # Multi-LLM
-    profile = LLM_for_chat[selected_LLM]
+    profile = LLM_for_chat[selected_chat]
     bedrock_region =  profile['bedrock_region']
     modelId = profile['model_id']
-    print(f'selected_LLM: {selected_LLM}, bedrock_region: {bedrock_region}, modelId: {modelId}')
+    print(f'selected_chat: {selected_chat}, bedrock_region: {bedrock_region}, modelId: {modelId}')
     # print('profile: ', profile)
     
-    chat = get_chat(LLM_for_chat, selected_LLM)    
+    chat = get_chat()    
     answer = search_by_opensearch_test('보일러 에러코드')
     print('answer: ', answer)
     

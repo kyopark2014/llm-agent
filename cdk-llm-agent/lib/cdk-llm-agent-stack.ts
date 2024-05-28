@@ -16,6 +16,7 @@ import * as opensearch from 'aws-cdk-lib/aws-opensearchservice';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
 import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
 import * as lambdaEventSources from 'aws-cdk-lib/aws-lambda-event-sources';
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
 
 const region = process.env.CDK_DEFAULT_REGION;    
 const accountId = process.env.CDK_DEFAULT_ACCOUNT;
@@ -542,12 +543,12 @@ export class CdkLlmAgentStack extends cdk.Stack {
       memorySize: 8192,
       role: roleLambdaWebsocket,
       environment: {
-        bedrock_region: bedrock_region,
         model_id: model_id,
         s3_bucket: s3Bucket.bucketName,
         s3_prefix: s3_prefix,
         path: 'https://'+distribution.domainName+'/',   
         callLogTableName: callLogTableName,
+        LLM_for_chat:JSON.stringify(claude3_sonnet),
         opensearch_account: opensearch_account,
         opensearch_passwd: opensearch_passwd,
         opensearch_url: opensearch_url,
@@ -663,6 +664,7 @@ export class CdkLlmAgentStack extends cdk.Stack {
           max_object_size: String(max_object_size),
           supportedFormat: supportedFormat,
           profile_of_LLMs: JSON.stringify(profile_of_LLMs),
+          LLM_for_embedding: JSON.stringify(titan_embedding_v1),
           enableParallelSummay: enableParallelSummay
         }
       });         

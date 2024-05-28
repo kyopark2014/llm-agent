@@ -20,9 +20,6 @@ from opensearchpy import OpenSearch
 from pptx import Presentation
 from multiprocessing import Process, Pipe
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_community.chat_models import BedrockChat
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_aws import ChatBedrock
 
 s3 = boto3.client('s3')
@@ -38,7 +35,7 @@ opensearch_passwd = os.environ.get('opensearch_passwd')
 opensearch_url = os.environ.get('opensearch_url')
 sqsUrl = os.environ.get('sqsUrl')
 doc_prefix = s3_prefix+'/'
-
+LLM_for_embedding = json.loads(os.environ.get('LLM_for_embedding'))
 sqs = boto3.client('sqs')
 s3_client = boto3.client('s3')  
 
@@ -88,23 +85,37 @@ def delete_document_if_exist(metadata_key):
         raise Exception ("Not able to create meta file")
 
 # embedding for RAG
-region_name = os.environ.get('bedrock_region')
+def get_embedding():
+    global selected_embedding
+    profile = LLM_for_embedding[selected_embedding]
+    bedrock_region =  profile['bedrock_region']
+    print(f'Embedding: {selected_embedding}, bedrock_region: {bedrock_region}')
     
-boto3_bedrock = boto3.client(
-    service_name='bedrock-runtime',
-    region_name=region_name,
-    config=Config(
-        retries = {
-            'max_attempts': 30
-        }            
+    # bedrock   
+    boto3_bedrock = boto3.client(
+        service_name='bedrock-runtime',
+        # region_name=bedrock_region,  # use default
+        config=Config(
+            retries = {
+                'max_attempts': 30
+            }
+        )
     )
-)
+    
+    bedrock_embedding = BedrockEmbeddings(
+        client=boto3_bedrock,
+        region_name = bedrock_region,
+        model_id = 'amazon.titan-embed-text-v1' 
+    )  
+    
+    if selected_embedding >= len(LLM_for_embedding)-1:
+        selected_embedding = 0
+    else:
+        selected_embedding = selected_embedding + 1
+    
+    return bedrock_embedding
 
-bedrock_embeddings = BedrockEmbeddings(
-    client=boto3_bedrock,
-    region_name = region_name,
-    model_id = 'amazon.titan-embed-text-v1' 
-)   
+bedrock_embeddings = get_embedding()
 
 index_name = 'idx-rag'
 vectorstore = OpenSearchVectorSearch(

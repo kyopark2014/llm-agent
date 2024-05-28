@@ -20,6 +20,7 @@ from langchain_core.prompts import MessagesPlaceholder, ChatPromptTemplate
 from langchain.memory import ConversationBufferWindowMemory
 from langchain_aws import ChatBedrock
 from langchain_community.vectorstores.opensearch_vector_search import OpenSearchVectorSearch
+from langchain_community.embeddings import BedrockEmbeddings
 
 from langchain.agents import tool
 from langchain.agents import AgentExecutor, create_react_agent
@@ -44,6 +45,8 @@ projectName = os.environ.get('projectName')
 opensearch_account = os.environ.get('opensearch_account')
 opensearch_passwd = os.environ.get('opensearch_passwd')
 opensearch_url = os.environ.get('opensearch_url')
+LLM_for_chat = json.loads(os.environ.get('LLM_for_chat'))
+selected_LLM = 0
 
 # api key to get weather information in agent
 secretsmanager = boto3.client('secretsmanager')
@@ -99,7 +102,22 @@ connection_url = os.environ.get('connection_url')
 client = boto3.client('apigatewaymanagementapi', endpoint_url=connection_url)
 print('connection_url: ', connection_url)
 
-def initiate_chat():
+HUMAN_PROMPT = "\n\nHuman:"
+AI_PROMPT = "\n\nAssistant:"
+
+map_chain = dict() 
+MSG_LENGTH = 100
+
+# Multi-LLM
+def get_chat():
+    global selected_LLM
+    
+    profile = LLM_for_chat[selected_LLM]
+    bedrock_region =  profile['bedrock_region']
+    modelId = profile['model_id']
+    print(f'LLM: {selected_LLM}, bedrock_region: {bedrock_region}, modelId: {modelId}')
+    maxOutputTokens = int(profile['maxOutputTokens'])
+                          
     # bedrock   
     boto3_bedrock = boto3.client(
         service_name='bedrock-runtime',
@@ -107,51 +125,29 @@ def initiate_chat():
         config=Config(
             retries = {
                 'max_attempts': 30
-            }            
+            }
         )
     )
-
-    HUMAN_PROMPT = "\n\nHuman:"
-    AI_PROMPT = "\n\nAssistant:"
-    def get_parameter(modelId):
-        if modelId == 'amazon.titan-tg1-large' or modelId == 'amazon.titan-tg1-xlarge': 
-            return {
-                "maxTokenCount":1024,
-                "stopSequences":[],
-                "temperature":0,
-                "topP":0.9
-            }
-        elif modelId[:9] == 'anthropic':
-            return {
-                "max_tokens":4096,
-                "temperature":0.1,
-                "top_k":250,
-                "top_p": 0.9,
-                "stop_sequences": [HUMAN_PROMPT]            
-            }
-    parameters = get_parameter(modelId)
-
-    """
-    chat = BedrockChat(
-        model_id=modelId,
-        client=boto3_bedrock, 
-        streaming=True,
-        callbacks=[StreamingStdOutCallbackHandler()],
-        model_kwargs=parameters,
-    )  
-    """
+    parameters = {
+        "max_tokens":maxOutputTokens,     
+        "temperature":0.1,
+        "top_k":250,
+        "top_p":0.9,
+        "stop_sequences": [HUMAN_PROMPT]
+    }
+    # print('parameters: ', parameters)
 
     chat = ChatBedrock(   # new chat model
         model_id=modelId,
         client=boto3_bedrock, 
         model_kwargs=parameters,
     )    
+    
+    selected_LLM = selected_LLM + 1
+    if selected_LLM == len(LLM_for_chat):
+        selected_LLM = 0
+    
     return chat
-
-chat = initiate_chat()
-
-map_chain = dict() 
-MSG_LENGTH = 100
 
 # load documents from s3 for pdf and txt
 def load_document(file_type, s3_file_name):
@@ -438,6 +434,7 @@ def get_weather_info(city: str) -> str:
     city = city.replace('\n','')
     city = city.replace('\'','')
                 
+    chat = get_chat()
     if isKorean(city):
         place = traslation(chat, city, "Korean", "English")
         print('city (translated): ', place)
@@ -729,6 +726,8 @@ def run_agent_tool_calling(connectionId, requestId, chat, query):
     return output
 
 def run_agent_tool_calling_chat(connectionId, requestId, chat, query):
+    toolList = ", ".join((t.name for t in tools))
+    
     # system = f"You are a helpful assistant. Make sure to use the {toolList} tools for information."
     system = f"다음의 Human과 Assistant의 친근한 이전 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다. 답변에 필요한 정보는 다움의 tools를 이용해 수집하세요. Tools: {toolList}"
             
@@ -1103,6 +1102,8 @@ def getResponse(connectionId, jsonBody):
         load_chat_history(userId, allowTime)
     
     start = int(time.time())    
+    
+    chat = get_chat()
 
     msg = ""
     if type == 'text' and body[:11] == 'list models':

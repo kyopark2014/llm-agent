@@ -579,6 +579,52 @@ def search_by_opensearch(keyword: str) -> str:
     
     return answer
 
+def search_by_opensearch_test(keyword: str) -> str:
+    """
+    Search technical information by keyword and then return the result as a string.
+    keyword: search keyword
+    return: the technical information of keyword
+    """    
+    
+    print('keyword: ', keyword)
+    keyword = keyword.replace('\'','')
+    keyword = keyword.replace('|','')
+    keyword = keyword.replace('\n','')
+    print('modified keyword: ', keyword)
+    
+    bedrock_embedding = get_embedding()
+        
+    vectorstore_opensearch = OpenSearchVectorSearch(
+        index_name = "idx-*", # all
+        is_aoss = False,
+        ef_search = 1024, # 512(default)
+        m=48,
+        #engine="faiss",  # default: nmslib
+        embedding_function = bedrock_embedding,
+        opensearch_url=opensearch_url,
+        http_auth=(opensearch_account, opensearch_passwd), # http_auth=awsauth,
+    ) 
+    
+    answer = ""
+    top_k = 2
+    relevant_documents = vectorstore_opensearch.similarity_search_with_score(
+        query = keyword,
+        k = top_k,
+    )
+
+    for i, document in enumerate(relevant_documents):
+        print(f'## Document(opensearch-vector) {i+1}: {document}')
+
+        excerpt = document[0].page_content        
+        uri = document[0].metadata['uri']
+                    
+        answer = answer + f"{excerpt}, URL: {uri}\n\n"
+    
+    return answer
+
+answer = search_by_opensearch_test('보일러 에러코드')
+print('answer: ', answer)
+
 # define tools
 tools = [get_current_time, get_book_list, get_weather_info, search_by_tavily, search_by_opensearch]        
 

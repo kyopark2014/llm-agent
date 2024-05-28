@@ -13,7 +13,7 @@ LLM을 사용할때 다양한 API로 부터 얻은 결과를 사용하여 더 �
 
 ## Agent Type
 
-LangChain의 [Agent Type](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/)을 보면, [Tool Calling](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/tool_calling/), [OpenAI tools](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/openai_tools/), [ReAct](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/react/)가 있습니다. 
+LangChain의 [Agent Type](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/)와 같이, Agent는 [Tool Calling](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/tool_calling/), [OpenAI tools](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/openai_tools/), [ReAct](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/react/)와 같은 방법을 이용해 구현할 수 있습니다. 
 
 - ReAct의 경우에 직관적이고 이해가 쉬운 반면에 Multi-Input Tools, Parallel Function Calling과 같은 기능을 제공하지 않고 있습니다.
 - OpenAI tools는 가장 많이 사용되고 있고, 다양한 사례를 가지고 있습니다.

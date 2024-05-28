@@ -622,9 +622,6 @@ def search_by_opensearch_test(keyword: str) -> str:
     
     return answer
 
-answer = search_by_opensearch_test('보일러 에러코드')
-print('answer: ', answer)
-
 # define tools
 tools = [get_current_time, get_book_list, get_weather_info, search_by_tavily, search_by_opensearch]        
 
@@ -1226,6 +1223,10 @@ def getResponse(connectionId, jsonBody):
     start = int(time.time())    
     
     chat = get_chat()
+    
+    
+    answer = search_by_opensearch_test('보일러 에러코드')
+    print('answer: ', answer)
 
     msg = ""
     if type == 'text' and body[:11] == 'list models':

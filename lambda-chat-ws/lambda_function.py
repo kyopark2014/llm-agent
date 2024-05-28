@@ -46,7 +46,9 @@ opensearch_account = os.environ.get('opensearch_account')
 opensearch_passwd = os.environ.get('opensearch_passwd')
 opensearch_url = os.environ.get('opensearch_url')
 LLM_for_chat = json.loads(os.environ.get('LLM_for_chat'))
+LLM_for_embedding = json.loads(os.environ.get('LLM_for_embedding'))
 selected_LLM = 0
+selected_embedding = 0
 
 # api key to get weather information in agent
 secretsmanager = boto3.client('secretsmanager')
@@ -148,6 +150,36 @@ def get_chat():
         selected_LLM = 0
     
     return chat
+
+def get_embedding():
+    global selected_embedding
+    profile = LLM_for_embedding[selected_embedding]
+    bedrock_region =  profile['bedrock_region']
+    print(f'Embedding: {selected_embedding}, bedrock_region: {bedrock_region}')
+    
+    # bedrock   
+    boto3_bedrock = boto3.client(
+        service_name='bedrock-runtime',
+        # region_name=bedrock_region,  # use default
+        config=Config(
+            retries = {
+                'max_attempts': 30
+            }
+        )
+    )
+    
+    bedrock_embedding = BedrockEmbeddings(
+        client=boto3_bedrock,
+        region_name = bedrock_region,
+        model_id = 'amazon.titan-embed-text-v1' 
+    )  
+    
+    if selected_embedding >= len(LLM_for_embedding)-1:
+        selected_embedding = 0
+    else:
+        selected_embedding = selected_embedding + 1
+    
+    return bedrock_embedding
 
 # load documents from s3 for pdf and txt
 def load_document(file_type, s3_file_name):
@@ -503,8 +535,52 @@ def search_by_tavily(keyword: str) -> str:
         
     return answer
 
+@tool    
+def search_by_opensearch(keyword: str) -> str:
+    """
+    Search technical information by keyword and then return the result as a string.
+    keyword: search keyword
+    return: the technical information of keyword
+    """    
+    
+    print('keyword: ', keyword)
+    keyword = keyword.replace('\'','')
+    keyword = keyword.replace('|','')
+    keyword = keyword.replace('\n','')
+    print('modified keyword: ', keyword)
+    
+    bedrock_embedding = get_embedding()
+        
+    vectorstore_opensearch = OpenSearchVectorSearch(
+        index_name = "idx-*", # all
+        is_aoss = False,
+        ef_search = 1024, # 512(default)
+        m=48,
+        #engine="faiss",  # default: nmslib
+        embedding_function = bedrock_embedding,
+        opensearch_url=opensearch_url,
+        http_auth=(opensearch_account, opensearch_passwd), # http_auth=awsauth,
+    ) 
+    
+    answer = ""
+    top_k = 2
+    relevant_documents = vectorstore_opensearch.similarity_search_with_score(
+        query = keyword,
+        k = top_k,
+    )
+
+    for i, document in enumerate(relevant_documents):
+        print(f'## Document(opensearch-vector) {i+1}: {document}')
+
+        excerpt = document[0].page_content        
+        uri = document[0].metadata['uri']
+                    
+        answer = answer + f"{excerpt}, URL: {uri}\n\n"
+    
+    return answer
+
 # define tools
-tools = [get_current_time, get_book_list, get_weather_info, search_by_tavily]   
+tools = [get_current_time, get_book_list, get_weather_info, search_by_tavily, search_by_opensearch]        
 
 def get_react_prompt_template(mode: str): # (hwchase17/react) https://smith.langchain.com/hub/hwchase17/react
     # Get the react prompt template

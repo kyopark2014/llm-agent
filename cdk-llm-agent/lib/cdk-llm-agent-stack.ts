@@ -549,6 +549,7 @@ export class CdkLlmAgentStack extends cdk.Stack {
         path: 'https://'+distribution.domainName+'/',   
         callLogTableName: callLogTableName,
         LLM_for_chat:JSON.stringify(claude3_sonnet),
+        LLM_for_embedding: JSON.stringify(titan_embedding_v1),
         opensearch_account: opensearch_account,
         opensearch_passwd: opensearch_passwd,
         opensearch_url: opensearch_url,

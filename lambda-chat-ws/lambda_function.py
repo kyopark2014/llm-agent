@@ -195,12 +195,13 @@ def get_embedding():
     global selected_embedding
     profile = LLM_for_embedding[selected_embedding]
     bedrock_region =  profile['bedrock_region']
+    model_id = profile['model_id']
     print(f'Embedding: {selected_embedding}, bedrock_region: {bedrock_region}')
     
     # bedrock   
     boto3_bedrock = boto3.client(
         service_name='bedrock-runtime',
-        region_name=bedrock_region,  # use default
+        # region_name=bedrock_region,  # use default
         config=Config(
             retries = {
                 'max_attempts': 30
@@ -211,13 +212,12 @@ def get_embedding():
     bedrock_embedding = BedrockEmbeddings(
         client=boto3_bedrock,
         region_name = bedrock_region,
-        model_id = 'amazon.titan-embed-text-v1' 
+        model_id = model_id
     )  
     
-    if selected_embedding >= len(LLM_for_embedding)-1:
+    selected_embedding = selected_embedding + 1
+    if selected_embedding == len(LLM_for_embedding):
         selected_embedding = 0
-    else:
-        selected_embedding = selected_embedding + 1
     
     return bedrock_embedding
 

@@ -543,7 +543,6 @@ export class CdkLlmAgentStack extends cdk.Stack {
       memorySize: 8192,
       role: roleLambdaWebsocket,
       environment: {
-        model_id: model_id,
         s3_bucket: s3Bucket.bucketName,
         s3_prefix: s3_prefix,
         path: 'https://'+distribution.domainName+'/',   

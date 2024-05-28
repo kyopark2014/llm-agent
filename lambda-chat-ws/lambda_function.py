@@ -651,6 +651,7 @@ def search_by_opensearch_test(keyword: str) -> str:
         query = keyword,
         k = top_k,
     )
+    print('length: ', len(relevant_documents))
 
     for i, document in enumerate(relevant_documents):
         print(f'## Document(opensearch-vector) {i+1}: {document}')

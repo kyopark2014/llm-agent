@@ -1353,6 +1353,8 @@ def getResponse(connectionId, jsonBody):
     # print('profile: ', profile)
     
     chat = get_chat(LLM_for_chat, selected_LLM)    
+    answer = search_by_opensearch_test('보일러 에러코드')
+    print('answer: ', answer)
     
     # create memory
     if userId in map_chain:  
@@ -1367,12 +1369,6 @@ def getResponse(connectionId, jsonBody):
         load_chat_history(userId, allowTime)
     
     start = int(time.time())    
-    
-    chat = get_chat()
-    
-    
-    answer = search_by_opensearch_test('보일러 에러코드')
-    print('answer: ', answer)
 
     msg = ""
     if type == 'text' and body[:11] == 'list models':

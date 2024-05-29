@@ -41,12 +41,10 @@ Final Answer: Joe Biden is the United States President and his current age raise
 
 [Reasoning and Action의 약자](https://blog.kubwa.co.kr/%EB%85%BC%EB%AC%B8%EB%A6%AC%EB%B7%B0-%EB%9E%AD%EC%B2%B4%EC%9D%B8%EA%B4%80%EB%A0%A8-%EB%85%BC%EB%AC%B8-react-synergizing-reasoning-and-acting-in-language-models-%EA%B0%84%EB%8B%A8%ED%95%9C-%EC%8B%A4%EC%8A%B5-w-pytorch-dd31321ead00)로서, reasoning trace는 CoT(Chain of Thought)을 기초로 하고, Reasoning과 action을 반복적으로 수행하면서 환각(Hallucination)과 에러 전파(error properation)을 줄일 수 있습니다. 이를 통해 사람처럼 task를 푸는 것(human like task solving trajectory)을 가능하게 합니다.
 
-이때, ReAct를 위한 Prompt는 [hwchase17/react](https://smith.langchain.com/hub/hwchase17/react)을 이용해 아래와 같이 정의합니다.
+이때, ReAct를 위한 Prompt는 [hwchase17/react](https://smith.langchain.com/hub/hwchase17/react)을 참조해 아래와 같이 정의합니다. 불필요한 반복을 막기 위하여 Thought을 추가하였습니다. 
 
 ```python
-def get_react_prompt_template():
-    # Get the react prompt template
-    return PromptTemplate.from_template("""Answer the following questions as best you can. You have access to the following tools:
+PromptTemplate.from_template("""Answer the following questions as best you can. You have access to the following tools:
 
 {tools}
 
@@ -77,50 +75,26 @@ Thought:{agent_scratchpad}
 이를 부분적으로 한글화한 Prompt는 아래와 같습니다. 상세한 코드는 [lambda-chat](./lambda-chat-ws/lambda_function.py)을 참조합니다.
 
 ```python
-def get_react_prompt_template(mode: str): # (hwchase17/react) https://smith.langchain.com/hub/hwchase17/react
-    if mode=='eng':
-        return PromptTemplate.from_template("""Answer the following questions as best you can. You have access to the following tools:
-
-{tools}
-
-Use the following format:
-
-Question: the input question you must answer
-Thought: you should always think about what to do
-Action: the action to take, should be one of [{tool_names}]
-Action Input: the input to the action
-Observation: the result of the action
-... (this Thought/Action/Action Input/Observation can repeat N times)
-Thought: I now know the final answer
-Final Answer: the final answer to the original input question
-
-Begin!
-
-Question: {input}
-Thought:{agent_scratchpad}
-""")
-    else: 
-        return PromptTemplate.from_template("""다음은 Human과 Assistant의 친근한 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다.
+PromptTemplate.from_template("""다음은 Human과 Assistant의 친근한 대화입니다. Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다.
 
 사용할 수 있는 tools은 아래와 같습니다:
 
 {tools}
 
-Use the following format:
+다음의 format을 사용하세요.:
 
 Question: 답변하여야 할 input question 
 Thought: you should always think about what to do. 
-Action: 해야 할 action으로서 [{tool_names}]중 하나를 선택합니다.
+Action: 해야 할 action로서 [{tool_names}]중 하나를 선택합니다.
 Action Input: action의 input
 Observation: action의 result
-... (Thought/Action/Action Input/Observation을 3번 반복 할 수 있습니다. 반복이 끝날때까지 정답을 찾지 못하면 마지막 result로 답변합니다.)
-... (반복이 끝날때까지 적절한 답변을 얻지 못하면, 마지막 결과를 Final Answer를 전달합니다. )
+... (Thought/Action/Action Input/Observation을 3번 반복 할 수 있습니다.)
 Thought: 나는 이제 Final Answer를 알고 있습니다. 
 Final Answer: original input에 대한 Final Answer
 
-When you have a response to say to the Human, or if you do not need to use a tool, you MUST use the format:
+너는 Human에게 해줄 응답이 있거나, Tool을 사용하지 않아도 되는 경우에, 다음 format을 사용하세요.:
 '''
-Thought: Do I need to use a tool? No
+Thought: Tool을 사용해야 하나요? No
 Final Answer: [your response here]
 '''
 
@@ -129,7 +103,11 @@ Begin!
 Question: {input}
 Thought:{agent_scratchpad}
 """)
-        
+```
+
+ReAct Prompt를 이용해 실제 구현은 아래와 같습니다. 
+
+```python
 def run_agent_react(connectionId, requestId, chat, query):
      # create agent
     isTyping(connectionId, requestId)

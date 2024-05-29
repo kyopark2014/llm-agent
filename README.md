@@ -38,8 +38,6 @@ Thought -> Action (Search) -> Observation -> Thought - Action (Search) -> Observ
 3) Action결과를 관찰(Observation)합니다.
 4) 결과가 만족스러운지 확인(Thought) 합니다. 만족하지 않으면 반복합니다.
 
-[LLM-powered autonomous agent system](https://lilianweng.github.io/posts/2023-06-23-agent/)으로 부터 구현된 Agent는 다음과 같습니다. 
-
 
 ### Prompt 
 
@@ -198,3 +196,5 @@ LangChain의 Agent를 이용하여 Llama3로 한국어 Chatbot을 만들었습�
 [Automating tasks using Amazon Bedrock Agents and AI](https://blog.serverlessadvocate.com/automating-tasks-using-amazon-bedrock-agents-and-ai-4b6fb8856589)
 
 [llama3 로 #agent 🤖 만드는 방법 + 8B 오픈 모델로 Agent 구성하는 방법](https://www.youtube.com/watch?app=desktop&v=04MM0PXv2Fk)
+
+[LLM-powered autonomous agent system](https://lilianweng.github.io/posts/2023-06-23-agent/)

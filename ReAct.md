@@ -50,20 +50,20 @@ def get_react_prompt_template():
 
 {tools}
 
-다음의 format을 사용하세요.:
+Use the following format:
 
-Question: 답변하여야 할 input question 
-Thought: you should always think about what to do. 
-Action: 해야 할 action로서 [{tool_names}]중 하나를 선택합니다.
-Action Input: action의 input
-Observation: action의 result
-... (Thought/Action/Action Input/Observation을 3번 반복 할 수 있습니다.)
-Thought: 나는 이제 Final Answer를 알고 있습니다. 
-Final Answer: original input에 대한 Final Answer
+Question: the input question you must answer
+Thought: you should always think about what to do
+Action: the action to take, should be one of [{tool_names}]
+Action Input: the input to the action
+Observation: the result of the action
+... (this Thought/Action/Action Input/Observation can repeat N times)
+Thought: I now know the final answer
+Final Answer: the final answer to the original input question
 
-너는 Human에게 해줄 응답이 있거나, Tool을 사용하지 않아도 되는 경우에, 다음 format을 사용하세요.:
+When you have a response to say to the Human, or if you do not need to use a tool, you MUST use the format:
 '''
-Thought: Tool을 사용해야 하나요? No
+Thought: Do I need to use a tool? No
 Final Answer: [your response here]
 '''
 

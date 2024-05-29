@@ -187,7 +187,7 @@ cd ~/environment/llm-agent/cdk-llm-agent/ && cdk destroy --all
 
 ## 결론
 
-LangChain의 Agent를 이용하여 한국어 Chatbot을 만들었습니다. Agent를 사용함으로써 다양한 API를 낮은 지연시간으로 활용할 수 있었습니다. 다만 API를 여러번 호출함으로 인한 지연시간으로 증가가 발생하고, prompt에 넣을 수 있는 Context 길이 제한으로 검색이나 RAG 결과를 일부만 넣게 되는 단점이 있습니다.
+LangChain의 Agent를 이용하여 한국어 Chatbot을 만들었습니다. Agent를 사용함으로써 다양한 API를 낮은 지연시간으로 활용할 수 있었습니다. 다만 API를 여러번 호출함으로 인한 지연시간이 증가하고, prompt에 넣을 수 있는 Context 길이 제한으로 검색이나 RAG 결과를 일부만 넣게 되는 단점이 있습니다.
 
 ## Reference
 

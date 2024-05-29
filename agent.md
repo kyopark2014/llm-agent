@@ -87,4 +87,4 @@ Tool에는 아래와 같은 종류들이 있습니다.
 
 Chain은 연속된 action들로 hardcoding되어 있어서 다른 path를 쓸수 없습니다. 즉, agent는 관련된 정보를 이용하여 결정을 할 수 있고, 원하는 결과를 얻을때까지 반복적으로 다시 할 수 있습니다.
 
-<img src="https://github.com/kyopark2014/llm-agent/assets/52392004/d4d04989-5ec2-411a-a9ee-ced0a04dcb23" width="500">
+<img src="https://github.com/kyopark2014/llm-agent/assets/52392004/92233da1-03c4-4949-8636-b91191c975ce" width="700">

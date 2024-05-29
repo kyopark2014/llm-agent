@@ -171,6 +171,10 @@ Final Answer: 미국 여행을 계획할 때는 다음 사항들을 고려하는
 
 <img width="852" alt="image" src="https://github.com/kyopark2014/multimodal-on-aws/assets/52392004/16ee0cdc-73d2-4e03-9d23-129b209af4ea">
 
+LangSmith의 로그를 보면 아래와 같이 search_by_opensearch(RAG)를 호출하여 얻은 정보로 답변을 생성했음을 알 수 있습니다.
+
+![image](https://github.com/kyopark2014/llm-agent/assets/52392004/6f9db7f5-4ab1-44b5-aa8f-5c158ee12381)
+
 
 ## 리소스 정리하기 
 

@@ -45,7 +45,8 @@ retriever_tool = create_retriever_tool(
 
 ### Reasoning의 정의 
 
-Reasoning in Artificial Intelligence refers to the process by which AI systems analyze information, make inferences, and draw conclusions to solve problems or make decisions. It is a fundamental cognitive function that enables machines to mimic human thought processes and exhibit intelligent behavior.
+- 상황에 대한 인식을 바탕으로 새로운 사실을 유도
+- Reasoning in Artificial Intelligence refers to the process by which AI systems analyze information, make inferences, and draw conclusions to solve problems or make decisions. It is a fundamental cognitive function that enables machines to mimic human thought processes and exhibit intelligent behavior.
 
 
 

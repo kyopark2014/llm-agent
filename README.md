@@ -19,9 +19,7 @@ LangChain의 [Agent Type](https://python.langchain.com/v0.1/docs/modules/agents/
 - OpenAI tools는 가장 많이 사용되고 있고, 다양한 사례를 가지고 있습니다.
 - Tool Calling은 OpenAI tools와 유사한 방식으로 Anthropic, Gemini등을 지원하고 있습니다.
 
-여기에서는 ReAct와 Tool calling agent에 대해 설명합니다. 
-
-## ReAct Agent
+## Agent의 구현
 
 ### 기본 동작
 

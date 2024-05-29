@@ -185,6 +185,8 @@ LangChain의 Agent를 이용하여 Llama3로 한국어 Chatbot을 만들었습�
 
 ## Reference
 
+[Building Context-Aware Reasoning Applications with LangChain and LangSmith](https://www.youtube.com/watch?app=desktop&v=Hy08dbsfJGg)
+
 [Using LangChain ReAct Agents for Answering Multi-hop Questions in RAG Systems](https://towardsdatascience.com/using-langchain-react-agents-for-answering-multi-hop-questions-in-rag-systems-893208c1847e)
 
 [Intro to LLM Agents with Langchain: When RAG is Not Enough](https://towardsdatascience.com/intro-to-llm-agents-with-langchain-when-rag-is-not-enough-7d8c08145834)

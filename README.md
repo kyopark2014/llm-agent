@@ -87,7 +87,7 @@ LangChain의 [Tool calling agent](https://python.langchain.com/v0.1/docs/modules
 
 실행한 결과는 아래와 같습니다.
 
-- "오늘 날씨 알려줘"를 입력하면 현재의 [날씨 정보를 조회](./apis.md#%EB%82%A0%EC%94%A8-%EC%A0%95%EB%B3%B4-%EA%B0%80%EC%A0%B8%EC%98%A4%EA%B8%B0)하여 알려줍니다. 
+- "서울 날씨는?"를 입력하면 현재의 [날씨 정보를 조회](./apis.md#%EB%82%A0%EC%94%A8-%EC%A0%95%EB%B3%B4-%EA%B0%80%EC%A0%B8%EC%98%A4%EA%B8%B0)하여 알려줍니다. 
 
 ![image](https://github.com/kyopark2014/llm-agent/assets/52392004/4b2f79cc-6782-4c44-b594-1c5f22472dc7)
 
@@ -95,7 +95,7 @@ LangChain의 [Tool calling agent](https://python.langchain.com/v0.1/docs/modules
 
 <img width="850" alt="image" src="https://github.com/kyopark2014/llm-agent/assets/52392004/a0190426-33d4-46d3-b9d2-5294f9222b8c">
 
-- "서울 여행에 대한 책을 추천해줘"를 입력하면 [교보문의 책검색 API](./apis.md#%EB%8F%84%EC%84%9C-%EC%A0%95%EB%B3%B4-%EA%B0%80%EC%A0%B8%EC%98%A4%EA%B8%B0)를 이용하여 관련책을 검색하여 추천합니다.
+- "서울 여행에 대한 책을 추천해줘"를 입력하면 [교보문고의 검색 API](./apis.md#%EB%8F%84%EC%84%9C-%EC%A0%95%EB%B3%B4-%EA%B0%80%EC%A0%B8%EC%98%A4%EA%B8%B0)를 이용하여 관련책을 검색하여 추천합니다.
 
 <img width="849" alt="image" src="https://github.com/kyopark2014/llm-agent/assets/52392004/e62b4654-ba18-40e6-86ae-2152b241aa04">
 
@@ -104,7 +104,7 @@ LangChain의 [Tool calling agent](https://python.langchain.com/v0.1/docs/modules
 ![image](https://github.com/kyopark2014/llm-agent/assets/52392004/8905c677-7a26-4a4e-9e14-ee8af8a481cf)
 
 
-- "서울과 부산의 날씨를 알려줘"와 같이 서울과 부산의 결과를 모두 기대하고 입력시에 아래와 같은 결과를 얻습니다. 
+- "서울과 부산의 날씨를 알려줘"와 같이 서울과 부산의 결과를 각각 검색한 후에 아래와 같은 결과를 얻습니다. 
 
 <img width="848" alt="image" src="https://github.com/kyopark2014/llm-agent/assets/52392004/7b5c4993-1178-442d-9fb0-ddaff6b7ab09">
 
@@ -191,7 +191,7 @@ cd ~/environment/llm-agent/cdk-llm-agent/ && cdk destroy --all
 
 ## 결론
 
-LangChain의 Agent를 이용하여 한국어 Chatbot을 만들었습니다. Agent를 사용함으로써 다양한 API를 낮은 지연시간으로 활용할 수 있었습니다. 다만 API를 여러번 호출함으로 인한 지연시간이 증가하고, prompt에 넣을 수 있는 Context 길이 제한으로 검색이나 RAG 결과를 일부만 넣게 되는 단점이 있습니다.
+LangChain의 Agent를 이용하여 한국어 Chatbot을 만들었습니다. Agent를 사용함으로써 다양한 API를 문맥(Context)에 따라 활용할 수 있었습니다. 다만 API를 여러번 호출함으로 인한 지연시간이 증가하고, prompt에 넣을 수 있는 Context 길이 제한으로 검색이나 RAG 결과를 일부만 넣게 되는 단점이 있습니다.
 
 ## Reference
 

@@ -1,4 +1,4 @@
-# Agent
+# Agent에서 사용하는 API 
 
 ### Internet Search
 
@@ -19,7 +19,7 @@
 [api-current-time.ipynb](./api/api-current-time.ipynb)와 같이 구현합니다.
 
   
-## API 예제
+## 구현한 API
 
 ### 도서 정보 가져오기
 

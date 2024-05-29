@@ -41,9 +41,15 @@ Thought -> Action (Search) -> Observation -> Thought - Action (Search) -> Observ
 
 ReAct를 위한 Prompt 에제는 [prompt.md](./prompt.md)을 참조합니다.
 
-### 외부 API 
+### 구현된 API 
 
 [apis.md](./apis.md)에서는 도서 검색, 날씨, 시간과 같은 유용한 검색 API에 대해 설명하고 있습니다.
+
+- get_book_list: 도서 정보 검색 (교보)
+- get_current_time: 시스템 날짜와 시간
+- get_weather_info: 현재의 날씨 정보
+- search_by_tavily: 가벼운 인터넷 검색
+- search_by_opensearch: RAG에서 기술적인 자료 검색
 
 ### LangSmith 사용 설정
 

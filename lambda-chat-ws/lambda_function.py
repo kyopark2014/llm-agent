@@ -564,12 +564,12 @@ def search_by_tavily(keyword: str) -> str:
     if tavily_api_key:
         keyword = keyword.replace('\'','')
         
-        search = TavilySearchResults(k=5)
+        search = TavilySearchResults(k=3)
                     
         output = search.invoke(keyword)
         print('tavily output: ', output)
         
-        for result in output[:3]:
+        for result in output:
             print('result: ', result)
             if result:
                 content = result.get("content")

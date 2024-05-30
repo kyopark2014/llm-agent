@@ -499,7 +499,7 @@ def get_system_time() -> list:
 def get_weather_info(city: str) -> str:
     """
     Search weather information by city name and then return weather statement.
-    city: the english name of city to search
+    city: the name of city 
     return: weather statement
     """    
     

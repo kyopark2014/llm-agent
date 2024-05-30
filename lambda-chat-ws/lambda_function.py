@@ -496,7 +496,7 @@ def get_system_time() -> list:
     return result
 
 @tool
-def get_weather_info(city: str = "Seoul" or 'Seoul') -> str:
+def get_weather_info(city: str) -> str:
     """
     retrieve weather information by city name and then return weather statement.
     city: the name of city to retrieve

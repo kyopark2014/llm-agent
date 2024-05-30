@@ -442,7 +442,7 @@ def get_book_list(keyword: str) -> str:
     return answer
     
 @tool
-def get_current_time(format: str)->str:
+def get_current_time(format: str=f"%Y-%m-%d %H:%M:%S")->str:
     """Returns the current date and time in the specified format"""
     # f"%Y-%m-%d %H:%M:%S"
     format = format.replace('\'','')

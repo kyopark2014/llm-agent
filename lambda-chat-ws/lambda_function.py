@@ -40,7 +40,7 @@ callLogTableName = os.environ.get('callLogTableName')
 path = os.environ.get('path')
 doc_prefix = s3_prefix+'/'
 debugMessageMode = os.environ.get('debugMessageMode', 'false')
-agentLangMode = 'eng'
+agentLangMode = 'kor'
 projectName = os.environ.get('projectName')
 opensearch_account = os.environ.get('opensearch_account')
 opensearch_passwd = os.environ.get('opensearch_passwd')
@@ -639,7 +639,7 @@ Thought: you should always think about what to do
 Action: the action to take, should use only the tool name from [{tool_names}]
 Action Input: the input to the action
 Observation: the result of the action
-... (this Thought/Action/Action Input/Observation can repeat N times)
+... (this Thought/Action/Action Input/Observation can repeat 3 times)
 Thought: I now know the final answer
 Final Answer: the final answer to the original input question
 
@@ -727,10 +727,10 @@ Use the following format:
 
 Question: the input question you must answer
 Thought: you should always think about what to do
-Action: the action to take, should be one of [{tool_names}]
+Action: the action to take, should use only the tool name from [{tool_names}]
 Action Input: the input to the action
 Observation: the result of the action
-... (this Thought/Action/Action Input/Observation can repeat N times)
+... (this Thought/Action/Action Input/Observation can repeat 3 times)
 Thought: I now know the final answer
 Final Answer: the final answer to the original input question
 

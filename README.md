@@ -182,6 +182,11 @@ Final Answer: 미국 여행을 계획할 때는 다음 사항들을 고려하는
 
 ![image](https://github.com/kyopark2014/multimodal-on-aws/assets/52392004/6b33eb2d-11bc-4959-81d0-9ba76ca55ab2)
 
+- 다양한 API사용해 보기 위하여 "서울에서 부산으로 여행하려고 하고 있어. 서울과 부산의 온도를 비교해줘. 그리고 부산가면서 읽을 책 추천해주고, 부산가서 먹을 맛집도 찾아줘."로 입력 후 결과를 확인합니다. 
+
+  ![image](https://github.com/kyopark2014/llm-agent/assets/52392004/05eb0ab0-fa84-487e-b008-d8517d53105c)
+
+
 - [error_code.pdf](./contents/error_code.pdf)를 다운로드 한 후에 채팅창의 파일 아이콘을 선택하여 업로드 합니다. 이후 "보일러 에러코드에 대해 설명해줘."라고 입력하몬 RAG에서 얻어진 결과를 이용해 아래와 같이 답변합니다. 
 
 <img width="852" alt="image" src="https://github.com/kyopark2014/multimodal-on-aws/assets/52392004/16ee0cdc-73d2-4e03-9d23-129b209af4ea">
@@ -189,6 +194,10 @@ Final Answer: 미국 여행을 계획할 때는 다음 사항들을 고려하는
 LangSmith의 로그를 보면 아래와 같이 search_by_opensearch(RAG)를 호출하여 얻은 정보로 답변을 생성했음을 알 수 있습니다.
 
 ![image](https://github.com/kyopark2014/llm-agent/assets/52392004/6f9db7f5-4ab1-44b5-aa8f-5c158ee12381)
+
+LangSmith의 로그를 보면 아래와 같이 get_weather_info로 서울/부산의 날씨를 검색하고, get_book_list을 이용해 도서 목록을 가져오고, search_by_tavily로 맛집 검색한 결과를 보여주고 있습니다. 
+
+<img width="293" alt="image" src="https://github.com/kyopark2014/llm-agent/assets/52392004/dc0db14a-dcd2-486b-b0f5-3fae8a7b60bb">
 
 
 ## 리소스 정리하기 

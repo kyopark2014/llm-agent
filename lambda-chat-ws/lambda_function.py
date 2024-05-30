@@ -40,7 +40,7 @@ callLogTableName = os.environ.get('callLogTableName')
 path = os.environ.get('path')
 doc_prefix = s3_prefix+'/'
 debugMessageMode = os.environ.get('debugMessageMode', 'false')
-agentLangMode = 'eng'
+agentLangMode = 'kor'
 projectName = os.environ.get('projectName')
 opensearch_account = os.environ.get('opensearch_account')
 opensearch_passwd = os.environ.get('opensearch_passwd')
@@ -665,7 +665,7 @@ Thought:{agent_scratchpad}
 
 Question: 답변하여야 할 input question 
 Thought: you should always think about what to do. 
-Action: 해야 할 action로서 [{tool_names}]중 하나를 선택합니다.
+Action: 해야 할 action로서 [{tool_names}]의 tool의 name만을 가져옵니다. 
 Action Input: action의 input
 Observation: action의 result
 ... (Thought/Action/Action Input/Observation을 3번 반복 할 수 있습니다.)

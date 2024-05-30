@@ -496,10 +496,10 @@ def get_system_time() -> list:
     return result
 
 @tool
-def get_weather_info(city: str) -> str:
+def get_weather_info(city: str = "Seoul") -> str:
     """
-    Search weather information by city name and then return weather statement.
-    city: the english name of city to search
+    retrieve weather information by city name and then return weather statement.
+    city: the name of city to retrieve
     return: weather statement
     """    
     

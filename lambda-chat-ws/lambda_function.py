@@ -624,7 +624,7 @@ def search_by_opensearch(keyword: str) -> str:
 # define tools
 #tools = [get_current_time, get_book_list, get_weather_info, search_by_tavily, search_by_opensearch]        
 
-tools = [get_current_time(), get_book_list(), get_weather_info(), search_by_tavily(), search_by_opensearch()]        
+tools = [get_current_time(str), get_book_list(str), get_weather_info(str), search_by_tavily(str), search_by_opensearch(str)]        
 
 def get_react_prompt_template(mode: str): # (hwchase17/react) https://smith.langchain.com/hub/hwchase17/react
     # Get the react prompt template

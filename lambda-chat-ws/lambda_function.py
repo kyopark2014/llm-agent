@@ -570,10 +570,12 @@ def search_by_tavily(keyword: str) -> str:
         print('tavily output: ', output)
         
         for result in output[:3]:
-            content = result.get("content")
-            url = result.get("url")
+            print('result: ', result)
+            if result:
+                content = result.get("content")
+                url = result.get("url")
             
-            answer = answer + f"{content}, URL: {url}\n"
+                answer = answer + f"{content}, URL: {url}\n"
         
     return answer
 

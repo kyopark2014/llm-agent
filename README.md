@@ -87,6 +87,21 @@ LangChain의 [Tool calling agent](https://python.langchain.com/v0.1/docs/modules
 
 실행한 결과는 아래와 같습니다.
 
+- "안녕"이라고 입력하고, 동작하는것을 LangSmith로 확인합니다. 
+  
+![image](https://github.com/kyopark2014/llm-agent/assets/52392004/9e737a68-1e7b-4062-9dde-f94b7b03a2b4)
+
+Tools에 여러개의 API를 등록해 놓았지만, LLM이 Tool을 사용할 필요가 없다고 생각하면 LLM이 답변을 수행합니다.
+
+![image](https://github.com/kyopark2014/llm-agent/assets/52392004/da33d115-62fc-454d-ac26-71d13358bc90)
+
+이때의 로그는 아래와 같습니다.
+
+```text
+Thought: Tool을 사용해야 하나요? No
+Final Answer: 안녕하세요! 무엇을 도와드릴까요?
+```  
+
 - "서울 날씨는?"를 입력하면 현재의 [날씨 정보를 조회](./apis.md#%EB%82%A0%EC%94%A8-%EC%A0%95%EB%B3%B4-%EA%B0%80%EC%A0%B8%EC%98%A4%EA%B8%B0)하여 알려줍니다. 
 
 ![image](https://github.com/kyopark2014/llm-agent/assets/52392004/4b2f79cc-6782-4c44-b594-1c5f22472dc7)

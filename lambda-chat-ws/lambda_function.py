@@ -51,6 +51,7 @@ LLM_for_embedding = json.loads(os.environ.get('LLM_for_embedding'))
 selected_chat = 0
 selected_multimodal = 0
 selected_embedding = 0
+separated_chat_history = os.environ.get('separated_chat_history')
 
 # api key to get weather information in agent
 secretsmanager = boto3.client('secretsmanager')
@@ -621,7 +622,9 @@ def search_by_opensearch(keyword: str) -> str:
     return answer
 
 # define tools
-tools = [get_current_time, get_book_list, get_weather_info, search_by_tavily, search_by_opensearch]        
+#tools = [get_current_time, get_book_list, get_weather_info, search_by_tavily, search_by_opensearch]        
+
+tools = [get_current_time(), get_book_list(), get_weather_info(), search_by_tavily(), search_by_opensearch()]        
 
 def get_react_prompt_template(mode: str): # (hwchase17/react) https://smith.langchain.com/hub/hwchase17/react
     # Get the react prompt template
@@ -1400,7 +1403,10 @@ def getResponse(connectionId, jsonBody):
                 elif convType == 'agent-react':
                     msg = run_agent_react(connectionId, requestId, chat, text)      
                 elif convType == 'agent-react-chat':         
-                    msg = run_agent_react_chat(connectionId, requestId, chat, text)
+                    if separated_chat_history=='true': 
+                        msg = run_agent_react_chat_using_revised_question(connectionId, requestId, chat, text)
+                    else:
+                        msg = run_agent_react_chat(connectionId, requestId, chat, text)
                 elif convType == 'agent-toolcalling':
                     msg = run_agent_tool_calling(connectionId, requestId, chat, text)
                 elif convType == 'agent-toolcalling-chat':         

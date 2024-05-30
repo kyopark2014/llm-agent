@@ -636,7 +636,7 @@ Use the following format:
 
 Question: the input question you must answer
 Thought: you should always think about what to do
-Action: the action to take, should be a tool name from [{tool_names}]
+Action: the action to take, should use only the tool name from [{tool_names}]
 Action Input: the input to the action
 Observation: the result of the action
 ... (this Thought/Action/Action Input/Observation can repeat N times)
@@ -665,7 +665,7 @@ Thought:{agent_scratchpad}
 
 Question: 답변하여야 할 input question 
 Thought: you should always think about what to do. 
-Action: 해야 할 action로서 [{tool_names}]의 tool의 name만을 가져옵니다. 
+Action: 해야 할 action로서 [{tool_names}]의 tool name만을 가져옵니다. 
 Action Input: action의 input
 Observation: action의 result
 ... (Thought/Action/Action Input/Observation을 3번 반복 할 수 있습니다.)
@@ -760,7 +760,7 @@ Thought:{agent_scratchpad}
 
 Question: 답변하여야 할 input question 
 Thought: you should always think about what to do. 
-Action: 해야 할 action로서 [{tool_names}]의 tool의 name만을 가져옵니다. 
+Action: 해야 할 action로서 [{tool_names}]의 tool name만을 가져옵니다. 
 Action Input: action의 input
 Observation: action의 result
 ... (Thought/Action/Action Input/Observation을 3번 반복 할 수 있습니다.)

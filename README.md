@@ -59,6 +59,11 @@ ReAct를 위한 Prompt 에제는 [prompt.md](./prompt.md)을 참조합니다.
 
 Agent 사용시 Tool을 선택하고, Observation과 Thought을 통해 Action으로 얻어진 결과가 만족스러운지 확인하는 과정이 필요합니다. 따라서 LLM의 성능은 Agent의 결과와 밀접한 관계가 있습니다. Claude Sonnet으로 Agent를 만든 결과가 일반적으로 Claude Haiku보다 우수하여, Sonnet을 추천합니다.
 
+### Parent Document Retrieval
+
+RAG의 검색정확도를 향상시키기 위한 여러가지 방법중에 Parent/Child Chunking을 이용할 수 있습니다. [Parent Document Retrieval](https://github.com/kyopark2014/korean-chatbot-using-amazon-bedrock/blob/main/parent-document-retrieval.md)에서는 parent/child로 chunking 전략을 달리하는 방법에 대해 설명합니다. 
+
+
 
 ### Tool calling agent
 

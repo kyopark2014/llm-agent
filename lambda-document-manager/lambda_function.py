@@ -20,14 +20,16 @@ from opensearchpy import OpenSearch
 from pptx import Presentation
 from multiprocessing import Process, Pipe
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_aws import ChatBedrock
 from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_aws import ChatBedrock
 
+sqs = boto3.client('sqs')
 s3_client = boto3.client('s3')  
 s3_bucket = os.environ.get('s3_bucket') # bucket name
 s3_prefix = os.environ.get('s3_prefix')
 meta_prefix = "metadata/"
 enableParallelSummay = os.environ.get('enableParallelSummay')
+enalbeParentDocumentRetrival = os.environ.get('enalbeParentDocumentRetrival')
 
 opensearch_account = os.environ.get('opensearch_account')
 opensearch_passwd = os.environ.get('opensearch_passwd')
@@ -35,12 +37,11 @@ opensearch_url = os.environ.get('opensearch_url')
 sqsUrl = os.environ.get('sqsUrl')
 doc_prefix = s3_prefix+'/'
 LLM_for_chat = json.loads(os.environ.get('LLM_for_chat'))
-selected_chat = 0
 LLM_for_multimodal= json.loads(os.environ.get('LLM_for_multimodal'))
+LLM_embedding = json.loads(os.environ.get('LLM_embedding'))
+selected_chat = 0
 selected_multimodal = 0
-LLM_for_embedding = json.loads(os.environ.get('LLM_for_embedding'))
 selected_embedding = 0
-sqs = boto3.client('sqs')
 
 roleArn = os.environ.get('roleArn') 
 path = os.environ.get('path')
@@ -92,7 +93,7 @@ def get_chat():
     profile = LLM_for_chat[selected_chat]
     bedrock_region =  profile['bedrock_region']
     modelId = profile['model_id']
-    print(f'LLM: {selected_chat}, bedrock_region: {bedrock_region}, modelId: {modelId}')
+    print(f'selected_chat: {selected_chat}, bedrock_region: {bedrock_region}, modelId: {modelId}')
     maxOutputTokens = int(profile['maxOutputTokens'])
                           
     # bedrock   
@@ -132,7 +133,7 @@ def get_multimodal():
     profile = LLM_for_multimodal[selected_multimodal]
     bedrock_region =  profile['bedrock_region']
     modelId = profile['model_id']
-    print(f'LLM: {selected_multimodal}, bedrock_region: {bedrock_region}, modelId: {modelId}')
+    print(f'selected_multimodal: {selected_multimodal}, bedrock_region: {bedrock_region}, modelId: {modelId}')
     maxOutputTokens = int(profile['maxOutputTokens'])
                           
     # bedrock   
@@ -168,15 +169,15 @@ def get_multimodal():
 
 def get_embedding():
     global selected_embedding
-    profile = LLM_for_embedding[selected_embedding]
+    profile = LLM_embedding[selected_embedding]
     bedrock_region =  profile['bedrock_region']
     model_id = profile['model_id']
-    print(f'selected_embedding: {selected_embedding}, bedrock_region: {bedrock_region}, model_id:{model_id}')
+    print(f'selected_embedding: {selected_embedding}, bedrock_region: {bedrock_region}')
     
     # bedrock   
     boto3_bedrock = boto3.client(
         service_name='bedrock-runtime',
-        region_name=bedrock_region,  
+        region_name=bedrock_region, 
         config=Config(
             retries = {
                 'max_attempts': 30
@@ -191,9 +192,9 @@ def get_embedding():
     )  
     
     selected_embedding = selected_embedding + 1
-    if selected_embedding == len(LLM_for_embedding):
+    if selected_embedding == len(LLM_embedding):
         selected_embedding = 0
-        
+    
     return bedrock_embedding
 
 bedrock_embeddings = get_embedding()
@@ -208,24 +209,199 @@ vectorstore = OpenSearchVectorSearch(
     http_auth=(opensearch_account, opensearch_passwd),
 )  
 
-def store_document_for_opensearch(docs, key):    
+def store_document_for_opensearch(file_type, key):
+    print('upload to opensearch: ', key) 
+    contents = load_document(file_type, key)
+    
+    if len(contents) == 0:
+        print('no contents: ', key)
+        return []
+    
+    # contents = str(contents).replace("\n"," ") 
+    print('length: ', len(contents))
+    
+    docs = []
+    docs.append(Document(
+        page_content=contents,
+        metadata={
+            'name': key,
+            # 'page':i+1,
+            'uri': path+parse.quote(key)
+        }
+    ))
+    print('docs: ', docs)
+    
+    return add_to_opensearch(docs, key)    
+
+def store_code_for_opensearch(file_type, key):
+    codes = load_code(file_type, key)  # number of functions in the code
+            
+    if enableParallelSummay=='true':
+        docs = summarize_relevant_codes_using_parallel_processing(codes, key)
+                                
+    else:
+        docs = []
+        for code in codes:
+            start = code.find('\ndef ')
+            end = code.find(':')                    
+            # print(f'start: {start}, end: {end}')
+                                    
+        if start != -1:      
+            function_name = code[start+1:end]
+            # print('function_name: ', function_name)
+                                                
+            chat = get_multimodal()      
+                                        
+            summary = summary_of_code(chat, code, file_type)
+                                            
+            if summary[:len(function_name)]==function_name:
+                summary = summary[summary.find('\n')+1:len(summary)]
+                                                                                        
+            docs.append(
+                Document(
+                    page_content=summary,
+                        metadata={
+                            'name': key,
+                            # 'page':i+1,
+                            #'uri': path+doc_prefix+parse.quote(key),
+                            'uri': path+key,
+                            'code': code,
+                            'function_name': function_name
+                        }
+                    )
+                )
+    print('docs size: ', len(docs))
+    
+    return add_to_opensearch(docs, key)
+    
+def store_image_for_opensearch(key):
+    print('extract text from an image: ', key) 
+                                            
+    image_obj = s3_client.get_object(Bucket=s3_bucket, Key=key)
+                        
+    image_content = image_obj['Body'].read()
+    img = Image.open(BytesIO(image_content))
+                        
+    width, height = img.size 
+    print(f"width: {width}, height: {height}, size: {width*height}")
+                        
+    isResized = False
+    while(width*height > 5242880):
+        width = int(width/2)
+        height = int(height/2)
+        isResized = True
+        print(f"width: {width}, height: {height}, size: {width*height}")
+                        
+    if isResized:
+        img = img.resize((width, height))
+                        
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
+    img_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+                                                            
+    # extract text from the image
+    chat = get_multimodal()    
+    text = extract_text(chat, img_base64)
+    extracted_text = text[text.find('<result>')+8:len(text)-9] # remove <result> tag
+    print('extracted_text: ', extracted_text)
+    
+    docs = []
+    if len(extracted_text)>10:
+        docs.append(
+            Document(
+                page_content=extracted_text,
+                metadata={
+                    'name': key,
+                    # 'page':i+1,
+                    'uri': path+parse.quote(key)
+                }
+            )
+        )                                                                                                            
+    print('docs size: ', len(docs))
+    
+    return add_to_opensearch(docs, key)
+
+def add_to_opensearch(docs, key):    
+    if len(docs) == 0:
+        return []    
+    print('docs[0]: ', docs[0])       
+    
     objectName = (key[key.find(s3_prefix)+len(s3_prefix)+1:len(key)])
     print('objectName: ', objectName)    
     metadata_key = meta_prefix+objectName+'.metadata.json'
     print('meta file name: ', metadata_key)    
     delete_document_if_exist(metadata_key)
-    
-    try:        
-        response = vectorstore.add_documents(docs, bulk_size = 2000)
-        print('response of adding documents: ', response)
-    except Exception:
-        err_msg = traceback.format_exc()
-        print('error message: ', err_msg)                
-        #raise Exception ("Not able to request to LLM")
+        
+    ids = []
+    if enalbeParentDocumentRetrival == 'true':
+        parent_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=2000,
+            chunk_overlap=100,
+            separators=["\n\n", "\n", ".", " ", ""],
+            length_function = len,
+        )
+        child_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=400,
+            chunk_overlap=50,
+            # separators=["\n\n", "\n", ".", " ", ""],
+            length_function = len,
+        )
 
-    print('uploaded into opensearch')
-    
-    return response
+        parent_docs = parent_splitter.split_documents(docs)
+        print('len(parent_docs): ', len(parent_docs))
+        if len(parent_docs):
+            # print('parent_docs[0]: ', parent_docs[0])
+            # parent_doc_ids = [str(uuid.uuid4()) for _ in parent_docs]
+            # print('parent_doc_ids: ', parent_doc_ids)
+            
+            for i, doc in enumerate(parent_docs):
+                doc.metadata["doc_level"] = "parent"
+                print(f"parent_docs[{i}]: {doc}")
+                    
+            try:        
+                parent_doc_ids = vectorstore.add_documents(parent_docs, bulk_size = 10000)
+                print('parent_doc_ids: ', parent_doc_ids)
+                
+                child_docs = []
+                       
+                for i, doc in enumerate(parent_docs):
+                    _id = parent_doc_ids[i]
+                    sub_docs = child_splitter.split_documents([doc])
+                    for _doc in sub_docs:
+                        _doc.metadata["parent_doc_id"] = _id
+                        _doc.metadata["doc_level"] = "child"
+                    child_docs.extend(sub_docs)
+                # print('child_docs: ', child_docs)
+                
+                child_doc_ids = vectorstore.add_documents(child_docs, bulk_size = 10000)
+                print('child_doc_ids: ', child_doc_ids)
+                    
+                ids = parent_doc_ids+child_doc_ids
+            except Exception:
+                err_msg = traceback.format_exc()
+                print('error message: ', err_msg)                
+                #raise Exception ("Not able to add docs in opensearch")                
+    else:
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000,
+            chunk_overlap=100,
+            separators=["\n\n", "\n", ".", " ", ""],
+            length_function = len,
+        ) 
+        
+        documents = text_splitter.split_documents(docs)
+        print('len(documents): ', len(documents))
+        if len(documents):
+            print('documents[0]: ', documents[0])        
+            
+        try:        
+            ids = vectorstore.add_documents(documents, bulk_size = 10000)
+            print('response of adding documents: ', ids)
+        except Exception:
+            err_msg = traceback.format_exc()
+            print('error message: ', err_msg)
+            #raise Exception ("Not able to add docs in opensearch")    
+    return ids
     
 def delete_document_if_exist(metadata_key):
     try: 
@@ -310,28 +486,14 @@ def load_document(file_type, key):
                 if(para.text):
                     texts.append(para.text)
                     # print(f"{i}: {para.text}")        
-            contents = '\n'.join(texts)
+            contents = '\n'.join(texts)            
             # print('contents: ', contents)
         except Exception:
                 err_msg = traceback.format_exc()
                 print('err_msg: ', err_msg)
                 # raise Exception ("Not able to load docx")   
     
-    texts = ""
-    if len(contents)>0:
-        new_contents = str(contents).replace("\n"," ") 
-        print('length: ', len(new_contents))
-        
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
-            chunk_overlap=100,
-            separators=["\n\n", "\n", ".", " ", ""],
-            length_function = len,
-        ) 
-
-        texts = text_splitter.split_text(new_contents) 
-                        
-    return texts
+    return contents
 
 # load a code file from s3
 def load_code(file_type, key):
@@ -503,7 +665,7 @@ def summarize_relevant_codes_using_parallel_processing(codes, key):
 
         process = Process(target=summarize_process_for_relevent_code, args=(child_conn, chat, code, key, region_name))
         processes.append(process)
-
+        
     for process in processes:
         process.start()
             
@@ -681,116 +843,16 @@ def lambda_handler(event, context):
                 documentId = get_documentId(key, category)                                
                 print('documentId: ', documentId)
                 
-                docs = []
-                        
+                ids = []                        
                 if file_type == 'pdf' or file_type == 'txt' or file_type == 'md' or file_type == 'csv' or file_type == 'pptx' or file_type == 'docx':
-                    print('upload to opensearch: ', key) 
-                    texts = load_document(file_type, key)
-                            
-                    for i in range(len(texts)):
-                        if texts[i]:
-                            docs.append(
-                                Document(
-                                    page_content=texts[i],
-                                    metadata={
-                                        'name': key,
-                                        # 'page':i+1,
-                                        'uri': path+parse.quote(key)
-                                    }
-                                )
-                            )
+                    ids = store_document_for_opensearch(file_type, key)   
                                     
                 elif file_type == 'py' or file_type == 'js':
-                    codes = load_code(file_type, key)  # number of functions in the code
-                                            
-                    if enableParallelSummay=='true':
-                        docs = summarize_relevant_codes_using_parallel_processing(codes, key)
-                                
-                    else:
-                        for code in codes:
-                            start = code.find('\ndef ')
-                            end = code.find(':')                    
-                            # print(f'start: {start}, end: {end}')
-                                    
-                            if start != -1:      
-                                function_name = code[start+1:end]
-                                # print('function_name: ', function_name)
-                                                
-                                chat = get_multimodal()      
-                                        
-                                if file_type == 'py':
-                                    mode = 'python'
-                                elif file_type == 'js':
-                                    mode = 'nodejs'
-                                else:
-                                    mode = file_type  
-                                summary = summary_of_code(chat, code, mode)                        
-                                            
-                                if summary[:len(function_name)]==function_name:
-                                    summary = summary[summary.find('\n')+1:len(summary)]
-                                                                                        
-                                docs.append(
-                                    Document(
-                                        page_content=summary,
-                                        metadata={
-                                            'name': key,
-                                            # 'page':i+1,
-                                            #'uri': path+doc_prefix+parse.quote(key),
-                                            'uri': path+key,
-                                            'code': code,
-                                            'function_name': function_name
-                                        }
-                                    )
-                                )         
+                    ids = store_code_for_opensearch(file_type, key)  
                                 
                 elif file_type == 'png' or file_type == 'jpg' or file_type == 'jpeg':
-                    print('extract text from an image: ', key) 
-                                       
-                    image_obj = s3_client.get_object(Bucket=s3_bucket, Key=key)
-                
-                    image_content = image_obj['Body'].read()
-                    img = Image.open(BytesIO(image_content))
-                
-                    width, height = img.size 
-                    print(f"width: {width}, height: {height}, size: {width*height}")
-                
-                    isResized = False
-                    while(width*height > 5242880):                    
-                        width = int(width/2)
-                        height = int(height/2)
-                        isResized = True
-                        print(f"width: {width}, height: {height}, size: {width*height}")
-                
-                    if isResized:
-                        img = img.resize((width, height))
-                
-                    buffer = BytesIO()
-                    img.save(buffer, format="PNG")
-                    img_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
-               
-                    # extract text from the image
-                    chat = get_multimodal()    
-                    text = extract_text(chat, img_base64)
-                    extracted_text = text[text.find('<result>')+8:len(text)-9] # remove <result> tag
-                    print('extracted_text: ', extracted_text)
-                    if len(extracted_text)>10:
-                        docs.append(
-                            Document(
-                                page_content=extracted_text,
-                                metadata={
-                                    'name': key,
-                                    # 'page':i+1,
-                                    'uri': path+parse.quote(key)
-                                }
-                            )
-                        )        
+                    ids = store_image_for_opensearch(key)
                                                                                                          
-                print('docs size: ', len(docs))
-                if len(docs)>0:
-                    print('docs[0]: ', docs[0])
-                                    
-                    ids = store_document_for_opensearch(docs, key)
-                    
                 create_metadata(bucket=s3_bucket, key=key, meta_prefix=meta_prefix, s3_prefix=s3_prefix, uri=path+parse.quote(key), category=category, documentId=documentId, ids=ids)
 
             else: # delete if the object is unsupported one for format or size

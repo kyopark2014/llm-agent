@@ -32,6 +32,7 @@ from langchain.agents import AgentExecutor, create_tool_calling_agent
 from pytz import timezone
 from langchain_community.tools.tavily_search import TavilySearchResults
 from PIL import Image
+from opensearchpy import OpenSearch
 
 s3 = boto3.client('s3')
 s3_bucket = os.environ.get('s3_bucket') # bucket name
@@ -52,6 +53,7 @@ selected_chat = 0
 selected_multimodal = 0
 selected_embedding = 0
 separated_chat_history = os.environ.get('separated_chat_history')
+enalbeParentDocumentRetrival = os.environ.get('enalbeParentDocumentRetrival')
 
 # api key to get weather information in agent
 secretsmanager = boto3.client('secretsmanager')
@@ -413,6 +415,66 @@ def general_conversation(connectionId, requestId, chat, query):
     
     return msg
 
+def get_documents_from_opensearch(vectorstore_opensearch, query, top_k):
+    result = vectorstore_opensearch.similarity_search_with_score(
+        query = query,
+        k = top_k*2,  
+        pre_filter={"doc_level": {"$eq": "child"}}
+    )
+    print('result: ', result)
+            
+    relevant_documents = []
+    docList = []
+    for re in result:
+        if 'parent_doc_id' in re[0].metadata:
+            parent_doc_id = re[0].metadata['parent_doc_id']
+            doc_level = re[0].metadata['doc_level']
+            print(f"doc_level: {doc_level}, parent_doc_id: {parent_doc_id}")
+                    
+            if doc_level == 'child':
+                if parent_doc_id in docList:
+                    print('duplicated!')
+                else:
+                    relevant_documents.append(re)
+                    docList.append(parent_doc_id)
+                    
+                    if len(relevant_documents)>=top_k:
+                        break
+                                
+    # print('lexical query result: ', json.dumps(response))
+    print('relevant_documents: ', relevant_documents)
+    
+    return relevant_documents
+
+os_client = OpenSearch(
+    hosts = [{
+        'host': opensearch_url.replace("https://", ""), 
+        'port': 443
+    }],
+    http_compress = True,
+    http_auth=(opensearch_account, opensearch_passwd),
+    use_ssl = True,
+    verify_certs = True,
+    ssl_assert_hostname = False,
+    ssl_show_warn = False,
+)
+
+def get_parent_document(parent_doc_id):
+    response = os_client.get(
+        index="idx-rag", 
+        id = parent_doc_id
+    )
+    
+    source = response['_source']                            
+    # print('parent_doc: ', source['text'])   
+    
+    metadata = source['metadata']    
+    #print('name: ', metadata['name'])   
+    #print('uri: ', metadata['uri'])   
+    #print('doc_level: ', metadata['doc_level']) 
+    
+    return source['text'], metadata['name'], metadata['uri'], metadata['doc_level']    
+
 @tool 
 def get_book_list(keyword: str) -> str:
     """
@@ -608,18 +670,34 @@ def search_by_opensearch(keyword: str) -> str:
     
     answer = ""
     top_k = 2
-    relevant_documents = vectorstore_opensearch.similarity_search_with_score(
-        query = keyword,
-        k = top_k,
-    )
+    
+    if enalbeParentDocumentRetrival == 'true':
+        relevant_documents = get_documents_from_opensearch(vectorstore_opensearch, keyword, top_k)
 
-    for i, document in enumerate(relevant_documents):
-        print(f'## Document(opensearch-vector) {i+1}: {document}')
+        for i, document in enumerate(relevant_documents):
+            print(f'## Document(opensearch-vector) {i+1}: {document}')
+            
+            parent_doc_id = document[0].metadata['parent_doc_id']
+            doc_level = document[0].metadata['doc_level']
+            print(f"child: parent_doc_id: {parent_doc_id}, doc_level: {doc_level}")
+                
+            excerpt, name, uri, doc_level = get_parent_document(parent_doc_id) # use pareant document
+            print(f"parent: name: {name}, uri: {uri}, doc_level: {doc_level}")
+            
+            answer = answer + f"{excerpt}, URL: {uri}\n\n"
+    else: 
+        relevant_documents = vectorstore_opensearch.similarity_search_with_score(
+            query = keyword,
+            k = top_k,
+        )
 
-        excerpt = document[0].page_content        
-        uri = document[0].metadata['uri']
-                    
-        answer = answer + f"{excerpt}, URL: {uri}\n\n"
+        for i, document in enumerate(relevant_documents):
+            print(f'## Document(opensearch-vector) {i+1}: {document}')
+            
+            excerpt = document[0].page_content        
+            uri = document[0].metadata['uri']
+                            
+            answer = answer + f"{excerpt}, URL: {uri}\n\n"
     
     return answer
 

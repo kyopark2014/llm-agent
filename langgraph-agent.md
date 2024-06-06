@@ -87,4 +87,14 @@ for s in app.stream(inputs):
 
 이때의 Node와 Edge는 아래와 같습니다. 
 
+```python
+from IPython.display import Image, display
+
+try:
+    display(Image(app.get_graph(xray=True).draw_mermaid_png()))
+except:
+    # This requires some extra dependencies and is optional
+    pass
+```
+
 ![image](https://github.com/kyopark2014/llm-agent/assets/52392004/d43b1f81-7d5d-4bad-abe9-f7c91acb181a)

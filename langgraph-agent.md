@@ -84,3 +84,6 @@ for s in app.stream(inputs):
     print(list(s.values())[0])
     print("----")
 ```
+
+이때의 Node와 Edge는 아래와 같습니다. 
+![image](https://github.com/kyopark2014/llm-agent/assets/52392004/d43b1f81-7d5d-4bad-abe9-f7c91acb181a)

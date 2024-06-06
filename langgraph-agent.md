@@ -51,7 +51,7 @@ def should_continue(data):
         return "continue"
 ```
 
-## Graph wjddml 
+## Graph 정의
 
 ```python
 from langgraph.graph import END, StateGraph

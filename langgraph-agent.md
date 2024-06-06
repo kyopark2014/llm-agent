@@ -16,15 +16,71 @@ from langchain_core.messages import BaseMessage
 import operator
 
 class AgentState(TypedDict):
-    # The input string
     input: str
-    # The list of previous messages in the conversation
     chat_history: list[BaseMessage]
-    # The outcome of a given call to the agent
-    # Needs `None` as a valid type, since this is what this will start as
     agent_outcome: Union[AgentAction, AgentFinish, None]
-    # List of actions and corresponding observations
-    # Here we annotate this with `operator.add` to indicate that operations to
-    # this state should be ADDED to the existing values (not overwrite it)
     intermediate_steps: Annotated[list[tuple[AgentAction, str]], operator.add]
+```
+
+## Node 정의
+
+Node는 함수(Function)이나 [Runnable](https://python.langchain.com/v0.1/docs/expression_language/interface/)입니다. Action을 실행하거나 tool을 실행합니다. 
+
+- Conditional Edge: Tool을 호출하거나 작업을 종료
+- Normal Edge: tool이 호출(invoke)된 후에 normal edge는 다음에 해야할 것을 결정하는 agent로 돌아감
+
+```python
+from langchain_core.agents import AgentFinish
+from langgraph.prebuilt.tool_executor import ToolExecutor
+
+tool_executor = ToolExecutor(tools)
+
+def run_agent(data):
+    agent_outcome = agent_runnable.invoke(data)
+    return {"agent_outcome": agent_outcome}
+
+def execute_tools(data):
+    agent_action = data["agent_outcome"]
+    output = tool_executor.invoke(agent_action)
+    return {"intermediate_steps": [(agent_action, str(output))]}
+
+def should_continue(data):
+    if isinstance(data["agent_outcome"], AgentFinish):
+        return "end"
+    else:
+        return "continue"
+```
+
+## Graph wjddml 
+
+```python
+from langgraph.graph import END, StateGraph
+
+workflow = StateGraph(AgentState)
+workflow.add_node("agent", run_agent)
+workflow.add_node("action", execute_tools)
+
+workflow.set_entry_point("agent")
+
+workflow.add_conditional_edges(
+    "agent",
+    should_continue,
+    {
+        "continue": "action",
+        "end": END,
+    },
+)
+
+workflow.add_edge("action", "agent")
+
+app = workflow.compile()
+```
+
+Agent의 실행결과는 아래와 같이 stream으로 결과를 얻을 수 있습니다.
+
+```python
+inputs = {"input": "what is the weather in sf", "chat_history": []}
+for s in app.stream(inputs):
+    print(list(s.values())[0])
+    print("----")
 ```

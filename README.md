@@ -85,6 +85,9 @@ LangChain의 [Tool calling agent](https://python.langchain.com/v0.1/docs/modules
 
 [planning-agents.md](./planning-agents.md)에서는 plan-and-execution 형태의 agent를 생성하는 방법을 설명합니다.
 
+### Reflection Agent
+
+[reflection-agent.md](./reflection-agent.md)에서는 reflection을 이용해 성능을 향상시키는 방법에 대해 설명합니다.
 
 
 ## 직접 실습 해보기

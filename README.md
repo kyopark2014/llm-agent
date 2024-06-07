@@ -93,6 +93,9 @@ LangGraph는 agent를 생성하고 여러개의 Agent가 있을때의 흐름을 
 
 [reflection-agent.md](./reflection-agent.md)에서는 reflection을 이용해 성능을 향상시키는 방법에 대해 설명합니다.
 
+### Storm Agent
+
+[stome-agent.md](./stome-agent.md)에서는 풍부한 기사를 생성(richer article generation) Storm Agent에 대해 설명합니다.
 
 ## 직접 실습 해보기
 

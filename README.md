@@ -59,6 +59,11 @@ ReAct를 위한 Prompt 에제는 [prompt.md](./prompt.md)을 참조합니다.
 
 Agent 사용시 Tool을 선택하고, Observation과 Thought을 통해 Action으로 얻어진 결과가 만족스러운지 확인하는 과정이 필요합니다. 따라서 LLM의 성능은 Agent의 결과와 밀접한 관계가 있습니다. Claude Sonnet으로 Agent를 만든 결과가 일반적으로 Claude Haiku보다 우수하여, Sonnet을 추천합니다.
 
+### Planning Agent
+
+[planning-agents.md](./planning-agents.md)에서는 plan-and-execution 형태의 agent를 생성하는 방법을 설명합니다.
+
+
 ### Tool calling agent
 
 LangChain의 [Tool calling agent](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/tool_calling/)은 Multi-Input Tools, Parallel Function Calling와 같은 다양한 기능을 제공하고 있습니다. 상세한 내용은 [toolcalling.md](https://github.com/kyopark2014/llm-agent/blob/main/toolcalling.md)을 참조합니다. 

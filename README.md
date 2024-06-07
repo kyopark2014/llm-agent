@@ -75,15 +75,11 @@ LangChain의 [Tool calling agent](https://python.langchain.com/v0.1/docs/modules
 
 ### Basic LangGraph Agent
 
-[langgraph-agent.md](https://github.com/kyopark2014/llm-agent/blob/main/langgraph-agent.md)에서는 LangGraph를 이용해 Agent를 생성하는 방법을 설명합니다. 
+[langgraph-agent.md](./langgraph-agent.md)에서는 LangGraph를 이용해 Agent를 생성하는 방법을 설명합니다. 
 
 ### Multi agent
 
-
-
-Agent Supervisor
-
-[agent Supervisor
+[multi-agent.md](./multi-agent.md)에서는 여러개의 Agent를 이용하는 방법에 대해 설명합니다. 
 
 ### Planning Agent
 

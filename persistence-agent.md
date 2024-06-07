@@ -1,6 +1,6 @@
 # Persistence Agent
 
-[persistence.ipynb](https://github.com/langchain-ai/langgraph/blob/main/examples/persistence.ipynb)에서는 checkpoint를 이용해 state를 관리하는것을 보여줍니다.
+[persistence.ipynb](https://github.com/langchain-ai/langgraph/blob/main/examples/persistence.ipynb)에서는 checkpoint를 이용해 state를 관리하는것을 보여줍니다. 이것은 agent의 메모리 역할을 합니다. 
 
 ```python
 workflow = StateGraph(State)

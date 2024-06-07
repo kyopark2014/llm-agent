@@ -87,6 +87,8 @@ LangGraph는 agent를 생성하고 여러개의 Agent가 있을때의 흐름을 
 
 - [email-agent.md](./email-agent.md)에서는 LangGraph를 이용해 email을 생성하는 예제입니다.
 
+- [corrective-rag-agent.md](./corrective-rag-agent.md)에서는 Self reflection을 이용한 RAG 성능 강화에 대해 설명합니다. 
+
 ### Multi agent
 
 [multi-agent.md](./multi-agent.md)에서는 여러개의 Agent를 이용하는 방법에 대해 설명합니다. 

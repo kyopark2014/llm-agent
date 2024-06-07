@@ -1,4 +1,4 @@
-# Build a Customer Support Bot
+# Customer Support Bot
 
 [Build a Customer Support Bot | LangGraph](https://www.youtube.com/watch?v=b3XsvoFWp4c)에서는 고객 지원 App 개발을 위한 Agent를 설명합니다.
 

@@ -79,6 +79,8 @@ LangGraph는 agent를 생성하고 여러개의 Agent가 있을때의 흐름을 
 
 [langgraph-agent.md](./langgraph-agent.md)에서는 LangGraph를 이용해 Agent를 생성하는 방법을 설명합니다. 
 
+[persistence-agent.md](./persistence-agent.md)에서는 checkpoint를 이용해 이전 state로 돌아가는 것을 보여줍니다. 
+
 ### Multi agent
 
 [multi-agent.md](./multi-agent.md)에서는 여러개의 Agent를 이용하는 방법에 대해 설명합니다. 

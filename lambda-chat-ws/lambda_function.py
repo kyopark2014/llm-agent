@@ -984,12 +984,12 @@ def run_langgraph_agent(connectionId, requestId, chat, query):
     for event in events:
         print('event: ', event)
         
-        msg = event["messages"][-1].pretty_print()
-        print('msg: ', msg)
-        
+        #msg = event["messages"][-1].pretty_print()
+        #print('msg: ', msg)
+    msg = ""
             
     """
-    for output in app.stream(inputs, stream_mode="values"):
+    for output in app.stream(inputs):
         result = list(output.values())[0]
         
         print('result:', result)

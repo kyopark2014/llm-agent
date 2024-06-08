@@ -999,6 +999,10 @@ def run_langgraph_agent(connectionId, requestId, chat, query):
             print("---")
             print(f"Output from node '{key}': {value}")
             
+            if 'agent_outcome' in value and isinstance(value['agent_outcome'], AgentFinish):
+                response = value['agent_outcome'].return_values
+                msg = readStreamMsg(connectionId, requestId, response['output'])
+            
     """
     for output in app.stream(inputs):
         result = list(output.values())[0]

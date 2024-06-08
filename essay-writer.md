@@ -166,7 +166,7 @@ from IPython.display import Image
 Image(graph.get_graph().draw_png())
 ```
 
-아래와 같이 실행합니다.
+아래와 같이 실행합니다.
 
 ```pyhton
 thread = {"configurable": {"thread_id": "1"}}

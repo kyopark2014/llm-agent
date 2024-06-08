@@ -978,58 +978,16 @@ def run_langgraph_agent(connectionId, requestId, chat, query):
     workflow.add_edge("action", "agent")
     app = workflow.compile()
     
-    inputs = {"input": query}
-    
-    """
-    results = app.stream(inputs, stream_mode="values")
-    msg = ""    
-    for result in results:
-        print('result: ', result)
-        
-        if 'agent_outcome' in result and isinstance(result['agent_outcome'], AgentFinish):
-            response = result['agent_outcome'].return_values
-            msg = readStreamMsg(connectionId, requestId, response['output'])
-            
-        #msg = event["messages"][-1].pretty_print()
-        #print('msg: ', msg)
-    """
-            
+    inputs = {"input": query}    
     for output in app.stream(inputs):
         for key, value in output.items():
             print("---")
-            print(f"Output from node '{key}': {value}")
+            print(f"Node '{key}': {value}")
             
             if 'agent_outcome' in value and isinstance(value['agent_outcome'], AgentFinish):
                 response = value['agent_outcome'].return_values
                 msg = readStreamMsg(connectionId, requestId, response['output'])
-            
-    """
-    for output in app.stream(inputs):
-        result = list(output.values())[0]
-        
-        print('result:', result)
-        print("----")
-        
-        for key, value in output.items():
-            print("---")
-            print(f"Output from node '{key}': {value}")
-            
-            #if 'agent_outcome' in value:
-            #    print('agent_outcome value: ', value)
-        #if 'agent_outcome' in result:
-        #    print('--> agent_outcome: ', result['agent_outcome'])
-        
-    msg = ""
-    if 'agent_outcome' in result:
-        response = result['agent_outcome'].return_values
-        msg = response['output']
-   """         
-    # streaming    
-    #msg = readStreamMsg(connectionId, requestId, response['output'])
-
-    #msg = response['output']
-    print('msg: ', msg)
-            
+                                        
     return msg
 
 ####################### agent_tool_calling #######################

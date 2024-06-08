@@ -83,6 +83,16 @@ workflow.add_conditional_edges(
 app = workflow.compile()
 ```
 
+실행은 아래와 같습니다.
+
+```python
+config = {"recursion_limit": 50}
+inputs = {"input": "what is the hometown of the 2024 Australia open winner?"}
+async for event in app.astream(inputs, config=config):
+    for k, v in event.items():
+        if k != "__end__":
+            print(v)
+```
 
 ## Reasoning without Observation
 

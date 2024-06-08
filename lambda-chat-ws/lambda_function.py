@@ -991,6 +991,8 @@ def run_langgraph_agent(connectionId, requestId, chat, query):
             
             #if 'agent_outcome' in value:
             #    print('agent_outcome: ', value['agent_outcome'])
+        if 'agent_outcome' in result:
+            print('--> agent_outcome: ', result['agent_outcome'])
         
     msg = ""
     if 'agent_outcome' in result:

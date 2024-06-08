@@ -990,8 +990,9 @@ def run_langgraph_agent(connectionId, requestId, chat, query):
             
             if isinstance(event['agent_outcome'], AgentFinish):
                 response = event['agent_outcome'].return_values
-                msg = response['output']
-                print('msg: ', )
+                #msg = response['output']
+                #print('msg: ', )
+                msg = readStreamMsg(connectionId, requestId, response['output'])
             
         #msg = event["messages"][-1].pretty_print()
         #print('msg: ', msg)

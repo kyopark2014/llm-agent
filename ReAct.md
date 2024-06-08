@@ -8,7 +8,7 @@
 
 아래와 같이 [LangChain의 ReAct는 Reasoning와 Action](https://www.youtube.com/watch?v=Eug2clsLtFs)으로 표현됩니다. 여기서는 생각하는 방법(Paradigm of thinking)으로 Reseoning은 답변의 정당성(justification of the answer)을 확인하여, 답변에 필요한 것(prime)을 찾습니다. 또한, 현재의 환경(Envrionment)에서 어떤 행동(Action)을 선택(SayCan)하고, 관찰(Obseravation)을 통해 결과를 확인합니다.  
 
-![image](https://github.com/kyopark2014/llm-agent/assets/52392004/f75501fd-d3d5-4a3f-9b6c-42b5466bb3f9)
+![image](./contents/react.png)
 
 
 동작 방식을 이해하기 위하여 [YT_LangChain_Agents.ipynb](https://github.com/samwit/langchain-tutorials/blob/main/agents/YT_LangChain_Agents.ipynb)와 같이 agent를 실행합니다.

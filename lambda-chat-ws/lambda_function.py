@@ -930,7 +930,6 @@ class AgentState(TypedDict):
     agent_outcome: Union[AgentAction, AgentFinish, None]
     intermediate_steps: Annotated[list[tuple[AgentAction, str]], operator.add]
 
-from langchain_core.agents import AgentFinish
 from langgraph.prebuilt.tool_executor import ToolExecutor
 
 tool_executor = ToolExecutor(tools)
@@ -989,6 +988,9 @@ def run_langgraph_agent(connectionId, requestId, chat, query):
         for key, value in output.items():
             print("---")
             print(f"Output from node '{key}': {value}")
+            
+            if 'agent_outcome' in value:
+                print('agent_outcome: ', value['agent_outcome'])
         
     msg = ""
     if 'agent_outcome' in result:

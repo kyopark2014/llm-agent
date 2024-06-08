@@ -16,6 +16,18 @@ LangGraph은 staful하고 multi-actor 애플리케이션을 만들 수 있도록
 class와 함수를 정의합니다. 
 
 ```python
+planner_prompt = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            """For the given objective, come up with a simple step by step plan. \
+This plan should involve individual tasks, that if executed correctly will yield the correct answer. Do not add any superfluous steps. \
+The result of the final step should be the final answer. Make sure that each step has all the information needed - do not skip steps.""",
+        ),
+        ("placeholder", "{messages}"),
+    ]
+)
+
 class Response(BaseModel):
     """Response to user."""
 

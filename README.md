@@ -77,7 +77,98 @@ LangGraph는 agent를 생성하고 여러개의 Agent가 있을때의 흐름을 
 
 ### LangGraph Agent
 
-[Introduction to LangGraph](https://langchain-ai.github.io/langgraph/tutorials/introduction/)은 Agent 종류별로 설명하고 있습니다. 
+[Introduction to LangGraph](https://langchain-ai.github.io/langgraph/tutorials/introduction/)은 Agent 종류별로 설명하고 있습니다. 이를 구현한 코드는 [labmda-chat](./lambda-chat-ws/lambda_function.py)을 참조합니다.
+
+AgentState와 ToolExecutor를 정의합니다.
+
+```python
+import operator
+from typing import TypedDict, Annotated, List, Union
+from langchain_core.agents import AgentAction, AgentFinish
+from langchain_core.messages import BaseMessage
+from langgraph.prebuilt.tool_executor import ToolExecutor
+
+class AgentState(TypedDict):
+    input: str
+    chat_history: list[BaseMessage]
+    agent_outcome: Union[AgentAction, AgentFinish, None]
+    intermediate_steps: Annotated[list[tuple[AgentAction, str]], operator.add]
+
+tool_executor = ToolExecutor(tools)
+```
+
+각 Node state를 정의합니다. 
+
+```python
+chat = get_chat() 
+mode  = 'kor'
+prompt_template = get_react_prompt_template(mode)
+agent_runnable = create_react_agent(chat, tools, prompt_template)
+
+def run_agent(data):
+    agent_outcome = agent_runnable.invoke(data)
+    return {"agent_outcome": agent_outcome}
+
+def execute_tools(data):
+    agent_action = data["agent_outcome"]
+    output = tool_executor.invoke(agent_action)
+    return {"intermediate_steps": [(agent_action, str(output))]}
+
+def should_continue(data):
+    if isinstance(data["agent_outcome"], AgentFinish):
+        return "end"
+    else:
+        return "continue"
+```
+
+Graph를 정의하고 아래와 같이 실행합니다. 
+
+```python
+from langgraph.graph import END, StateGraph
+
+msg = run_langgraph_agent(connectionId, requestId, chat, text)
+
+def run_langgraph_agent(connectionId, requestId, chat, query):
+    isTyping(connectionId, requestId)
+    
+    workflow = StateGraph(AgentState)
+
+    workflow.add_node("agent", run_agent)
+    workflow.add_node("action", execute_tools)
+
+    workflow.set_entry_point("agent")
+    workflow.add_conditional_edges(
+        "agent",
+        should_continue,
+        {
+            "continue": "action",
+            "end": END,
+        },
+    )
+    workflow.add_edge("action", "agent")
+    app = workflow.compile()
+    
+    inputs = {"input": query}    
+    for output in app.stream(inputs):
+        for key, value in output.items():
+            print("---")
+            print(f"Node '{key}': {value}")
+            
+            if 'agent_outcome' in value and isinstance(value['agent_outcome'], AgentFinish):
+                response = value['agent_outcome'].return_values
+                msg = readStreamMsg(connectionId, requestId, response['output'])
+                                        
+    return msg
+```
+
+생성된 Graph는 아래와 같습니다.
+
+![image](https://github.com/kyopark2014/llm-agent/assets/52392004/9383094f-0507-4a64-96b3-278e3f6e8d3e)
+
+
+
+
+### 참고 사례들
 
 - [langgraph-agent.md](./langgraph-agent.md)에서는 LangGraph를 이용해 Agent를 생성하는 방법을 설명합니다. 
 

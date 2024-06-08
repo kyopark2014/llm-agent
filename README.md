@@ -100,9 +100,10 @@ tool_executor = ToolExecutor(tools)
 각 Node state를 정의합니다. 
 
 ```python
-chat = get_chat() 
-mode  = 'kor'
-prompt_template = get_react_prompt_template(mode)
+chat = get_chat()
+tools = [get_current_time, get_book_list, get_weather_info, search_by_tavily, search_by_opensearch]
+prompt_template = get_react_prompt_template('kor')
+
 agent_runnable = create_react_agent(chat, tools, prompt_template)
 
 def run_agent(data):

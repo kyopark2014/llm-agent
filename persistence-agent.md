@@ -24,13 +24,12 @@ workflow.add_edge("action", "agent")
 
 ## Interacting with the Agent
 
-메모리를 이용합니다.
+메모리를 이용하여 context를 공유 합니다.
 
 ```python
-from langchain_core.messages import HumanMessage
+from langgraph.checkpoint.sqlite import SqliteSaver
 
-config = {"configurable": {"thread_id": "2"}}
-input_message = HumanMessage(content="hi! I'm bob")
-for event in app.stream({"messages": [input_message]}, config, stream_mode="values"):
-    event["messages"][-1].pretty_print()
-```
+memory = SqliteSaver.from_conn_string(":memory:")
+
+app = workflow.compile(checkpointer=memory)
+````

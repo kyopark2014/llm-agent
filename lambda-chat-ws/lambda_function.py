@@ -985,14 +985,14 @@ def run_langgraph_agent(connectionId, requestId, chat, query):
         print('result:', result)
         print("----")
         
-        #for key, value in output.items():
-        #    print("---")
-        #    print(f"Output from node '{key}': {value}")
+        for key, value in output.items():
+            print("---")
+            print(f"Output from node '{key}': {value}")
             
-            #if 'agent_outcome' in value:
-            #    print('agent_outcome: ', value['agent_outcome'])
-        if 'agent_outcome' in result:
-            print('--> agent_outcome: ', result['agent_outcome'])
+            if 'agent_outcome' in value:
+                print('agent_outcome value: ', value)
+        #if 'agent_outcome' in result:
+        #    print('--> agent_outcome: ', result['agent_outcome'])
         
     msg = ""
     if 'agent_outcome' in result:

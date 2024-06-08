@@ -2,6 +2,13 @@
 
 [Essay Writer](https://learn.deeplearning.ai/courses/ai-agents-in-langgraph/lesson/7/essay-writer)의 내용을 정리합니다.
 
+전체 Graph의 구성도는 아래와 같습니다.
+
+![noname](https://github.com/kyopark2014/llm-agent/assets/52392004/e99efd4a-10ff-41e9-9d3b-5f2dcd2d341a)
+
+
+먼저 class와 프롬프트를 정의합니다.
+
 ```python
 from langgraph.graph import StateGraph, END
 from typing import TypedDict, Annotated, List

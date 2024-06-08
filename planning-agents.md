@@ -14,6 +14,21 @@ LangGraph은 staful하고 multi-actor 애플리케이션을 만들 수 있도록
 ![image](https://github.com/kyopark2014/llm-agent/assets/52392004/3a311023-53d7-464a-b4a0-655c558bc058)
 
 ```python
+class Response(BaseModel):
+    """Response to user."""
+
+    response: str
+
+class Act(BaseModel):
+    """Action to perform."""
+
+    action: Union[Response, Plan] = Field(
+        description="Action to perform. If you want to respond to user, use Response. "
+        "If you need to further use tools to get the answer, use Plan."
+    )    
+```
+
+```python
 from langgraph.graph import StateGraph
 
 workflow = StateGraph(PlanExecute)

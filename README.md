@@ -198,15 +198,25 @@ def run_langgraph_agent(connectionId, requestId, chat, query):
 ![image](https://github.com/kyopark2014/llm-agent/assets/52392004/9383094f-0507-4a64-96b3-278e3f6e8d3e)
 
 
-### checkpoint
+### Checkpoint 활용
 
-[Memory를 이용해 checkpoint](https://langchain-ai.github.io/langgraph/tutorials/introduction/#part-3-adding-memory-to-the-chatbot)로 이동할 수 있습니다.
+[Memory를 이용해 checkpoint](https://langchain-ai.github.io/langgraph/tutorials/introduction/#part-3-adding-memory-to-the-chatbot)를 이용할 수 있습니다.
 
 ```python
 from langgraph.checkpoint.sqlite import SqliteSaver
 
 memory = SqliteSaver.from_conn_string(":memory:")
 ```
+
+[LangGraph](https://langchain-ai.github.io/langgraph/)와 같이 "action" node이 호출될때 state machine이 멈추게 설정하고 checkpoint를 설정할 수 있습니다.
+
+```python
+memory = SqliteSaver.from_conn_string(":memory:") 
+app = workflow.compile(checkpointer=memory, interrupt_before=["action"])
+```
+
+memory로 
+
 
 ### Human-in-the-loop
 

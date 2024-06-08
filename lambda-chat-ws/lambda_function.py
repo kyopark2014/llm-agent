@@ -918,6 +918,91 @@ def run_agent_react_chat_using_revised_question(connectionId, requestId, chat, q
             
     return msg
 
+####################### LangGraph #######################
+from typing import TypedDict, Annotated, List, Union
+from langchain_core.agents import AgentAction, AgentFinish
+from langchain_core.messages import BaseMessage
+import operator
+
+class AgentState(TypedDict):
+    input: str
+    chat_history: list[BaseMessage]
+    agent_outcome: Union[AgentAction, AgentFinish, None]
+    intermediate_steps: Annotated[list[tuple[AgentAction, str]], operator.add]
+
+from langchain_core.agents import AgentFinish
+from langgraph.prebuilt.tool_executor import ToolExecutor
+
+tool_executor = ToolExecutor(tools)
+
+chat = get_chat() 
+mode  = 'kor'
+prompt_template = get_react_prompt_template(mode)
+agent_runnable = create_react_agent(chat, tools, prompt_template)
+
+def run_agent(data):
+    agent_outcome = agent_runnable.invoke(data)
+    return {"agent_outcome": agent_outcome}
+
+def execute_tools(data):
+    agent_action = data["agent_outcome"]
+    #response = input(prompt=f"[y/n] continue with: {agent_action}?")
+    #if response == "n":
+    #    raise ValueError
+    output = tool_executor.invoke(agent_action)
+    return {"intermediate_steps": [(agent_action, str(output))]}
+
+def should_continue(data):
+    if isinstance(data["agent_outcome"], AgentFinish):
+        return "end"
+    else:
+        return "continue"
+
+from langgraph.graph import END, StateGraph
+def run_langgraph_agent(connectionId, requestId, chat, query):
+    isTyping(connectionId, requestId)
+    
+    workflow = StateGraph(AgentState)
+
+    workflow.add_node("agent", run_agent)
+    workflow.add_node("action", execute_tools)
+
+    workflow.set_entry_point("agent")
+    workflow.add_conditional_edges(
+        "agent",
+        should_continue,
+        {
+            "continue": "action",
+            "end": END,
+        },
+    )
+    workflow.add_edge("action", "agent")
+    app = workflow.compile()
+    
+    inputs = {"input": query}
+    
+     # create agent
+    isTyping(connectionId, requestId)
+    
+    for s in app.stream(inputs):
+        result = list(s.values())[0]
+        
+        print(result)
+        print("----")
+        
+    msg = ""
+    if 'agent_outcome' in result:
+        response = result['agent_outcome'].return_values
+        msg = response['output']
+            
+    # streaming    
+    #msg = readStreamMsg(connectionId, requestId, response['output'])
+
+    #msg = response['output']
+    print('msg: ', msg)
+            
+    return msg
+
 def run_agent_tool_calling(connectionId, requestId, chat, query):
     toolList = ", ".join((t.name for t in tools))
     
@@ -1485,6 +1570,10 @@ def getResponse(connectionId, jsonBody):
                         msg = run_agent_react_chat_using_revised_question(connectionId, requestId, chat, text)
                     else:
                         msg = run_agent_react_chat(connectionId, requestId, chat, text)
+                elif convType == 'langgraph-agent':
+                    msg = run_langgraph_agent(connectionId, requestId, chat, text)      
+                #elif convType == 'langgraph-agent':
+                #    msg = run_langgraph_agent_chat_using_revised_question(connectionId, requestId, chat, text)
                 elif convType == 'agent-toolcalling':
                     msg = run_agent_tool_calling(connectionId, requestId, chat, text)
                 elif convType == 'agent-toolcalling-chat':         

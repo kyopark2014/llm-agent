@@ -104,6 +104,32 @@ planner는 task 처리 형태는 아래와 같습니다.
 
 ![image](https://github.com/kyopark2014/llm-agent/assets/52392004/3ff28ecd-67ff-4500-a8cb-8a7758de92be)
 
+```python
+class ReWOO(TypedDict):
+    task: str
+    plan_string: str
+    steps: List
+    results: dict
+    result: str
+
+def get_plan(state: ReWOO): # plan
+
+def tool_execution(state: ReWOO): # tool
+
+def solve(state: ReWOO):  # solve
+
+def _get_current_task(state: ReWOO):
+
+def _route(state):
+    _step = _get_current_task(state)
+    if _step is None:
+        # We have executed all tasks
+        return "solve"
+    else:
+        # We are still executing tasks, loop back to the "tool" node
+        return "tool"
+```
+
 이때의 Graph 구성은 아래와 같습니다. 
 
 ```python

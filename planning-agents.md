@@ -13,6 +13,8 @@ LangGraph은 staful하고 multi-actor 애플리케이션을 만들 수 있도록
 
 ![image](https://github.com/kyopark2014/llm-agent/assets/52392004/3a311023-53d7-464a-b4a0-655c558bc058)
 
+class와 함수를 정의합니다. 
+
 ```python
 class Response(BaseModel):
     """Response to user."""
@@ -26,7 +28,17 @@ class Act(BaseModel):
         description="Action to perform. If you want to respond to user, use Response. "
         "If you need to further use tools to get the answer, use Plan."
     )    
+
+async def plan_step(state: PlanExecute):  # planner
+
+async def execute_step(state: PlanExecute):  # agent
+
+async def replan_step(state: PlanExecute): # replan
+
+def should_end(state: PlanExecute) -> Literal["agent", "__end__"]:
 ```
+
+Graph, Node, Edge를 정의합니다.
 
 ```python
 from langgraph.graph import StateGraph

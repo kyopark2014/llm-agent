@@ -4,7 +4,7 @@
 
 전체 Graph의 구성도는 아래와 같습니다.
 
-![noname](https://github.com/kyopark2014/llm-agent/assets/52392004/e99efd4a-10ff-41e9-9d3b-5f2dcd2d341a)
+<img src="https://github.com/kyopark2014/llm-agent/assets/52392004/e99efd4a-10ff-41e9-9d3b-5f2dcd2d341a" width="400">
 
 
 먼저 class와 프롬프트를 정의합니다.

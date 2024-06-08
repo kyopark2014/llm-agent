@@ -919,18 +919,17 @@ def run_agent_react_chat_using_revised_question(connectionId, requestId, chat, q
     return msg
 
 ####################### LangGraph #######################
+import operator
 from typing import TypedDict, Annotated, List, Union
 from langchain_core.agents import AgentAction, AgentFinish
 from langchain_core.messages import BaseMessage
-import operator
+from langgraph.prebuilt.tool_executor import ToolExecutor
 
 class AgentState(TypedDict):
     input: str
     chat_history: list[BaseMessage]
     agent_outcome: Union[AgentAction, AgentFinish, None]
     intermediate_steps: Annotated[list[tuple[AgentAction, str]], operator.add]
-
-from langgraph.prebuilt.tool_executor import ToolExecutor
 
 tool_executor = ToolExecutor(tools)
 
@@ -979,7 +978,8 @@ def run_langgraph_agent(connectionId, requestId, chat, query):
     app = workflow.compile()
     
     inputs = {"input": query}    
-    for output in app.stream(inputs):
+    config = {"recursion_limit": 50}
+    for output in app.stream(inputs, config=config):
         for key, value in output.items():
             print("---")
             print(f"Node '{key}': {value}")

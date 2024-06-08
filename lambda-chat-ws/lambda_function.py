@@ -984,7 +984,8 @@ def run_langgraph_agent(connectionId, requestId, chat, query):
     for event in events:
         print('event: ', event)
         
-        print('agent_outcome: ', event['agent_outcome'])
+        if 'agent_outcome' in event:
+            print('agent_outcome: ', event['agent_outcome'])
         
         #msg = event["messages"][-1].pretty_print()
         #print('msg: ', msg)

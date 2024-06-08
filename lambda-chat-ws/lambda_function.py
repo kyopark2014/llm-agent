@@ -979,24 +979,23 @@ def run_langgraph_agent(connectionId, requestId, chat, query):
     app = workflow.compile()
     
     inputs = {"input": query}
-    msg = ""
     for output in app.stream(inputs):
         result = list(output.values())[0]
         
-        #print('result:', result)
-        #print("----")
+        print('result:', result)
+        print("----")
         
-        for key, value in output.items():
-            print("---")
-            print(f"Output from node '{key}': {value}")
+        #for key, value in output.items():
+        #    print("---")
+        #    print(f"Output from node '{key}': {value}")
             
             #if 'agent_outcome' in value:
             #    print('agent_outcome: ', value['agent_outcome'])
         
-    
-        if 'agent_outcome' in result:
-            response = result['agent_outcome'].return_values
-            msg = response['output']
+    msg = ""
+    if 'agent_outcome' in result:
+        response = result['agent_outcome'].return_values
+        msg = response['output']
             
     # streaming    
     #msg = readStreamMsg(connectionId, requestId, response['output'])

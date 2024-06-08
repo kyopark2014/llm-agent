@@ -188,4 +188,3 @@ MultiAgent = ewriter()
 app = writer_gui(MultiAgent.graph)
 app.launch()
 ```
-from helper import ewriter, writer_gui

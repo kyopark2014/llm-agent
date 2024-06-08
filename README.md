@@ -198,7 +198,15 @@ def run_langgraph_agent(connectionId, requestId, chat, query):
 ![image](https://github.com/kyopark2014/llm-agent/assets/52392004/9383094f-0507-4a64-96b3-278e3f6e8d3e)
 
 
+### checkpoint
 
+[Memory를 이용해 checkpoint](https://langchain-ai.github.io/langgraph/tutorials/introduction/#part-3-adding-memory-to-the-chatbot)로 이동할 수 있습니다.
+
+```python
+from langgraph.checkpoint.sqlite import SqliteSaver
+
+memory = SqliteSaver.from_conn_string(":memory:")
+```
 
 ### 참고 사례들
 

@@ -208,6 +208,22 @@ from langgraph.checkpoint.sqlite import SqliteSaver
 memory = SqliteSaver.from_conn_string(":memory:")
 ```
 
+### Human-in-the-loop
+
+[Human-in-the-loop](https://langchain-ai.github.io/langgraph/tutorials/introduction/#part-4-human-in-the-loop)에서는 human의 approval을 수행할 수 있습니다. 
+
+아래와 같이 사용자의 confirm을 받은 후에 agent_action을 수행하도록 할 수 있습니다.
+
+```python
+def execute_tools(data):
+    agent_action = data["agent_outcome"]
+    response = input(prompt=f"[y/n] continue with: {agent_action}?")
+    if response == "n":
+        raise ValueError
+    output = tool_executor.invoke(agent_action)
+    return {"intermediate_steps": [(agent_action, str(output))]}
+```
+
 ### 참고 사례들
 
 - [langgraph-agent.md](./langgraph-agent.md)에서는 LangGraph를 이용해 Agent를 생성하는 방법을 설명합니다. 

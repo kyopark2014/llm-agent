@@ -980,10 +980,6 @@ def run_langgraph_agent(connectionId, requestId, chat, query):
     app = workflow.compile()
     
     inputs = {"input": query}
-    
-     # create agent
-    isTyping(connectionId, requestId)
-    
     for s in app.stream(inputs):
         result = list(s.values())[0]
         
@@ -1003,6 +999,7 @@ def run_langgraph_agent(connectionId, requestId, chat, query):
             
     return msg
 
+####################### agent_tool_calling #######################
 def run_agent_tool_calling(connectionId, requestId, chat, query):
     toolList = ", ".join((t.name for t in tools))
     

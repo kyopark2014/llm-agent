@@ -983,13 +983,12 @@ def run_langgraph_agent(connectionId, requestId, chat, query):
     for output in app.stream(inputs):
         result = list(output.values())[0]
         
-        print(result)
-        print("----")
+        #print(result)
+        #print("----")
         
         for key, value in output.items():
-            print(f"Output from node '{key}':")
             print("---")
-            print(value)
+            print(f"Output from node '{key}': {value}")
         
     msg = ""
     if 'agent_outcome' in result:

@@ -13,6 +13,12 @@ LLM을 사용할 때 다양한 API로부터 얻은 결과를 사용하여 더 �
 
 ## LangChain Agent
 
+### LangChain Agent와 비교
+
+- LangChain Agent는 LLM의 성능에 가반하여 매우 powerful 합니다. 
+- 각 Tool의 invoation을 위해 LLM을 호출하여야 하므로, Tool을 연속적으로 실행할 때에는 많은 시간이 소요됩니다.
+- 한번에 한개의 step을 수행하고 parallel call을 지원하지 않습니다.
+
 ### Agent Type
 
 LangChain의 [Agent Type](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/)와 같이, Agent는 [Tool Calling](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/tool_calling/), [OpenAI tools](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/openai_tools/), [ReAct](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/react/)와 같은 방법을 이용해 구현할 수 있습니다. 

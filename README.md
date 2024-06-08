@@ -11,7 +11,9 @@ LLM을 사용할 때 다양한 API로부터 얻은 결과를 사용하여 더 �
 
 ![image](https://github.com/kyopark2014/llm-agent/assets/52392004/c372c125-4e05-41f8-b691-784e4c2028af)
 
-## Agent Type
+## LangChain Agent
+
+### Agent Type
 
 LangChain의 [Agent Type](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/)와 같이, Agent는 [Tool Calling](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/tool_calling/), [OpenAI tools](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/openai_tools/), [ReAct](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/react/)와 같은 방법을 이용해 구현할 수 있습니다. 
 
@@ -19,9 +21,7 @@ LangChain의 [Agent Type](https://python.langchain.com/v0.1/docs/modules/agents/
 - OpenAI tools는 가장 많이 사용되고 있고, 다양한 사례를 가지고 있습니다.
 - Tool Calling은 OpenAI tools와 유사한 방식으로 Anthropic, Gemini등을 지원하고 있습니다.
 
-## Agent의 구현
-
-### 기본 동작
+### Agent의 기본 동작
 
 LangChain의 [ReAct](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/react/)를 이용하여 Agent를 정의합니다. ReAct에 대한 자세한 내용은 [ReAct.md](./ReAct.md)을 참조합니다. Agent의 동작은 Action, Observation, Thought와 같은 동작을 반복적으로 수행하여 Final Answer를 얻습니다. Agent에 대한 자세한 내용은 [agent.md](./agent.md)을 참조합니다.
 

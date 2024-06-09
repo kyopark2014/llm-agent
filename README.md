@@ -11,13 +11,9 @@ LLM을 사용할 때 다양한 API로부터 얻은 결과를 사용하여 더 �
 
 ![image](https://github.com/kyopark2014/llm-agent/assets/52392004/c372c125-4e05-41f8-b691-784e4c2028af)
 
+아래에서 구현한 Agent는 zero-shot agent로 사용자의 질문에 따라 tools 리스트로부터 적절한 tool을 선택하여 활용합니다. tool은 함수 또는 API로 구현됩니다. 선택된 tool로 원하는 작업을 완료하지 못하면 다른 tool을 추가로 활용합니다.
+
 ## LangChain Agent
-
-### LangChain Agent와 비교
-
-- LangChain Agent는 LLM의 성능에 가반하여 매우 powerful 합니다. 
-- 각 Tool의 invoation을 위해 LLM을 호출하여야 하므로, Tool을 연속적으로 실행할 때에는 많은 시간이 소요됩니다.
-- 한번에 한개의 step을 수행하고 parallel call을 지원하지 않습니다.
 
 ### Agent Type
 
@@ -112,7 +108,14 @@ LangChain의 [Tool calling agent](https://python.langchain.com/v0.1/docs/modules
 
 LangGraph는 agent를 생성하고 여러개의 Agent가 있을때의 흐름을 관리하기 위한 LangChain의 Extention입니다. 이를 통해 cycle flow를 생성할 수 있으며, 메모리가 내장되어 Agent를 생성에 도움을 줍니다.
 
-### LangGraph Agent
+### LangChain Agent와 비교
+
+- LangChain Agent는 LLM의 성능에 가반하여 매우 powerful 합니다. 
+- 각 Tool의 invoation을 위해 LLM을 호출하여야 하므로, Tool을 연속적으로 실행할 때에는 많은 시간이 소요됩니다.
+- 한번에 한개의 step을 수행하고 parallel call을 지원하지 않습니다.
+
+
+### LangGraph Agent의 구현
 
 [Introduction to LangGraph](https://langchain-ai.github.io/langgraph/tutorials/introduction/)은 Agent 종류별로 설명하고 있습니다. 이를 구현한 코드는 [lambda-chat](./lambda-chat-ws/lambda_function.py)을 참조합니다.
 

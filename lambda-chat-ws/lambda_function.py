@@ -39,6 +39,7 @@ from typing import TypedDict, Annotated, List, Union
 from langchain_core.agents import AgentAction, AgentFinish
 from langchain_core.messages import BaseMessage
 from langgraph.prebuilt.tool_executor import ToolExecutor
+from langgraph.graph import END, StateGraph
 
 s3 = boto3.client('s3')
 s3_bucket = os.environ.get('s3_bucket') # bucket name
@@ -954,6 +955,8 @@ def buildAgent():
     workflow.add_edge("action", "agent")
     return workflow.compile()
 
+app = buildAgent()
+
 def run_agent(data):
     agent_outcome = agent_runnable.invoke(data)
     return {"agent_outcome": agent_outcome}
@@ -977,11 +980,8 @@ def should_continue(data):
     else:
         return "continue"
 
-from langgraph.graph import END, StateGraph
 def run_langgraph_agent(connectionId, requestId, chat, query):
     isTyping(connectionId, requestId)
-    
-    app = buildAgent()
     
     inputs = {"input": query}    
     config = {"recursion_limit": 50}

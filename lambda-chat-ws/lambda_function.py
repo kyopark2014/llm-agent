@@ -9,6 +9,7 @@ import re
 import traceback
 import requests
 import base64
+import operator
 
 from botocore.config import Config
 from botocore.exceptions import ClientError
@@ -33,6 +34,11 @@ from pytz import timezone
 from langchain_community.tools.tavily_search import TavilySearchResults
 from PIL import Image
 from opensearchpy import OpenSearch
+
+from typing import TypedDict, Annotated, List, Union
+from langchain_core.agents import AgentAction, AgentFinish
+from langchain_core.messages import BaseMessage
+from langgraph.prebuilt.tool_executor import ToolExecutor
 
 s3 = boto3.client('s3')
 s3_bucket = os.environ.get('s3_bucket') # bucket name
@@ -919,48 +925,18 @@ def run_agent_react_chat_using_revised_question(connectionId, requestId, chat, q
     return msg
 
 ####################### LangGraph #######################
-import operator
-from typing import TypedDict, Annotated, List, Union
-from langchain_core.agents import AgentAction, AgentFinish
-from langchain_core.messages import BaseMessage
-from langgraph.prebuilt.tool_executor import ToolExecutor
-
 class AgentState(TypedDict):
     input: str
     chat_history: list[BaseMessage]
     agent_outcome: Union[AgentAction, AgentFinish, None]
     intermediate_steps: Annotated[list[tuple[AgentAction, str]], operator.add]
 
-tool_executor = ToolExecutor(tools)
-
 chat = get_chat() 
 mode  = 'kor'
 prompt_template = get_react_prompt_template(mode)
 agent_runnable = create_react_agent(chat, tools, prompt_template)
 
-def run_agent(data):
-    agent_outcome = agent_runnable.invoke(data)
-    return {"agent_outcome": agent_outcome}
-
-def execute_tools(data):
-    agent_action = data["agent_outcome"]
-    #response = input(prompt=f"[y/n] continue with: {agent_action}?")
-    #if response == "n":
-    #    raise ValueError
-    
-    output = tool_executor.invoke(agent_action)
-    return {"intermediate_steps": [(agent_action, str(output))]}
-
-def should_continue(data):
-    if isinstance(data["agent_outcome"], AgentFinish):
-        return "end"
-    else:
-        return "continue"
-
-from langgraph.graph import END, StateGraph
-def run_langgraph_agent(connectionId, requestId, chat, query):
-    isTyping(connectionId, requestId)
-    
+def buildAgent():
     workflow = StateGraph(AgentState)
 
     workflow.add_node("agent", run_agent)
@@ -976,7 +952,36 @@ def run_langgraph_agent(connectionId, requestId, chat, query):
         },
     )
     workflow.add_edge("action", "agent")
-    app = workflow.compile()
+    return workflow.compile()
+
+def run_agent(data):
+    agent_outcome = agent_runnable.invoke(data)
+    return {"agent_outcome": agent_outcome}
+
+def execute_tools(data):
+    agent_action = data["agent_outcome"]
+    #response = input(prompt=f"[y/n] continue with: {agent_action}?")
+    #if response == "n":
+    #    raise ValueError
+    
+    tools = [get_current_time, get_book_list, get_weather_info, search_by_tavily, search_by_opensearch]      
+
+    tool_executor = ToolExecutor(tools)
+    
+    output = tool_executor.invoke(agent_action)
+    return {"intermediate_steps": [(agent_action, str(output))]}
+
+def should_continue(data):
+    if isinstance(data["agent_outcome"], AgentFinish):
+        return "end"
+    else:
+        return "continue"
+
+from langgraph.graph import END, StateGraph
+def run_langgraph_agent(connectionId, requestId, chat, query):
+    isTyping(connectionId, requestId)
+    
+    app = buildAgent()
     
     inputs = {"input": query}    
     config = {"recursion_limit": 50}

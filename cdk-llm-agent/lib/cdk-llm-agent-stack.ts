@@ -23,14 +23,12 @@ const accountId = process.env.CDK_DEFAULT_ACCOUNT;
 const debug = false;
 const stage = 'dev';
 const s3_prefix = 'docs';
-const model_id = "anthropic.claude-3-sonnet-20240229-v1:0"; // anthropic.claude-3-sonnet-20240229-v1:0  anthropic.claude-3-haiku-20240307-v1:0
 const projectName = `llm-agent`; 
 
 const opensearch_account = "admin";
 const opensearch_passwd = "Wifi1234!";
 let opensearch_url = "";
 const bucketName = `storage-for-${projectName}-${accountId}-${region}`; 
-const bedrock_region = "us-east-1";  // "us-east-1" "us-west-2" 
 const debugMessageMode = 'false'; // if true, debug messages will be delivered to the client.
 const max_object_size = 102400000; // 100 MB max size of an object, 50MB(default)
 const enableParallelSummay = 'true';

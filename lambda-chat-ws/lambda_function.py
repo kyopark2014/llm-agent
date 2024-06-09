@@ -937,26 +937,6 @@ mode  = 'kor'
 prompt_template = get_react_prompt_template(mode)
 agent_runnable = create_react_agent(chat, tools, prompt_template)
 
-def buildAgent():
-    workflow = StateGraph(AgentState)
-
-    workflow.add_node("agent", run_agent)
-    workflow.add_node("action", execute_tools)
-
-    workflow.set_entry_point("agent")
-    workflow.add_conditional_edges(
-        "agent",
-        should_continue,
-        {
-            "continue": "action",
-            "end": END,
-        },
-    )
-    workflow.add_edge("action", "agent")
-    return workflow.compile()
-
-app = buildAgent()
-
 def run_agent(data):
     agent_outcome = agent_runnable.invoke(data)
     return {"agent_outcome": agent_outcome}
@@ -979,6 +959,26 @@ def should_continue(data):
         return "end"
     else:
         return "continue"
+    
+def buildAgent():
+    workflow = StateGraph(AgentState)
+
+    workflow.add_node("agent", run_agent)
+    workflow.add_node("action", execute_tools)
+
+    workflow.set_entry_point("agent")
+    workflow.add_conditional_edges(
+        "agent",
+        should_continue,
+        {
+            "continue": "action",
+            "end": END,
+        },
+    )
+    workflow.add_edge("action", "agent")
+    return workflow.compile()    
+
+app = buildAgent()
 
 def run_langgraph_agent(connectionId, requestId, chat, query):
     isTyping(connectionId, requestId)

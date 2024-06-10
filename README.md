@@ -133,17 +133,14 @@ class AgentState(TypedDict):
     chat_history: list[BaseMessage]
     agent_outcome: Union[AgentAction, AgentFinish, None]
     intermediate_steps: Annotated[list[tuple[AgentAction, str]], operator.add]
-
-tool_executor = ToolExecutor(tools)
 ```
 
 각 Node state를 정의합니다. 
 
 ```python
-chat = get_chat()
-tools = [get_current_time, get_book_list, get_weather_info, search_by_tavily, search_by_opensearch]
-prompt_template = get_react_prompt_template('kor')
-
+chat = get_chat() 
+mode  = 'kor'
+prompt_template = get_react_prompt_template(mode)
 agent_runnable = create_react_agent(chat, tools, prompt_template)
 
 def run_agent(data):
@@ -152,6 +149,10 @@ def run_agent(data):
 
 def execute_tools(data):
     agent_action = data["agent_outcome"]
+    
+    tools = [get_current_time, get_book_list, get_weather_info, search_by_tavily, search_by_opensearch]      
+    tool_executor = ToolExecutor(tools)
+    
     output = tool_executor.invoke(agent_action)
     return {"intermediate_steps": [(agent_action, str(output))]}
 
@@ -162,16 +163,14 @@ def should_continue(data):
         return "continue"
 ```
 
-Graph를 정의하고 아래와 같이 실행합니다. 
+Graph로 Agent를 정의하고 아래와 같이 실행합니다. 
 
 ```python
 from langgraph.graph import END, StateGraph
 
-msg = run_langgraph_agent(connectionId, requestId, chat, text)
+msg = run_langgraph_agent(connectionId, requestId, app, text)  
 
-def run_langgraph_agent(connectionId, requestId, chat, query):
-    isTyping(connectionId, requestId)
-    
+def buildAgent():
     workflow = StateGraph(AgentState)
 
     workflow.add_node("agent", run_agent)
@@ -187,10 +186,16 @@ def run_langgraph_agent(connectionId, requestId, chat, query):
         },
     )
     workflow.add_edge("action", "agent")
-    app = workflow.compile()
+    return workflow.compile()    
+
+app = buildAgent()
+
+def run_langgraph_agent(connectionId, requestId, app, query):
+    isTyping(connectionId, requestId)
     
     inputs = {"input": query}    
-    for output in app.stream(inputs):
+    config = {"recursion_limit": 50}
+    for output in app.stream(inputs, config=config):
         for key, value in output.items():
             print("---")
             print(f"Node '{key}': {value}")

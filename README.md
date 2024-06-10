@@ -220,11 +220,8 @@ memory = SqliteSaver.from_conn_string(":memory:")
 [LangGraph](https://langchain-ai.github.io/langgraph/)와 같이 "action" node이 호출될때 state machine이 멈추게 설정하고 checkpoint를 설정할 수 있습니다.
 
 ```python
-memory = SqliteSaver.from_conn_string(":memory:") 
 app = workflow.compile(checkpointer=memory, interrupt_before=["action"])
 ```
-
-memory로 
 
 
 ### Human-in-the-loop

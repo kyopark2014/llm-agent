@@ -111,8 +111,9 @@ LangGraph는 agent를 생성하고 여러개의 Agent가 있을때의 흐름을 
 ### LangChain Agent와 비교
 
 - LangChain Agent는 LLM의 성능에 가반하여 매우 powerful 합니다. 
-- 각 Tool의 invoation을 위해 LLM을 호출하여야 하므로, Tool을 연속적으로 실행할 때에는 많은 시간이 소요됩니다.
+- 그러나 각 Tool의 invoation을 위해 매번 LLM을 호출하여야 하므로, Tool을 연속적으로 실행(Observation 없이)할 때에는 불필요한 시간이 소요됩니다.
 - 한번에 한개의 step을 수행하고 parallel call을 지원하지 않습니다.
+- LangGraph를 이용한 Agent는 복잡한 process(clcle 포함)를 State Machine을 이용해 구현할 수 있으며, Multi-Agent 구조에 적합합니다.
 
 
 ### LangGraph Agent의 구현

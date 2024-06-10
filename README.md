@@ -121,7 +121,7 @@ LangGraph는 agent를 생성하고 여러개의 Agent가 있을때의 흐름을 
 
 [Introduction to LangGraph](https://langchain-ai.github.io/langgraph/tutorials/introduction/)은 Agent 종류별로 설명하고 있습니다. 이를 구현한 코드는 [lambda-chat](./lambda-chat-ws/lambda_function.py)을 참조합니다.
 
-AgentState와 ToolExecutor를 정의합니다.
+Agent를 위한 Class인 AgentState를 정의합니다.
 
 ```python
 import operator

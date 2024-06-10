@@ -980,10 +980,74 @@ def buildAgent():
 
 app = buildAgent()
 
-def run_langgraph_agent(connectionId, requestId, chat, query):
+def run_langgraph_agent(connectionId, requestId, app, query):
     isTyping(connectionId, requestId)
     
     inputs = {"input": query}    
+    config = {"recursion_limit": 50}
+    for output in app.stream(inputs, config=config):
+        for key, value in output.items():
+            print("---")
+            print(f"Node '{key}': {value}")
+            
+            if 'agent_outcome' in value and isinstance(value['agent_outcome'], AgentFinish):
+                response = value['agent_outcome'].return_values
+                msg = readStreamMsg(connectionId, requestId, response['output'])
+                                        
+    return msg
+
+# LangGraph Agent (Chat)
+prompt_chat_template = get_react_chat_prompt_template(agentLangMode)
+agent_chat_runnable = create_react_agent(chat, tools, prompt_chat_template)
+
+def run_agent_chat(data):
+    agent_outcome = agent_chat_runnable.invoke(data)
+    return {"agent_outcome": agent_outcome}
+
+def buildAgentChat():
+    workflow = StateGraph(AgentState)
+
+    workflow.add_node("agent", run_agent_chat)
+    workflow.add_node("action", execute_tools)
+
+    workflow.set_entry_point("agent")
+    workflow.add_conditional_edges(
+        "agent",
+        should_continue,
+        {
+            "continue": "action",
+            "end": END,
+        },
+    )
+    workflow.add_edge("action", "agent")
+    return workflow.compile()    
+
+app_chat = buildAgentChat()
+
+def run_langgraph_agent_chat(connectionId, requestId, app, query):
+    isTyping(connectionId, requestId)
+    
+    inputs = {"input": query}    
+    config = {"recursion_limit": 50}
+    for output in app.stream(inputs, config=config):
+        for key, value in output.items():
+            print("---")
+            print(f"Node '{key}': {value}")
+            
+            if 'agent_outcome' in value and isinstance(value['agent_outcome'], AgentFinish):
+                response = value['agent_outcome'].return_values
+                msg = readStreamMsg(connectionId, requestId, response['output'])
+                                        
+    return msg
+
+def run_langgraph_agent_chat_using_revised_question(connectionId, requestId, app, query):
+    # revise question
+    revised_question = revise_question(connectionId, requestId, chat, query)     
+    print('revised_question: ', revised_question)  
+    
+    isTyping(connectionId, requestId)
+    
+    inputs = {"input": revised_question}    
     config = {"recursion_limit": 50}
     for output in app.stream(inputs, config=config):
         for key, value in output.items():
@@ -1565,12 +1629,15 @@ def getResponse(connectionId, jsonBody):
                     else:
                         msg = run_agent_react_chat(connectionId, requestId, chat, text)
                 elif convType == 'langgraph-agent':
-                    msg = run_langgraph_agent(connectionId, requestId, chat, text)      
-                #elif convType == 'langgraph-agent':
-                #    msg = run_langgraph_agent_chat_using_revised_question(connectionId, requestId, chat, text)
+                    msg = run_langgraph_agent(connectionId, requestId, app, text)      
+                elif convType == 'langgraph-agent-chat':
+                    if separated_chat_history=='true': 
+                        msg = run_langgraph_agent_chat_using_revised_question(connectionId, requestId, app, text)
+                    else:
+                        msg = run_langgraph_agent_chat(connectionId, requestId, app_chat, text)  
                 elif convType == 'agent-toolcalling':
                     msg = run_agent_tool_calling(connectionId, requestId, chat, text)
-                elif convType == 'agent-toolcalling-chat':         
+                elif convType == 'agent-toolcalling-chat':
                     msg = run_agent_tool_calling_chat(connectionId, requestId, chat, text)       
                                         
                 elif convType == "translation":

@@ -937,12 +937,12 @@ mode  = 'kor'
 prompt_template = get_react_prompt_template(mode)
 agent_runnable = create_react_agent(chat, tools, prompt_template)
 
-def run_agent(data):
-    agent_outcome = agent_runnable.invoke(data)
+def run_agent(state: AgentState):
+    agent_outcome = agent_runnable.invoke(state)
     return {"agent_outcome": agent_outcome}
 
-def execute_tools(data):
-    agent_action = data["agent_outcome"]
+def execute_tools(state: AgentState):
+    agent_action = state["agent_outcome"]
     #response = input(prompt=f"[y/n] continue with: {agent_action}?")
     #if response == "n":
     #    raise ValueError
@@ -954,8 +954,8 @@ def execute_tools(data):
     output = tool_executor.invoke(agent_action)
     return {"intermediate_steps": [(agent_action, str(output))]}
 
-def should_continue(data):
-    if isinstance(data["agent_outcome"], AgentFinish):
+def should_continue(state: AgentState):
+    if isinstance(state["agent_outcome"], AgentFinish):
         return "end"
     else:
         return "continue"

@@ -84,6 +84,35 @@ Thought:{agent_scratchpad}
 - search_by_tavily: 가벼운 인터넷 검색
 - search_by_opensearch: RAG에서 기술적인 자료 검색
 
+### LangChain Agent 구현
+
+LangChain의 Prebuilt component인 [create_react_agent](https://langchain-ai.github.io/langgraph/reference/prebuilt/)을 이용합니다.
+
+```python
+def run_agent_react(connectionId, requestId, chat, query):
+    prompt_template = get_react_prompt_template(agentLangMode)
+    
+     # create agent
+    isTyping(connectionId, requestId)
+    agent = create_react_agent(chat, tools, prompt_template)
+    
+    agent_executor = AgentExecutor(
+        agent=agent, 
+        tools=tools, 
+        verbose=True, 
+        handle_parsing_errors=True,
+        max_iterations = 5
+    )
+    
+    # run agent
+    response = agent_executor.invoke({"input": query})
+    msg = readStreamMsg(connectionId, requestId, response['output'])
+    msg = response['output']
+            
+    return msg
+```
+
+
 ### LangSmith 사용 설정
 
 [langsmith.md](./langsmith.md)은 [LangSmith](https://smith.langchain.com/)에서 발급한 api key를 설정하여, agent의 동작을 디버깅할 수 있도록 해줍니다. 

@@ -105,7 +105,7 @@ Thought:{agent_scratchpad}
 """)
 ```
 
-ReAct Prompt를 이용해 실제 구현은 아래와 같습니다. 
+ReAct Prompt를 이용해 실제 구현은 아래와 같습니다. 여기서는 LangChain의 Prebuilt component인 [create_react_agent](https://langchain-ai.github.io/langgraph/reference/prebuilt/)을 이용합니다.
 
 ```python
 def run_agent_react(connectionId, requestId, chat, query):

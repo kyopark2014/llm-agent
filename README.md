@@ -216,12 +216,26 @@ def run_langgraph_agent(connectionId, requestId, app, query):
 
 ### Checkpoint 활용
 
-[Memory를 이용해 checkpoint](https://langchain-ai.github.io/langgraph/tutorials/introduction/#part-3-adding-memory-to-the-chatbot)를 이용할 수 있습니다.
+[LangGraph Tutorial](https://langchain-ai.github.io/langgraph/tutorials/)와 [Memory를 이용해 checkpoint](https://langchain-ai.github.io/langgraph/tutorials/introduction/#part-3-adding-memory-to-the-chatbot)를 참조하여 아래처럼 memory_task를 정의합니다.
 
 ```python
 from langgraph.checkpoint.sqlite import SqliteSaver
 
-memory = SqliteSaver.from_conn_string(":memory:")
+memory_task = SqliteSaver.from_conn_string(":memory:")
+```
+
+실제 Lambda 환경에서 구성할때에는 사용자(userId)별로 memory를 관리하여야 하므로, 아래와 같이 map_task를 정의한 후, userId 존재여부에 따라 기존 memory를 재사용할 있도록 해줍니다.
+
+```python
+map_task = dict()
+
+if userId in map_task:  
+    print('memory_task exist. reuse it!')        
+    memory_task = map_task[userId]
+else: 
+    print('memory_task does not exist. create new one!')                
+    memory_task = SqliteSaver.from_conn_string(":memory:")
+    map_task[userId] = memory_task
 ```
 
 [LangGraph](https://langchain-ai.github.io/langgraph/)와 같이 "action" node이 호출될때 state machine이 멈추게 설정하고 checkpoint를 설정할 수 있습니다.

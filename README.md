@@ -249,7 +249,9 @@ def run_langgraph_agent(connectionId, requestId, app, query):
 
 ### Checkpoint 활용
 
-[LangGraph Tutorial](https://langchain-ai.github.io/langgraph/how-tos/)와 [Memory를 이용해 checkpoint](https://langchain-ai.github.io/langgraph/tutorials/introduction/#part-3-adding-memory-to-the-chatbot)를 참조하여 아래처럼 memory_task를 정의합니다.
+[Checkpoint는 thead의 state](https://langchain-ai.github.io/langgraph/concepts/#checkpoints)를 의미합니다.
+
+[LangGraph Tutorial](https://langchain-ai.github.io/langgraph/how-tos/)와 [Memory를 이용해 checkpoint](https://langchain-ai.github.io/langgraph/tutorials/introduction/#part-3-adding-memory-to-the-chatbot)를 참조하여 아래처럼 memory_task를 정의합니다. 
 
 ```python
 from langgraph.checkpoint.sqlite import SqliteSaver

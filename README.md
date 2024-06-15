@@ -238,7 +238,7 @@ else:
     map_task[userId] = memory_task
 ```
 
-[LangGraph](https://langchain-ai.github.io/langgraph/)와 같이 "action" node이 호출될때 state machine이 멈추게 설정하고 checkpoint를 설정할 수 있습니다.
+[LangGraph](https://langchain-ai.github.io/langgraph/)와 같이 "action"이 호출될 때에 state machine이 멈추도록 "interrupt_before"을 설정할 수도 있습니다. 
 
 ```python
 app = workflow.compile(checkpointer=memory, interrupt_before=["action"])

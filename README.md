@@ -174,12 +174,12 @@ mode  = 'kor'
 prompt_template = get_react_prompt_template(mode)
 agent_runnable = create_react_agent(chat, tools, prompt_template)
 
-def run_agent(data):
-    agent_outcome = agent_runnable.invoke(data)
+def run_agent(state: AgentState):
+    agent_outcome = agent_runnable.invoke(state)
     return {"agent_outcome": agent_outcome}
 
-def execute_tools(data):
-    agent_action = data["agent_outcome"]
+def execute_tools(state: AgentState):
+    agent_action = state["agent_outcome"]
     
     tools = [get_current_time, get_book_list, get_weather_info, search_by_tavily, search_by_opensearch]      
     tool_executor = ToolExecutor(tools)
@@ -187,8 +187,8 @@ def execute_tools(data):
     output = tool_executor.invoke(agent_action)
     return {"intermediate_steps": [(agent_action, str(output))]}
 
-def should_continue(data):
-    if isinstance(data["agent_outcome"], AgentFinish):
+def should_continue(state: AgentState):
+    if isinstance(state["agent_outcome"], AgentFinish):
         return "end"
     else:
         return "continue"
@@ -281,8 +281,8 @@ app = workflow.compile(checkpointer=memory, interrupt_before=["action"])
 아래와 같이 사용자의 confirm을 받은 후에 agent_action을 수행하도록 할 수 있습니다.
 
 ```python
-def execute_tools(data):
-    agent_action = data["agent_outcome"]
+def execute_tools(state: AgentState):
+    agent_action = state["agent_outcome"]
     response = input(prompt=f"[y/n] continue with: {agent_action}?")
     if response == "n":
         raise ValueError

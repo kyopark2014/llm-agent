@@ -42,6 +42,17 @@ Thought -> Action (Search) -> Observation -> Thought - Action (Search) -> Observ
 3) Action결과를 관찰(Observation)합니다.
 4) 결과가 만족스러운지 확인(Thought) 합니다. 만족하지 않으면 반복합니다.
 
+#### Definition: one of cases
+
+[An Introduction to LLM Agents | From OpenAI Function Calling to LangChain Agents](https://www.youtube.com/watch?v=ATUUd2bpRfo) 참조
+
+- Thinking: What to do + planning (order, priority...)
+- Acting: used tools, search, browser, etc...
+- What is an Agent? LLM + Tools
+  LLM = predicts next word/sentence
+
+
+
 
 ### Prompt 
 

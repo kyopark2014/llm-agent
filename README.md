@@ -149,6 +149,15 @@ LangGraph는 agent를 생성하고 여러개의 Agent가 있을때의 흐름을 
 - 한번에 한개의 step을 수행하고 parallel call을 지원하지 않습니다.
 - LangGraph를 이용한 Agent는 복잡한 process(clcle 포함)를 State Machine을 이용해 구현할 수 있으며, Multi-Agent 구조에 적합합니다.
 
+## Components
+
+- Memory: Shared state across the graph
+- Tools: Nodes can call tools and modify state
+- Planning: Edges can route control flow based on LLM decisions
+
+참조: [Building and Testing Reliable Agents](https://www.youtube.com/watch?v=XiySC-d346E): chain/agent 비교하여 개념 설명 매우 좋음
+
+
 
 ### LangGraph Agent의 구현
 
@@ -495,4 +504,3 @@ LangChain과 LangGraph를 이용해 한국어 Chatbot Agent을 만들었습니�
 
 [LLM-powered autonomous agent system](https://lilianweng.github.io/posts/2023-06-23-agent/)
 
-[Building and Testing Reliable Agents](https://www.youtube.com/watch?v=XiySC-d346E): chain/agent 비교하여 개념 설명 매우 좋음

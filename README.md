@@ -494,3 +494,5 @@ LangChain과 LangGraph를 이용해 한국어 Chatbot Agent을 만들었습니�
 [llama3 로 #agent 🤖 만드는 방법 + 8B 오픈 모델로 Agent 구성하는 방법](https://www.youtube.com/watch?app=desktop&v=04MM0PXv2Fk)
 
 [LLM-powered autonomous agent system](https://lilianweng.github.io/posts/2023-06-23-agent/)
+
+[Building and Testing Reliable Agents](https://www.youtube.com/watch?v=XiySC-d346E): chain/agent 비교하여 개념 설명 매우 좋음

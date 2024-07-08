@@ -49,7 +49,8 @@ Thought -> Action (Search) -> Observation -> Thought - Action (Search) -> Observ
 - Thinking: What to do + planning (order, priority...)
 - Acting: used tools, search, browser, etc...
 - What is an Agent? LLM + Tools
-  LLM = predicts next word/sentence
+  - LLM: predicts next word/sentence
+  - Tool: perform actions in the real world
 
 
 

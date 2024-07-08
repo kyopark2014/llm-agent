@@ -32,13 +32,18 @@ Agent를 이용하면 LLM 결과를 향상시킬 수 있습니다.
 #### Agentic Reasoning Design Patterns
 
 1) Robust technology: Reflection, Tool use
-2) Emerging technology: Planning, Multi-agent collaboration
+- Reflection: coder agent가 생성한 코드를 critic agent가 확인하면서 코드를 개선하는 방법
+  - [Self-Refine: Iterative Refinement with Self-Feedback](https://arxiv.org/pdf/2303.17651)
+  - [Reflexion: Language Agents with Verbal Reinforcement Learning](https://arxiv.org/pdf/2303.11366)
+- Tool use
+  - [Gorilla: Large Language Model Connected with Massive APIs](https://arxiv.org/pdf/2305.15334)
+  - [MM-REACT: Prompting ChatGPT for Multimodal Reasoning and Action](https://arxiv.org/pdf/2303.11381)
+3) Emerging technology: Planning, Multi-agent collaboration
 
-#### Reflection: coder agent가 생성한 코드를 critic agent가 확인하면서 코드를 개선하는 방법
+#### Reflection: 
 
 
-- [Self-Refine: Iterative Refinement with Self-Feedback](https://arxiv.org/pdf/2303.17651)
-- [Reflexion: Language Agents with Verbal Reinforcement Learning](https://arxiv.org/pdf/2303.11366)
+
  
 
 

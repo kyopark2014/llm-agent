@@ -17,7 +17,7 @@ LLM을 사용할 때 다양한 API로부터 얻은 결과를 사용하여 더 �
 
 ### Agent의 정의
 
-[Agent란](https://terms.tta.or.kr/dictionary/dictionaryView.do?word_seq=171384-1%29) 주변 환경을 탐지하여 자율적으로 동작하는 장치 또는 프로그램을 의미합니다. 인공지능을 이용한 지능형 에이전트는 센서를 이용하여 주변 환경을 자각하여 Actuator를 이용하여 적절한 행동을 합니다. 
+[Agent란](https://terms.tta.or.kr/dictionary/dictionaryView.do?word_seq=171384-1%29) 주변 환경을 탐지하여 자율적으로 동작하는 장치 또는 프로그램을 의미합니다. 인공지능을 이용한 지능형 에이전트는 센서를 이용하여 주변 환경을 자각하여 Actuator를 이용하여 적절한 행동을 합니다. agent의 라틴어 어원인 agere의 뜻은 to do 또는 to act의 의미를 가지고 있습니다.
 
 Agent를 이용하면 LLM 결과를 향상시킬 수 있습니다. 
 

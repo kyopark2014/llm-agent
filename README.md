@@ -21,7 +21,9 @@ LLM을 사용할 때 다양한 API로부터 얻은 결과를 사용하여 더 �
 
 Agent를 이용하면 LLM 결과를 향상시킬 수 있습니다. 
 
-[Andrew Ng: AI Pioneer Shows The Power of AI AGENTS - "The Future Is Agentic"](https://www.youtube.com/watch?v=ZYf9V2fSFwU)
+[Andrew Ng: What's next for AI agentic workflows ft. Andrew Ng of AI Fund](https://www.youtube.com/watch?v=sal78ACtGTc)
+
+[AI Pioneer Shows The Power of AI AGENTS - "The Future Is Agentic"](https://www.youtube.com/watch?v=ZYf9V2fSFwU)
 
 [The evolution of AI: From Single Shots to Skilled Agents](https://siliconscrolls.substack.com/p/the-evolution-of-ai-from-single-shots)
 

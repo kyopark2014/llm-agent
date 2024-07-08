@@ -30,7 +30,8 @@ Agent를 이용하면 LLM 결과를 향상시킬 수 있습니다.
   - [The evolution of AI: From Single Shots to Skilled Agents](https://siliconscrolls.substack.com/p/the-evolution-of-ai-from-single-shots)
 
 <img src="https://github.com/kyopark2014/llm-agent/assets/52392004/ee9fba9c-1c2c-4032-9c69-3fcb4cc0bdad" width="700">
-   
+
+
 #### Agentic Reasoning Design Patterns
 
 1) Robust technology: Reflection, Tool use

@@ -39,6 +39,9 @@ Agent를 이용하면 LLM 결과를 향상시킬 수 있습니다.
   - [Gorilla: Large Language Model Connected with Massive APIs](https://arxiv.org/pdf/2305.15334)
   - [MM-REACT: Prompting ChatGPT for Multimodal Reasoning and Action](https://arxiv.org/pdf/2303.11381)
 3) Emerging technology: Planning, Multi-agent collaboration
+- Planning
+  - [Chain-of-Thought Prompting Elicits Reasoning in Large Language Models](https://arxiv.org/pdf/2201.11903)
+  - [HuggingGPT: Solving AI Tasks with ChatGPT and its Friends in Hugging Face](https://arxiv.org/pdf/2303.17580)
 
 #### Reflection: 
 

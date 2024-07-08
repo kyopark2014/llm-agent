@@ -19,6 +19,11 @@ LLM을 사용할 때 다양한 API로부터 얻은 결과를 사용하여 더 �
 
 [Agent란](https://terms.tta.or.kr/dictionary/dictionaryView.do?word_seq=171384-1%29) 주변 환경을 탐지하여 자율적으로 동작하는 장치 또는 프로그램을 의미합니다. 인공지능을 이용한 지능형 에이전트는 센서를 이용하여 주변 환경을 자각하여 Actuator를 이용하여 적절한 행동을 합니다. 
 
+[The evolution of AI: From Single Shots to Skilled Agents](https://siliconscrolls.substack.com/p/the-evolution-of-ai-from-single-shots)
+
+![image](https://github.com/kyopark2014/llm-agent/assets/52392004/dbe742d9-896b-4328-8966-8e6c6380be4a)
+
+
 ### Agent Type
 
 LangChain의 [Agent Type](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/)와 같이, Agent는 [Tool Calling](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/tool_calling/), [OpenAI tools](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/openai_tools/), [ReAct](https://python.langchain.com/v0.1/docs/modules/agents/agent_types/react/)와 같은 방법을 이용해 구현할 수 있습니다. 

@@ -25,12 +25,20 @@ Agent를 이용하면 LLM 결과를 향상시킬 수 있습니다.
 
 [The evolution of AI: From Single Shots to Skilled Agents](https://siliconscrolls.substack.com/p/the-evolution-of-ai-from-single-shots)
 
-<img width="961" alt="image" src="https://github.com/kyopark2014/llm-agent/assets/52392004/ee9fba9c-1c2c-4032-9c69-3fcb4cc0bdad">
+<img src="https://github.com/kyopark2014/llm-agent/assets/52392004/ee9fba9c-1c2c-4032-9c69-3fcb4cc0bdad" width="700">
+   
+
 
 #### Agentic Reasoning Design Patterns
 
 1) Robust technology: Reflection, Tool use
 2) Emerging technology: Planning, Multi-agent collaboration
+
+* Reflection
+
+- [Self-Refine: Iterative Refinement with Self-Feedback](https://arxiv.org/pdf/2303.17651)
+- [Reflexion: Language Agents with Verbal Reinforcement Learning](https://arxiv.org/pdf/2303.11366)
+- 
 
 
 [An Introduction to LLM Agents | From OpenAI Function Calling to LangChain Agents](https://www.youtube.com/watch?v=ATUUd2bpRfo) 참조

@@ -27,6 +27,20 @@ Agent를 이용하면 LLM 결과를 향상시킬 수 있습니다.
 
 <img width="961" alt="image" src="https://github.com/kyopark2014/llm-agent/assets/52392004/ee9fba9c-1c2c-4032-9c69-3fcb4cc0bdad">
 
+#### Agentic Reasoning Design Patterns
+
+1) Robust technology: Reflection, Tool use
+2) Emerging technology: Planning, Multi-agent collaboration
+
+
+[An Introduction to LLM Agents | From OpenAI Function Calling to LangChain Agents](https://www.youtube.com/watch?v=ATUUd2bpRfo) 참조
+
+- Thinking: What to do + planning (order, priority...)
+- Acting: used tools, search, browser, etc...
+- What is an Agent? LLM + Tools
+  - LLM: predicts next word/sentence
+  - Tool: perform actions in the real world
+
 
 
 ### Agent Type
@@ -36,6 +50,9 @@ LangChain의 [Agent Type](https://python.langchain.com/v0.1/docs/modules/agents/
 - ReAct의 경우에 직관적이고 이해가 쉬운 반면에 Multi-Input Tools, Parallel Function Calling과 같은 기능을 제공하지 않고 있습니다.
 - OpenAI tools는 가장 많이 사용되고 있고, 다양한 사례를 가지고 있습니다.
 - Tool Calling은 OpenAI tools와 유사한 방식으로 Anthropic, Gemini등을 지원하고 있습니다.
+
+
+
 
 ### Agent의 기본 동작
 
@@ -51,16 +68,6 @@ Thought -> Action (Search) -> Observation -> Thought - Action (Search) -> Observ
 2) Action을 수행합니다.
 3) Action결과를 관찰(Observation)합니다.
 4) 결과가 만족스러운지 확인(Thought) 합니다. 만족하지 않으면 반복합니다.
-
-#### Definition: one of cases
-
-[An Introduction to LLM Agents | From OpenAI Function Calling to LangChain Agents](https://www.youtube.com/watch?v=ATUUd2bpRfo) 참조
-
-- Thinking: What to do + planning (order, priority...)
-- Acting: used tools, search, browser, etc...
-- What is an Agent? LLM + Tools
-  - LLM: predicts next word/sentence
-  - Tool: perform actions in the real world
 
 
 

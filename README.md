@@ -44,7 +44,7 @@ Agent를 이용하면 LLM 결과를 향상시킬 수 있습니다.
   - [HuggingGPT: Solving AI Tasks with ChatGPT and its Friends in Hugging Face](https://arxiv.org/pdf/2303.17580)
 - Multi-agent collaboration 
   - [ChatDev: Communicative Agents for Software Development](https://arxiv.org/pdf/2307.07924)
-  - [HuggingGPT: Solving AI Tasks with ChatGPT and its Friends in Hugging Face](https://arxiv.org/pdf/2303.17580)
+  - [AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation](https://arxiv.org/pdf/2308.08155)
 
 #### Reflection: 
 

@@ -19,9 +19,14 @@ LLM을 사용할 때 다양한 API로부터 얻은 결과를 사용하여 더 �
 
 [Agent란](https://terms.tta.or.kr/dictionary/dictionaryView.do?word_seq=171384-1%29) 주변 환경을 탐지하여 자율적으로 동작하는 장치 또는 프로그램을 의미합니다. 인공지능을 이용한 지능형 에이전트는 센서를 이용하여 주변 환경을 자각하여 Actuator를 이용하여 적절한 행동을 합니다. 
 
+Agent를 이용하면 LLM 결과를 향상시킬 수 있습니다. 
+
+[AI Pioneer Shows The Power of AI AGENTS - "The Future Is Agentic"](https://www.youtube.com/watch?v=ZYf9V2fSFwU)
+
 [The evolution of AI: From Single Shots to Skilled Agents](https://siliconscrolls.substack.com/p/the-evolution-of-ai-from-single-shots)
 
-![image](https://github.com/kyopark2014/llm-agent/assets/52392004/dbe742d9-896b-4328-8966-8e6c6380be4a)
+<img width="961" alt="image" src="https://github.com/kyopark2014/llm-agent/assets/52392004/ee9fba9c-1c2c-4032-9c69-3fcb4cc0bdad">
+
 
 
 ### Agent Type

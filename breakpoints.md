@@ -1,8 +1,10 @@
 # Breakpoints
 
+[breakpoints.ipynb](./agent/breakpoints.ipynb)에서는 breakpoint의 개념과 사용예를 보여줍니다. 이 노트북의 원본은 [langchain-breakpoints](https://langchain-ai.github.io/langgraph/how-tos/human_in_the_loop/breakpoints/)입니다. 
+
 ## Simple Case
 
-[breakpoints.ipynb](./agent/breakpoints.ipynb)에서는 breakpoint의 개념과 사용예를 보여줍니다. 이 노트북의 원본은 [langchain-breakpoints](https://langchain-ai.github.io/langgraph/how-tos/human_in_the_loop/breakpoints/)입니다. 
+먼저 간단한 케이스에 대한 breakpoint 예제 입니다.
 
 ```python
 from typing import TypedDict

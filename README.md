@@ -213,94 +213,60 @@ LangGraph는 agent를 생성하고 여러개의 Agent가 있을때의 흐름을 
 
 ### LangGraph Agent의 구현
 
-[Introduction to LangGraph](https://langchain-ai.github.io/langgraph/tutorials/introduction/)은 Agent 종류별로 설명하고 있습니다. 이를 구현한 코드는 [lambda-chat](./lambda-chat-ws/lambda_function.py)을 참조합니다.
+[Introduction to LangGraph](https://langchain-ai.github.io/langgraph/tutorials/introduction/)은 Agent 종류별로 설명하고 있습니다. 또한, [agent-executor.md](./agent-executor.md)에서는 LangGraph를 이용하여 Tool을 실행하는 Agent Executor에 대해 설명하고 있습니다. 자세한 구현한 코드는 [agent-executor.ipynb](./agent-executor.ipynb)와 [lambda-chat](./lambda-chat-ws/lambda_function.py)를 참조합니다. 
 
-Agent를 위한 Class인 AgentState를 정의합니다.
+Agent를 위한 Class인 AgentState와 tool을 비롯한 각 노드를 정의합니다.
 
 ```python
-import operator
-from typing import TypedDict, Annotated, List, Union
-from langchain_core.agents import AgentAction, AgentFinish
-from langchain_core.messages import BaseMessage
-from langgraph.prebuilt.tool_executor import ToolExecutor
-
 class AgentState(TypedDict):
-    input: str
-    chat_history: list[BaseMessage]
-    agent_outcome: Union[AgentAction, AgentFinish, None]
-    intermediate_steps: Annotated[list[tuple[AgentAction, str]], operator.add]
+    messages: Annotated[Sequence[BaseMessage], operator.add]
+    
+tool_node = ToolNode(tools)
+
+def should_continue(state):
+    messages = state["messages"]
+    last_message = messages[-1]
+    if not last_message.tool_calls:
+        return "end"
+    else:
+        return "continue"
+
+def call_model(state):
+    messages = state["messages"]
+    response = model.invoke(messages)
+    return {"messages": [response]}
 ```
 
 각 Node state를 정의합니다. 
 
 ```python
-chat = get_chat() 
-mode  = 'kor'
-prompt_template = get_react_prompt_template(mode)
-agent_runnable = create_react_agent(chat, tools, prompt_template)
+workflow = StateGraph(AgentState)
 
-def run_agent(state: AgentState):
-    agent_outcome = agent_runnable.invoke(state)
-    return {"agent_outcome": agent_outcome}
+workflow.add_node("agent", call_model)
+workflow.add_node("action", tool_node)
+workflow.add_edge(START, "agent")
+workflow.add_conditional_edges(
+    "agent",
+    should_continue,
+    {
+        "continue": "action",
+        "end": END,
+    },
+)
+workflow.add_edge("action", "agent")
 
-def execute_tools(state: AgentState):
-    agent_action = state["agent_outcome"]
-    
-    tools = [get_current_time, get_book_list, get_weather_info, search_by_tavily, search_by_opensearch]      
-    tool_executor = ToolExecutor(tools)
-    
-    output = tool_executor.invoke(agent_action)
-    return {"intermediate_steps": [(agent_action, str(output))]}
-
-def should_continue(state: AgentState):
-    if isinstance(state["agent_outcome"], AgentFinish):
-        return "end"
-    else:
-        return "continue"
+app = workflow.compile()
 ```
 
 Graph로 Agent를 정의하고 아래와 같이 실행합니다. 
 
 ```python
-from langgraph.graph import END, StateGraph
+from langchain_core.messages import HumanMessage
 
-msg = run_langgraph_agent(connectionId, requestId, app, text)  
+inputs = [HumanMessage(content="강남역 맛집 알려줘")]
 
-def buildAgent():
-    workflow = StateGraph(AgentState)
-
-    workflow.add_node("agent", run_agent)
-    workflow.add_node("action", execute_tools)
-
-    workflow.set_entry_point("agent")
-    workflow.add_conditional_edges(
-        "agent",
-        should_continue,
-        {
-            "continue": "action",
-            "end": END,
-        },
-    )
-    workflow.add_edge("action", "agent")
-    return workflow.compile()    
-
-app = buildAgent()
-
-def run_langgraph_agent(connectionId, requestId, app, query):
-    isTyping(connectionId, requestId)
-    
-    inputs = {"input": query}    
-    config = {"recursion_limit": 50}
-    for output in app.stream(inputs, config=config):
-        for key, value in output.items():
-            print("---")
-            print(f"Node '{key}': {value}")
-            
-            if 'agent_outcome' in value and isinstance(value['agent_outcome'], AgentFinish):
-                response = value['agent_outcome'].return_values
-                msg = readStreamMsg(connectionId, requestId, response['output'])
-                                        
-    return msg
+for event in app.stream({"messages": inputs}, stream_mode="values"):    
+    event["messages"][-1].pretty_print()
 ```
 
 생성된 Graph는 아래와 같습니다.

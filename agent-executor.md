@@ -1,6 +1,6 @@
 # Agent Executor
 
-Agent를 이용하여 적절한 Tool을 실행할 수 있습니다.
+Agent를 이용하여 적절한 Tool을 실행할 수 있습니다. 상세한 코드는 [agent-executor.ipynb](./agent/agent-executor.ipynb)을 참조합니다.
 
 ## Chat Agent Executor
 

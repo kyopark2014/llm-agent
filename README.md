@@ -201,7 +201,7 @@ LangGraph는 agent를 생성하고 여러개의 Agent가 있을때의 흐름을 
 - 한번에 한개의 step을 수행하고 parallel call을 지원하지 않습니다.
 - LangGraph를 이용한 Agent는 복잡한 process를 State Machine을 이용해 구현할 수 있으며, Multi-Agent 구조에 적합합니다.
 
-## Components
+### Components
 
 - Memory: Shared state across the graph
 - Tools: Nodes can call tools and modify state
@@ -310,6 +310,13 @@ def run_langgraph_agent(connectionId, requestId, app, query):
 
 ### Checkpoint 활용
 
+#### Breakpoints
+
+[breakpoints.ipynb](./agent/breakpoints.ipynb)에서는 breakpoint의 개념과 사용예를 보여줍니다. 상세한 내용은 [breakpoints.md](./breakpoints.md)를 참조합니다. 
+
+
+
+#### Checkpoint
 [Checkpoint는 thread의 state](https://langchain-ai.github.io/langgraph/concepts/#checkpoints)를 의미합니다. [LangGraph Tutorial](https://langchain-ai.github.io/langgraph/how-tos/)와 [Memory를 이용해 checkpoint](https://langchain-ai.github.io/langgraph/tutorials/introduction/#part-3-adding-memory-to-the-chatbot)를 참조하여 아래처럼 memory_task를 정의합니다. 
 
 ```python

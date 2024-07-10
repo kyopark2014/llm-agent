@@ -8,6 +8,8 @@ LangGraph를 사용하여 3가지 반영 기술을 구축하는 방법을 설명
 
 ## Simple Reflection
 
+[agent-reflection.ipynb](./agent/agent-reflection.ipynb)와 [agent-reflection-kor.ipynb](./agent/agent-reflection-kor.ipynb)에서는 MessageGraph()로 LangGraph Agent 만드는것을 설명합니다.
+
 [reflection.ipynb](https://github.com/langchain-ai/langgraph/blob/main/examples/reflection/reflection.ipynb)에서는 LangGraph로 Reflection을 이용한 Agent를 설명하고 있습니다. 이것은 re-planning, search, evalution에 활용될 수 있습니다. 
 
 ![image](https://github.com/kyopark2014/llm-agent/assets/52392004/7ceb3d72-7fc3-4939-bdd0-f0260121e498)

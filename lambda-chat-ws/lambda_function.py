@@ -980,9 +980,6 @@ def run_langgraph_agent(connectionId, requestId, app, query):
     for event in app.stream({"messages": inputs}, stream_mode="values"):   
         print('event: ', event)
         
-        response = event["messages"]
-        print('response: ', response)
-        
         message = event["messages"][-1]
         print('message: ', message)
         

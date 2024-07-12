@@ -492,7 +492,7 @@ def get_book_list(keyword: str) -> str:
     
     keyword = keyword.replace('\'','')
 
-    answer = ""
+    answer = []
     url = f"https://search.kyobobook.co.kr/search?keyword={keyword}&gbCode=TOT&target=total"
     response = requests.get(url)
     if response.status_code == 200:
@@ -506,7 +506,8 @@ def get_book_list(keyword: str) -> str:
             # \n문자를 replace합니다.
             title = prod.text.strip().replace("\n", "")       
             link = prod.get("href")
-            answer = answer + f"{title}, URL: {link}\n"
+            
+            answer.append(f"{title}, URL: {link}")
     
     return answer
     
@@ -518,7 +519,7 @@ def get_current_time(format: str=f"%Y-%m-%d %H:%M:%S")->str:
     timestr = datetime.datetime.now(timezone('Asia/Seoul')).strftime(format)
     # print('timestr:', timestr)
     
-    return timestr
+    return [timestr]
 
 def get_lambda_client(region):
     return boto3.client(
@@ -560,10 +561,7 @@ def get_system_time() -> list:
     timestr = jsonBody['timestr']
     print('timestr: ', timestr)
     
-    result = []
-    result.append(timestr)
-    
-    return result
+    return [timestr]
 
 @tool
 def get_weather_info(city: str) -> str:
@@ -618,7 +616,7 @@ def get_weather_info(city: str) -> str:
             # raise Exception ("Not able to request to LLM")    
         
     print('weather_str: ', weather_str)                            
-    return weather_str
+    return [weather_str]
 
 @tool
 def search_by_tavily(keyword: str) -> str:
@@ -628,7 +626,7 @@ def search_by_tavily(keyword: str) -> str:
     return: the information of keyword
     """    
     
-    answer = ""
+    answer = []
     
     if tavily_api_key:
         keyword = keyword.replace('\'','')
@@ -644,7 +642,7 @@ def search_by_tavily(keyword: str) -> str:
                 content = result.get("content")
                 url = result.get("url")
             
-                answer = answer + f"{content}, URL: {url}\n"
+                answer.append(f"{content}, URL: {url}")
         
     return answer
 
@@ -675,7 +673,7 @@ def search_by_opensearch(keyword: str) -> str:
         http_auth=(opensearch_account, opensearch_passwd), # http_auth=awsauth,
     ) 
     
-    answer = ""
+    answer = []
     top_k = 2
     
     if enalbeParentDocumentRetrival == 'true':
@@ -691,7 +689,8 @@ def search_by_opensearch(keyword: str) -> str:
             excerpt, name, uri, doc_level = get_parent_document(parent_doc_id) # use pareant document
             print(f"parent: name: {name}, uri: {uri}, doc_level: {doc_level}")
             
-            answer = answer + f"{excerpt}, URL: {uri}\n\n"
+            answer.append(f"{excerpt}, URL: {uri}")
+            # answer = answer + f"{excerpt}, URL: {uri}\n\n"
     else: 
         relevant_documents = vectorstore_opensearch.similarity_search_with_score(
             query = keyword,
@@ -703,8 +702,9 @@ def search_by_opensearch(keyword: str) -> str:
             
             excerpt = document[0].page_content        
             uri = document[0].metadata['uri']
-                            
-            answer = answer + f"{excerpt}, URL: {uri}\n\n"
+                    
+            answer.append(f"{excerpt}, URL: {uri}")       
+            # answer = answer + \n\n"
     
     return answer
 

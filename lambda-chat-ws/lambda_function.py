@@ -35,11 +35,12 @@ from langchain_community.tools.tavily_search import TavilySearchResults
 from PIL import Image
 from opensearchpy import OpenSearch
 
-from typing import TypedDict, Annotated, List, Union
+from typing import TypedDict, Annotated, Sequence, List, Union
 from langchain_core.agents import AgentAction, AgentFinish
 from langchain_core.messages import BaseMessage
 from langgraph.prebuilt.tool_executor import ToolExecutor
-from langgraph.graph import END, StateGraph
+from langgraph.graph import START, END, StateGraph
+from langgraph.prebuilt import ToolNode
 
 s3 = boto3.client('s3')
 s3_bucket = os.environ.get('s3_bucket') # bucket name
@@ -926,47 +927,36 @@ def run_agent_react_chat_using_revised_question(connectionId, requestId, chat, q
     return msg
 
 ####################### LangGraph #######################
-class AgentState(TypedDict):
-    input: str
-    chat_history: list[BaseMessage]
-    agent_outcome: Union[AgentAction, AgentFinish, None]
-    intermediate_steps: Annotated[list[tuple[AgentAction, str]], operator.add]
-
+# Chat Agent Executor
+#########################################################
 chat = get_chat() 
-mode  = 'kor'
-prompt_template = get_react_prompt_template(mode)
-agent_runnable = create_react_agent(chat, tools, prompt_template)
 
-def run_agent(state: AgentState):
-    agent_outcome = agent_runnable.invoke(state)
-    return {"agent_outcome": agent_outcome}
+model = chat.bind_tools(tools)
 
-def execute_tools(state: AgentState):
-    agent_action = state["agent_outcome"]
-    #response = input(prompt=f"[y/n] continue with: {agent_action}?")
-    #if response == "n":
-    #    raise ValueError
-    
-    tools = [get_current_time, get_book_list, get_weather_info, search_by_tavily, search_by_opensearch]      
+class ChatAgentState(TypedDict):
+    messages: Annotated[Sequence[BaseMessage], operator.add]
 
-    tool_executor = ToolExecutor(tools)
-    
-    output = tool_executor.invoke(agent_action)
-    return {"intermediate_steps": [(agent_action, str(output))]}
+tool_node = ToolNode(tools)
 
-def should_continue(state: AgentState):
-    if isinstance(state["agent_outcome"], AgentFinish):
+def should_continue(state):
+    messages = state["messages"]
+    last_message = messages[-1]
+    if not last_message.tool_calls:
         return "end"
     else:
         return "continue"
-    
-def buildAgent():
-    workflow = StateGraph(AgentState)
 
-    workflow.add_node("agent", run_agent)
-    workflow.add_node("action", execute_tools)
+def call_model(state):
+    messages = state["messages"]
+    response = model.invoke(messages)
+    return {"messages": [response]}    
 
-    workflow.set_entry_point("agent")
+def buildChatAgent():
+    workflow = StateGraph(ChatAgentState)
+
+    workflow.add_node("agent", call_model)
+    workflow.add_node("action", tool_node)
+    workflow.add_edge(START, "agent")
     workflow.add_conditional_edges(
         "agent",
         should_continue,
@@ -976,11 +966,117 @@ def buildAgent():
         },
     )
     workflow.add_edge("action", "agent")
-    return workflow.compile()    
 
-app = buildAgent()
+    return workflow.compile()
+
+chat_app = buildChatAgent()
 
 def run_langgraph_agent(connectionId, requestId, app, query):
+    isTyping(connectionId, requestId)
+    
+    inputs = {"input": query}    
+    config = {"recursion_limit": 50}
+    for output in app.stream(inputs, config=config):
+        for key, value in output.items():
+            print("---")
+            print(f"Node '{key}': {value}")
+            
+            if 'agent_outcome' in value and isinstance(value['agent_outcome'], AgentFinish):
+                response = value['agent_outcome'].return_values
+                msg = readStreamMsg(connectionId, requestId, response['output'])                                        
+    return msg
+
+def run_langgraph_agent_chat(connectionId, requestId, app, query):
+    isTyping(connectionId, requestId)
+    
+    inputs = {"input": query}    
+    config = {"recursion_limit": 50}
+    for output in app.stream(inputs, config=config):
+        for key, value in output.items():
+            print("---")
+            print(f"Node '{key}': {value}")
+            
+            if 'agent_outcome' in value and isinstance(value['agent_outcome'], AgentFinish):
+                response = value['agent_outcome'].return_values
+                msg = readStreamMsg(connectionId, requestId, response['output'])
+                                        
+    return msg
+
+def run_langgraph_agent_chat_using_revised_question(connectionId, requestId, app, query):
+    # revise question
+    revised_question = revise_question(connectionId, requestId, chat, query)     
+    print('revised_question: ', revised_question)  
+    
+    isTyping(connectionId, requestId)
+    
+    inputs = {"input": revised_question}    
+    config = {"recursion_limit": 50}
+    for output in app.stream(inputs, config=config):
+        for key, value in output.items():
+            print("---")
+            print(f"Node '{key}': {value}")
+            
+            if 'agent_outcome' in value and isinstance(value['agent_outcome'], AgentFinish):
+                response = value['agent_outcome'].return_values
+                msg = readStreamMsg(connectionId, requestId, response['output'])
+                                        
+    return msg
+
+####################### LangGraph #######################
+# Agent Executor From Scratch
+#########################################################
+class AgentState(TypedDict):
+    input: str
+    chat_history: list[BaseMessage]
+    agent_outcome: Union[AgentAction, AgentFinish, None]
+    intermediate_steps: Annotated[list[tuple[AgentAction, str]], operator.add]
+
+mode  = 'kor'
+prompt_template = get_react_prompt_template(mode)
+agent_runnable = create_react_agent(chat, tools, prompt_template)
+
+def run_agent_from_scratch(state: AgentState):
+    agent_outcome = agent_runnable.invoke(state)
+    return {"agent_outcome": agent_outcome}
+
+def execute_tools_from_scratch(state: AgentState):
+    agent_action = state["agent_outcome"]
+    #response = input(prompt=f"[y/n] continue with: {agent_action}?")
+    #if response == "n":
+    #    raise ValueError
+    
+    tool_executor = ToolExecutor(tools)
+    
+    output = tool_executor.invoke(agent_action)
+    return {"intermediate_steps": [(agent_action, str(output))]}
+
+def should_continue_from_scratch(state: AgentState):
+    if isinstance(state["agent_outcome"], AgentFinish):
+        return "end"
+    else:
+        return "continue"
+    
+def buildAgentFromScratch():
+    workflow = StateGraph(AgentState)
+
+    workflow.add_node("agent", run_agent_from_scratch)
+    workflow.add_node("action", execute_tools_from_scratch)
+
+    workflow.set_entry_point("agent")
+    workflow.add_conditional_edges(
+        "agent",
+        should_continue_from_scratch,
+        {
+            "continue": "action",
+            "end": END,
+        },
+    )
+    workflow.add_edge("action", "agent")
+    return workflow.compile()    
+
+app_from_scratch = buildAgentFromScratch()
+
+def run_langgraph_agent_from_scratch(connectionId, requestId, app, query):
     isTyping(connectionId, requestId)
     
     inputs = {"input": query}    
@@ -1000,20 +1096,20 @@ def run_langgraph_agent(connectionId, requestId, app, query):
 prompt_chat_template = get_react_chat_prompt_template(agentLangMode)
 agent_chat_runnable = create_react_agent(chat, tools, prompt_chat_template)
 
-def run_agent_chat(data):
+def run_agent_chat_from_scratch(data):
     agent_outcome = agent_chat_runnable.invoke(data)
     return {"agent_outcome": agent_outcome}
 
 def buildAgentChat():
     workflow = StateGraph(AgentState)
 
-    workflow.add_node("agent", run_agent_chat)
-    workflow.add_node("action", execute_tools)
+    workflow.add_node("agent", run_agent_chat_from_scratch)
+    workflow.add_node("action", execute_tools_from_scratch)
 
     workflow.set_entry_point("agent")
     workflow.add_conditional_edges(
         "agent",
-        should_continue,
+        should_continue_from_scratch,
         {
             "continue": "action",
             "end": END,
@@ -1022,9 +1118,9 @@ def buildAgentChat():
     workflow.add_edge("action", "agent")
     return workflow.compile()    
 
-app_chat = buildAgentChat()
+app_chat_from_scratch = buildAgentChat()
 
-def run_langgraph_agent_chat(connectionId, requestId, app, query):
+def run_langgraph_agent_chat_from_scratch(connectionId, requestId, app, query):
     isTyping(connectionId, requestId)
     
     inputs = {"input": query}    
@@ -1040,7 +1136,7 @@ def run_langgraph_agent_chat(connectionId, requestId, app, query):
                                         
     return msg
 
-def run_langgraph_agent_chat_using_revised_question(connectionId, requestId, app, query):
+def run_langgraph_agent_chat_from_scratch_using_revised_question(connectionId, requestId, app, query):
     # revise question
     revised_question = revise_question(connectionId, requestId, chat, query)     
     print('revised_question: ', revised_question)  
@@ -1628,13 +1724,21 @@ def getResponse(connectionId, jsonBody):
                         msg = run_agent_react_chat_using_revised_question(connectionId, requestId, chat, text)
                     else:
                         msg = run_agent_react_chat(connectionId, requestId, chat, text)
+
                 elif convType == 'langgraph-agent':
-                    msg = run_langgraph_agent(connectionId, requestId, app, text)      
+                    msg = run_langgraph_agent(connectionId, requestId, chat_app, text)      
                 elif convType == 'langgraph-agent-chat':
                     if separated_chat_history=='true': 
-                        msg = run_langgraph_agent_chat_using_revised_question(connectionId, requestId, app, text)
+                        msg = run_langgraph_agent_chat_using_revised_question(connectionId, requestId, chat_app, text)
+                                
+                elif convType == 'langgraph-agent-from-scratch':
+                    msg = run_langgraph_agent_from_scratch(connectionId, requestId, app_from_scratch, text)      
+                elif convType == 'langgraph-agent-chat-from-scratch':
+                    if separated_chat_history=='true': 
+                        msg = run_langgraph_agent_chat_from_scratch_using_revised_question(connectionId, requestId, app_from_scratch, text)
                     else:
-                        msg = run_langgraph_agent_chat(connectionId, requestId, app_chat, text)  
+                        msg = run_langgraph_agent_chat_from_scratch(connectionId, requestId, app_chat_from_scratch, text)  
+                        
                 elif convType == 'agent-toolcalling':
                     msg = run_agent_tool_calling(connectionId, requestId, chat, text)
                 elif convType == 'agent-toolcalling-chat':

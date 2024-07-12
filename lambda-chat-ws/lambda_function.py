@@ -512,7 +512,7 @@ def get_book_list(keyword: str) -> str:
     return answer
     
 @tool
-def get_current_time(format: str=f"%Y-%m-%d %H:%M:%S")->str:
+def get_current_time(format: str=f"%Y-%m-%d %H:%M:%S")->list:
     """Returns the current date and time in the specified format"""
     # f"%Y-%m-%d %H:%M:%S"
     format = format.replace('\'','')
@@ -564,7 +564,7 @@ def get_system_time() -> list:
     return [timestr]
 
 @tool
-def get_weather_info(city: str) -> str:
+def get_weather_info(city: str) -> list:
     """
     retrieve weather information by city name and then return weather statement.
     city: the name of city to retrieve
@@ -619,7 +619,7 @@ def get_weather_info(city: str) -> str:
     return [weather_str]
 
 @tool
-def search_by_tavily(keyword: str) -> str:
+def search_by_tavily(keyword: str) -> list:
     """
     Search general information by keyword and then return the result as a string.
     keyword: search keyword
@@ -647,7 +647,7 @@ def search_by_tavily(keyword: str) -> str:
     return answer
 
 @tool    
-def search_by_opensearch(keyword: str) -> str:
+def search_by_opensearch(keyword: str) -> list:
     """
     Search technical information by keyword and then return the result as a string.
     keyword: search keyword

@@ -22,6 +22,8 @@ model = chat.bind_tools(tools)
 state를 위한 AgentState를 정의하고 node를 구성합니다.
 
 ```python
+from langgraph.prebuilt import ToolNode
+
 class AgentState(TypedDict):
     messages: Annotated[Sequence[BaseMessage], operator.add]
     

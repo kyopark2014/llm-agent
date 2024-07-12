@@ -482,10 +482,12 @@ def get_parent_document(parent_doc_id):
     
     return source['text'], metadata['name'], metadata['uri'], metadata['doc_level']    
 
-def check_query(query): # translate wrong format to a string
+def validate_query_format(query): # translate json format to a string
   try:
     input_json = json.loads(query)
+    print('input_json: ', input_json)
   except ValueError as e:
+    print('Error: ', e)  
     return query
   return input_json['query']
 
@@ -497,7 +499,12 @@ def get_book_list(query: str) -> list:
     return: book list
     """
     
-    keyword = check_query(query)
+    print('query: ', query)
+    
+    if 'query' in query:
+        keyword = query['query']
+    else:
+        keyword = validate_query_format(query)
     
     keyword = keyword.replace('\'','')
 
@@ -635,7 +642,7 @@ def search_by_tavily(query: str) -> list:
     return: the information of keyword
     """    
     
-    keyword = check_query(query)
+    keyword = validate_query_format(query)
     
     answer = []
     

@@ -508,21 +508,17 @@ def get_book_list(keyword: str) -> str:
             link = prod.get("href")
             answer = answer + f"{title}, URL: {link}\n"
     
-    print('answer: ', answer) 
-    #answer = answer.encode('utf-8').decode('unicode_escape')
-    #print('answer(utf8): ', answer)
-
     return answer
     
 @tool
-def get_current_time(format: str=f"%Y-%m-%d %H:%M:%S")->list:
+def get_current_time(format: str=f"%Y-%m-%d %H:%M:%S")->str:
     """Returns the current date and time in the specified format"""
     # f"%Y-%m-%d %H:%M:%S"
     format = format.replace('\'','')
     timestr = datetime.datetime.now(timezone('Asia/Seoul')).strftime(format)
     # print('timestr:', timestr)
     
-    return [timestr]
+    return timestr
 
 def get_lambda_client(region):
     return boto3.client(
@@ -531,7 +527,7 @@ def get_lambda_client(region):
     )
 
 @tool    
-def get_system_time() -> list:
+def get_system_time() -> str:
     """
     retrive system time to earn the current date and time.
     return: a string of date and time
@@ -564,10 +560,10 @@ def get_system_time() -> list:
     timestr = jsonBody['timestr']
     print('timestr: ', timestr)
     
-    return [timestr]
+    return timestr
 
 @tool
-def get_weather_info(city: str) -> list:
+def get_weather_info(city: str) -> str:
     """
     retrieve weather information by city name and then return weather statement.
     city: the name of city to retrieve
@@ -619,10 +615,10 @@ def get_weather_info(city: str) -> list:
             # raise Exception ("Not able to request to LLM")    
         
     print('weather_str: ', weather_str)                            
-    return [weather_str]
+    return weather_str
 
 @tool
-def search_by_tavily(keyword: str) -> list:
+def search_by_tavily(keyword: str) -> str:
     """
     Search general information by keyword and then return the result as a string.
     keyword: search keyword
@@ -647,10 +643,10 @@ def search_by_tavily(keyword: str) -> list:
             
                 answer = answer + f"{content}, URL: {url}\n"
         
-    return [answer]
+    return answer
 
 @tool    
-def search_by_opensearch(keyword: str) -> list:
+def search_by_opensearch(keyword: str) -> str:
     """
     Search technical information by keyword and then return the result as a string.
     keyword: search keyword
@@ -707,7 +703,7 @@ def search_by_opensearch(keyword: str) -> list:
                             
             answer = answer + f"{excerpt}, URL: {uri}\n\n"
     
-    return [answer]
+    return answer
 
 # define tools
 tools = [get_current_time, get_book_list, get_weather_info, search_by_tavily, search_by_opensearch]        
@@ -952,8 +948,7 @@ def should_continue(state: ChatAgentState) -> Literal["continue", "end"]:
 def call_model(state: ChatAgentState):
     response = model.invoke(state["messages"])
     print('messages: ', state["messages"])
-    
-    return {"messages": response}    
+    return {"messages": [response]}    
 
 def buildChatAgent():
     workflow = StateGraph(ChatAgentState)

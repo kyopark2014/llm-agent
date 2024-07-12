@@ -947,6 +947,8 @@ def should_continue(state):
 
 def call_model(state):
     messages = state["messages"]
+    print('messages: ', messages)
+    
     response = model.invoke(messages)
     return {"messages": [response]}    
 

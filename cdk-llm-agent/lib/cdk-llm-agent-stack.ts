@@ -45,6 +45,14 @@ const claude3_sonnet = [
   }
 ];
 
+const claude3_haiku = [
+  {
+    "bedrock_region": "us-west-2", // Oregon
+    "model_type": "claude3",
+    "model_id": "anthropic.claude-3-haiku-20240307-v1:0"
+  }
+];  
+
 const titan_embedding_v1 = [
   {
     "bedrock_region": "us-west-2", // Oregon
@@ -555,7 +563,7 @@ export class CdkLlmAgentStack extends cdk.Stack {
         s3_prefix: s3_prefix,
         path: 'https://'+distribution.domainName+'/',   
         callLogTableName: callLogTableName,
-        LLM_for_chat: JSON.stringify(claude3_sonnet),
+        LLM_for_chat: JSON.stringify(claude3_haiku),
         LLM_for_multimodal:JSON.stringify(claude3_sonnet),
         LLM_embedding: JSON.stringify(titan_embedding_v2),
         opensearch_account: opensearch_account,

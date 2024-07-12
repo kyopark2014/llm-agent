@@ -986,7 +986,7 @@ def run_langgraph_agent(connectionId, requestId, app, query):
             if msg == "": # first message
                 msg = readStreamMsg(connectionId, requestId, message.content)  
             else: # other messages
-                msg = readStreamMsg(connectionId, requestId, msg+'\n'+message.content)    
+                msg = readStreamMsg(connectionId, requestId, msg+'\n\n'+message.content)    
             
             # msg = msg + message.content
             print('msg: ', msg)

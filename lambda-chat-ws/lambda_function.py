@@ -508,6 +508,10 @@ def get_book_list(keyword: str) -> list:
             link = prod.get("href")
             answer = answer + f"{title}, URL: {link}\n"
     
+    print('answer(unicode): ', answer)
+    answer = answer.encode('utf-8').decode('unicode_escape')
+    print('answer(utf8): ', answer)
+
     return [answer]
     
 @tool

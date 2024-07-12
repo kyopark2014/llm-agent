@@ -483,17 +483,17 @@ def get_parent_document(parent_doc_id):
     return source['text'], metadata['name'], metadata['uri'], metadata['doc_level']    
 
 @tool 
-def get_book_list(keyword: str) -> str:
+def get_book_list(query: str) -> str:
     """
     Search book list by keyword and then return book list
-    keyword: search keyword
+    query: search keyword
     return: book list
     """
     
-    keyword = keyword.replace('\'','')
+    query = query.replace('\'','')
 
     answer = []
-    url = f"https://search.kyobobook.co.kr/search?keyword={keyword}&gbCode=TOT&target=total"
+    url = f"https://search.kyobobook.co.kr/search?keyword={query}&gbCode=TOT&target=total"
     response = requests.get(url)
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, "html.parser")
@@ -519,7 +519,7 @@ def get_current_time(format: str=f"%Y-%m-%d %H:%M:%S")->list:
     timestr = datetime.datetime.now(timezone('Asia/Seoul')).strftime(format)
     # print('timestr:', timestr)
     
-    return [f"current time: {timestr}"]
+    return [timestr]
 
 def get_lambda_client(region):
     return boto3.client(
@@ -619,21 +619,21 @@ def get_weather_info(city: str) -> list:
     return [weather_str]
 
 @tool
-def search_by_tavily(keyword: str) -> list:
+def search_by_tavily(query: str) -> list:
     """
     Search general information by keyword and then return the result as a string.
-    keyword: search keyword
+    query: search keyword
     return: the information of keyword
     """    
     
     answer = []
     
     if tavily_api_key:
-        keyword = keyword.replace('\'','')
+        query = query.replace('\'','')
         
         search = TavilySearchResults(k=3)
                     
-        output = search.invoke(keyword)
+        output = search.invoke(query)
         print('tavily output: ', output)
         
         for result in output:
@@ -647,18 +647,18 @@ def search_by_tavily(keyword: str) -> list:
     return answer
 
 @tool    
-def search_by_opensearch(keyword: str) -> list:
+def search_by_opensearch(query: str) -> list:
     """
     Search technical information by keyword and then return the result as a string.
-    keyword: search keyword
+    query: search keyword
     return: the technical information of keyword
     """    
     
-    print('keyword: ', keyword)
-    keyword = keyword.replace('\'','')
-    keyword = keyword.replace('|','')
-    keyword = keyword.replace('\n','')
-    print('modified keyword: ', keyword)
+    print('query: ', query)
+    query = query.replace('\'','')
+    query = query.replace('|','')
+    query = query.replace('\n','')
+    print('modified keyword: ', query)
     
     bedrock_embedding = get_embedding()
         

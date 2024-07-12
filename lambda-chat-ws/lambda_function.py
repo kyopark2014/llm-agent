@@ -483,7 +483,7 @@ def get_parent_document(parent_doc_id):
     return source['text'], metadata['name'], metadata['uri'], metadata['doc_level']    
 
 @tool 
-def get_book_list(keyword: str) -> list:
+def get_book_list(keyword: str) -> str:
     """
     Search book list by keyword and then return book list
     keyword: search keyword
@@ -508,11 +508,11 @@ def get_book_list(keyword: str) -> list:
             link = prod.get("href")
             answer = answer + f"{title}, URL: {link}\n"
     
-    print('answer(unicode): ', answer)
-    answer = answer.encode('utf-8').decode('unicode_escape')
-    print('answer(utf8): ', answer)
+    print('answer: ', answer)
+    #answer = answer.encode('utf-8').decode('unicode_escape')
+    #print('answer(utf8): ', answer)
 
-    return [answer]
+    return answer
     
 @tool
 def get_current_time(format: str=f"%Y-%m-%d %H:%M:%S")->list:

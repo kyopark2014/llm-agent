@@ -482,35 +482,17 @@ def get_parent_document(parent_doc_id):
     
     return source['text'], metadata['name'], metadata['uri'], metadata['doc_level']    
 
-def validate_query_format(query): # translate json format to a string
-  try:
-    input_json = json.loads(query)
-    print('input_json: ', input_json)
-  except ValueError as e:
-    print('Error: ', e)  
-    return query
-  return input_json['query']
-
 @tool 
-def get_book_list(query: str) -> list:
+def get_book_list(keyword: str) -> list:
     """
     Search book list by keyword and then return book list
-    query: search keyword which should be a string
+    keyword: search keyword
     return: book list
     """
     
-    print('query: ', query)
-    
-    if 'query' in query:
-        keyword = query['query']
-    else:
-        keyword = validate_query_format(query)
-    
-    print('keyword: ', keyword)
-    
     keyword = keyword.replace('\'','')
 
-    answer = []
+    answer = ""
     url = f"https://search.kyobobook.co.kr/search?keyword={keyword}&gbCode=TOT&target=total"
     response = requests.get(url)
     if response.status_code == 200:
@@ -524,10 +506,9 @@ def get_book_list(query: str) -> list:
             # \n문자를 replace합니다.
             title = prod.text.strip().replace("\n", "")       
             link = prod.get("href")
-            
-            answer.append(f"{title}, URL: {link}")
+            answer = answer + f"{title}, URL: {link}\n"
     
-    return answer
+    return [answer]
     
 @tool
 def get_current_time(format: str=f"%Y-%m-%d %H:%M:%S")->list:
@@ -637,16 +618,14 @@ def get_weather_info(city: str) -> list:
     return [weather_str]
 
 @tool
-def search_by_tavily(query: str) -> list:
+def search_by_tavily(keyword: str) -> list:
     """
     Search general information by keyword and then return the result as a string.
-    query: search keyword
+    keyword: search keyword
     return: the information of keyword
     """    
     
-    keyword = validate_query_format(query)
-    
-    answer = []
+    answer = ""
     
     if tavily_api_key:
         keyword = keyword.replace('\'','')
@@ -662,23 +641,23 @@ def search_by_tavily(query: str) -> list:
                 content = result.get("content")
                 url = result.get("url")
             
-                answer.append(f"{content}, URL: {url}")
+                answer = answer + f"{content}, URL: {url}\n"
         
-    return answer
+    return [answer]
 
 @tool    
-def search_by_opensearch(query: str) -> list:
+def search_by_opensearch(keyword: str) -> list:
     """
     Search technical information by keyword and then return the result as a string.
-    query: search keyword
+    keyword: search keyword
     return: the technical information of keyword
     """    
     
-    print('query: ', query)
-    query = query.replace('\'','')
-    query = query.replace('|','')
-    query = query.replace('\n','')
-    print('modified keyword: ', query)
+    print('keyword: ', keyword)
+    keyword = keyword.replace('\'','')
+    keyword = keyword.replace('|','')
+    keyword = keyword.replace('\n','')
+    print('modified keyword: ', keyword)
     
     bedrock_embedding = get_embedding()
         
@@ -693,7 +672,7 @@ def search_by_opensearch(query: str) -> list:
         http_auth=(opensearch_account, opensearch_passwd), # http_auth=awsauth,
     ) 
     
-    answer = []
+    answer = ""
     top_k = 2
     
     if enalbeParentDocumentRetrival == 'true':
@@ -709,8 +688,7 @@ def search_by_opensearch(query: str) -> list:
             excerpt, name, uri, doc_level = get_parent_document(parent_doc_id) # use pareant document
             print(f"parent: name: {name}, uri: {uri}, doc_level: {doc_level}")
             
-            answer.append(f"{excerpt}, URL: {uri}")
-            # answer = answer + f"{excerpt}, URL: {uri}\n\n"
+            answer = answer + f"{excerpt}, URL: {uri}\n\n"
     else: 
         relevant_documents = vectorstore_opensearch.similarity_search_with_score(
             query = keyword,
@@ -722,11 +700,10 @@ def search_by_opensearch(query: str) -> list:
             
             excerpt = document[0].page_content        
             uri = document[0].metadata['uri']
-                    
-            answer.append(f"{excerpt}, URL: {uri}")       
-            # answer = answer + \n\n"
+                            
+            answer = answer + f"{excerpt}, URL: {uri}\n\n"
     
-    return answer
+    return [answer]
 
 # define tools
 tools = [get_current_time, get_book_list, get_weather_info, search_by_tavily, search_by_opensearch]        
@@ -961,7 +938,8 @@ tool_node = ToolNode(tools)
 
 from typing import Literal
 def should_continue(state: ChatAgentState) -> Literal["continue", "end"]:
-    last_message = state["messages"][-1]
+    messages = state["messages"]
+    last_message = messages[-1]
     if not last_message.tool_calls:
         return "end"
     else:

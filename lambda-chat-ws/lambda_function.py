@@ -931,8 +931,8 @@ model = chat.bind_tools(tools)
 
 from langgraph.graph.message import add_messages
 class ChatAgentState(TypedDict):
-    # messages: Annotated[Sequence[BaseMessage], operator.add]
-    messages: Annotated[list, add_messages]
+    messages: Annotated[Sequence[BaseMessage], operator.add]
+    # messages: Annotated[list, add_messages]
 
 tool_node = ToolNode(tools)
 

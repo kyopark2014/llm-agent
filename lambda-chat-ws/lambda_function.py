@@ -483,10 +483,10 @@ def get_parent_document(parent_doc_id):
     return source['text'], metadata['name'], metadata['uri'], metadata['doc_level']    
 
 @tool 
-def get_book_list(query: str) -> str:
+def get_book_list(query: str) -> list:
     """
     Search book list by keyword and then return book list
-    query: search keyword
+    query: search keyword which should be a string
     return: book list
     """
     
@@ -941,8 +941,7 @@ tool_node = ToolNode(tools)
 
 from typing import Literal
 def should_continue(state: ChatAgentState) -> Literal["continue", "end"]:
-    messages = state["messages"]
-    last_message = messages[-1]
+    last_message = state["messages"][-1]
     if not last_message.tool_calls:
         return "end"
     else:

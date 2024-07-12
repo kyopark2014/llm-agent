@@ -947,7 +947,6 @@ def should_continue(state: ChatAgentState) -> Literal["continue", "end"]:
 
 def call_model(state: ChatAgentState):
     response = model.invoke(state["messages"])
-    print('messages: ', state["messages"])
     return {"messages": [response]}    
 
 def buildChatAgent():
@@ -975,14 +974,18 @@ def run_langgraph_agent(connectionId, requestId, app, query):
     
     inputs = [HumanMessage(content=query)]
     config = {"recursion_limit": 50}
+    
+    msg = ""
     for event in app.stream({"messages": inputs}, stream_mode="values"):   
         print('event: ', event)
         
         message = event["messages"][-1]
         print('message: ', message)
         
-    msg = readStreamMsg(connectionId, requestId, message.content)    
-    print('msg: ', msg)
+        if message.content:
+            # msg = readStreamMsg(connectionId, requestId, message.content)    
+            msg = msg + message.content
+            print('msg: ', msg)
         
     #for output in app.stream(inputs, config=config):
     #    for key, value in output.items():

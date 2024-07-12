@@ -983,8 +983,11 @@ def run_langgraph_agent(connectionId, requestId, app, query):
         response = event["messages"]
         print('response: ', response)
         
-        msg = readStreamMsg(connectionId, requestId, event["messages"][-1].content)    
-        print('msg: ', msg)
+        message = event["messages"][-1]
+        print('message: ', message)
+        
+    msg = readStreamMsg(connectionId, requestId, message.content)    
+    print('msg: ', msg)
         
     #for output in app.stream(inputs, config=config):
     #    for key, value in output.items():

@@ -932,12 +932,15 @@ chat = get_chat()
 
 model = chat.bind_tools(tools)
 
+from langgraph.graph.message import add_messages
 class ChatAgentState(TypedDict):
-    messages: Annotated[Sequence[BaseMessage], operator.add]
+    # messages: Annotated[Sequence[BaseMessage], operator.add]
+    messages: Annotated[list, add_messages]
 
 tool_node = ToolNode(tools)
 
-def should_continue(state):
+from typing import Literal
+def should_continue(state: ChatAgentState) -> Literal["continue", "end"]:
     messages = state["messages"]
     last_message = messages[-1]
     if not last_message.tool_calls:
@@ -945,12 +948,11 @@ def should_continue(state):
     else:
         return "continue"
 
-def call_model(state):
-    messages = state["messages"]
-    print('messages: ', messages)
+def call_model(state: ChatAgentState):
+    response = model.invoke(state["messages"])
+    print('messages: ', state["messages"])
     
-    response = model.invoke(messages)
-    return {"messages": [response]}    
+    return {"messages": response}    
 
 def buildChatAgent():
     workflow = StateGraph(ChatAgentState)

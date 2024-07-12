@@ -482,6 +482,13 @@ def get_parent_document(parent_doc_id):
     
     return source['text'], metadata['name'], metadata['uri'], metadata['doc_level']    
 
+def check_query(query): # translate wrong format to a string
+  try:
+    input_json = json.loads(query)
+  except ValueError as e:
+    return query
+  return input_json['query']
+
 @tool 
 def get_book_list(query: str) -> list:
     """
@@ -490,10 +497,12 @@ def get_book_list(query: str) -> list:
     return: book list
     """
     
-    query = query.replace('\'','')
+    keyword = check_query(query)
+    
+    keyword = keyword.replace('\'','')
 
     answer = []
-    url = f"https://search.kyobobook.co.kr/search?keyword={query}&gbCode=TOT&target=total"
+    url = f"https://search.kyobobook.co.kr/search?keyword={keyword}&gbCode=TOT&target=total"
     response = requests.get(url)
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, "html.parser")
@@ -626,14 +635,16 @@ def search_by_tavily(query: str) -> list:
     return: the information of keyword
     """    
     
+    keyword = check_query(query)
+    
     answer = []
     
     if tavily_api_key:
-        query = query.replace('\'','')
+        keyword = keyword.replace('\'','')
         
         search = TavilySearchResults(k=3)
                     
-        output = search.invoke(query)
+        output = search.invoke(keyword)
         print('tavily output: ', output)
         
         for result in output:

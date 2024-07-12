@@ -989,7 +989,7 @@ def run_langgraph_agent(connectionId, requestId, app, query):
                 output = output+'\n\n'+message.content
             
             # msg = msg + message.content
-            print('msg: ', msg)
+            print('output: ', output)
 
     msg = readStreamMsg(connectionId, requestId, output)    
         

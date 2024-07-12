@@ -973,16 +973,25 @@ chat_app = buildChatAgent()
 def run_langgraph_agent(connectionId, requestId, app, query):
     isTyping(connectionId, requestId)
     
-    inputs = {"input": query}    
+    inputs = [HumanMessage(content=query)]
     config = {"recursion_limit": 50}
-    for output in app.stream(inputs, config=config):
-        for key, value in output.items():
-            print("---")
-            print(f"Node '{key}': {value}")
+    for event in app.stream({"messages": inputs}, stream_mode="values"):   
+        print('event: ', event)
+        
+        response = event["messages"]
+        print('response: ', response)
+        
+        msg = event["messages"][-1]
+        print('msg: ', msg)
+    
+    #for output in app.stream(inputs, config=config):
+    #    for key, value in output.items():
+    #        print("---")
+    #        print(f"Node '{key}': {value}")
             
-            if 'agent_outcome' in value and isinstance(value['agent_outcome'], AgentFinish):
-                response = value['agent_outcome'].return_values
-                msg = readStreamMsg(connectionId, requestId, response['output'])                                        
+    #        if 'agent_outcome' in value and isinstance(value['agent_outcome'], AgentFinish):
+    #            response = value['agent_outcome'].return_values
+    #            msg = readStreamMsg(connectionId, requestId, response['output'])                                        
     return msg
 
 def run_langgraph_agent_chat(connectionId, requestId, app, query):

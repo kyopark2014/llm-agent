@@ -506,6 +506,8 @@ def get_book_list(query: str) -> list:
     else:
         keyword = validate_query_format(query)
     
+    print('keyword: ', keyword)
+    
     keyword = keyword.replace('\'','')
 
     answer = []

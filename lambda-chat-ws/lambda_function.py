@@ -975,7 +975,7 @@ def run_langgraph_agent(connectionId, requestId, app, query):
     inputs = [HumanMessage(content=query)]
     config = {"recursion_limit": 50}
     
-    msg = ""
+    output = ""
     for event in app.stream({"messages": inputs}, stream_mode="values"):   
         print('event: ', event)
         
@@ -983,13 +983,15 @@ def run_langgraph_agent(connectionId, requestId, app, query):
         print('message: ', message)
         
         if message.content and len(event["messages"])>1:
-            if msg == "": # first message
-                msg = readStreamMsg(connectionId, requestId, message.content)  
+            if output == "": # first message
+                output = message.content 
             else: # other messages
-                msg = readStreamMsg(connectionId, requestId, msg+'\n\n'+message.content)    
+                output = output+'\n\n'+message.content
             
             # msg = msg + message.content
             print('msg: ', msg)
+
+    msg = readStreamMsg(connectionId, requestId, output)    
         
     #for output in app.stream(inputs, config=config):
     #    for key, value in output.items():

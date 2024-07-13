@@ -51,11 +51,9 @@ Agent를 이용하면 LLM 결과를 향상시킬 수 있습니다.
 
 #### Reflection: 
 
-
+[reflection-agent.md](./reflection-agent.md)에서는 LangGraph를 이용해 Reflection을 반영하는 Agent를 생성하는 방법을 설명하고 있습니다. 
 
  
-
-
 [An Introduction to LLM Agents | From OpenAI Function Calling to LangChain Agents](https://www.youtube.com/watch?v=ATUUd2bpRfo) 참조
 
 - Thinking: What to do + planning (order, priority...)

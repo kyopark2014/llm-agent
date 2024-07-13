@@ -956,39 +956,19 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 def call_model(state: ChatAgentState):
     prompt = ChatPromptTemplate.from_messages(
         [
-            (
-                "system",
+            ("system",
                 "다음의 Human과 Assistant의 친근한 이전 대화입니다."
                 "Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다."
                 "Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다."
                 "최종 답변에는 <result> tag를 붙여주세요.",
-                #<result> tag를 붙여주세요.",
-                #"당신은 5문단의 에세이 작성을 돕는 작가이고 이름은 서연입니다"
-                #"사용자의 요청에 대해 최고의 에세이를 작성하세요."
-                #"사용자가 에세이에 대해 평가를 하면, 이전 에세이를 수정하여 답변하세요."
-                #"완성된 에세이는 <result> tag를 붙여주세요.",
             ),
             MessagesPlaceholder(variable_name="messages"),
         ]
     )
     chain = prompt | model
-    
-    #request = HumanMessage(
-    #    content="어린왕자가 현대 아동문학에 어떤 의미를 가지는지 에세이로 작성하세요."
-    #)
-
-    #output = chain.stream({"messages": [request]})
-    #for event in output:
-    #    print(event.content, end="")
-    #    essay += event.content
-    
+        
     response = chain.invoke(state["messages"])
     return {"messages": [response]}    
-
-    #response = model.invoke(state["messages"])
-    #return {"messages": [response]}    
-
-
 
 def buildChatAgent():
     workflow = StateGraph(ChatAgentState)
@@ -1032,7 +1012,7 @@ def run_agent_executor(connectionId, requestId, app, query):
         
     msg = readStreamMsg(connectionId, requestId, message.content)
     
-    msg = msg[msg.find('<result>')+8:len(msg)-9]
+    # msg = msg[msg.find('<result>')+8:len(msg)-9]
 
     return msg
 

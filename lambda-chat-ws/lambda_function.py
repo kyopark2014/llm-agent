@@ -1015,21 +1015,21 @@ def run_agent_executor(connectionId, requestId, app, query):
     inputs = [HumanMessage(content=query)]
     config = {"recursion_limit": 50}
     
-    output = ""
+    message = ""
     for event in app.stream({"messages": inputs}, stream_mode="values"):   
         print('event: ', event)
         
         message = event["messages"][-1]
         print('message: ', message)
         
-        if message.content and len(event["messages"])>1:
-            if output == "": # first message
-                output = message.content 
-            else: # other messages
-                output = output+'\n\n'+message.content
-            print('output: ', output)
+        #if message.content and len(event["messages"])>1:
+        #    if output == "": # first message
+        #        output = message.content 
+        #    else: # other messages
+        #        output = output+'\n\n'+message.content
+        #    print('output: ', output)
 
-    msg = readStreamMsg(connectionId, requestId, output)    
+    msg = readStreamMsg(connectionId, requestId, message)
         
     return msg
 

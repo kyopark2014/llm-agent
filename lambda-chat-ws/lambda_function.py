@@ -1029,8 +1029,11 @@ def run_agent_executor(connectionId, requestId, app, query):
         #    else: # other messages
         #        output = output+'\n\n'+message.content
         #    print('output: ', output)
+        
+    output = message.content
+    msg = output[output.find('<result>')+8:len(output)-9]
 
-    msg = readStreamMsg(connectionId, requestId, message.content)
+    msg = readStreamMsg(connectionId, requestId, msg)
         
     return msg
 

@@ -1252,7 +1252,7 @@ def run_reflection_agent(connectionId, requestId, app, query):
     inputs = [HumanMessage(content=query)]
     config = {"recursion_limit": 50}
     
-    output = msg = ""
+    msg = ""
     
     for event in app.stream({"messages": inputs}, config, stream_mode="values"):   
         print('event: ', event)
@@ -1261,18 +1261,18 @@ def run_reflection_agent(connectionId, requestId, app, query):
         print('message: ', message)
         
         if len(event["messages"])>1:
-            if output == "":
-                output = message.content
+            if msg == "":
+                msg = message.content
             else:
-                output = f"{output}\n\n{message.content}"
+                msg = f"{msg}\n\n{message.content}"
 
             result = {
                 'request_id': requestId,
-                'msg': output,
+                'msg': msg,
                 'status': 'proceeding'
             }
             #print('result: ', json.dumps(result))
-            msg = sendMessage(connectionId, result)
+            sendMessage(connectionId, result)
 
     return msg
 

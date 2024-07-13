@@ -49,10 +49,6 @@ Agent를 이용하면 LLM 결과를 향상시킬 수 있습니다.
   - [ChatDev: Communicative Agents for Software Development](https://arxiv.org/pdf/2307.07924)
   - [AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation](https://arxiv.org/pdf/2308.08155)
 
-#### Reflection: 
-
-[reflection-agent.md](./reflection-agent.md)에서는 LangGraph를 이용해 Reflection을 반영하는 Agent를 생성하는 방법을 설명하고 있습니다. 
-
  
 [An Introduction to LLM Agents | From OpenAI Function Calling to LangChain Agents](https://www.youtube.com/watch?v=ATUUd2bpRfo) 참조
 
@@ -281,6 +277,7 @@ for event in app.stream({"messages": inputs}, stream_mode="values"):
 
 
 #### Checkpoint
+
 [Checkpoint는 thread의 state](https://langchain-ai.github.io/langgraph/concepts/#checkpoints)를 의미합니다. [LangGraph Tutorial](https://langchain-ai.github.io/langgraph/how-tos/)와 [Memory를 이용해 checkpoint](https://langchain-ai.github.io/langgraph/tutorials/introduction/#part-3-adding-memory-to-the-chatbot)를 참조하여 아래처럼 memory_task를 정의합니다. 
 
 ```python
@@ -326,6 +323,29 @@ def execute_tools(state: AgentState):
     return {"intermediate_steps": [(agent_action, str(output))]}
 ```
 
+### Reflection
+
+[reflection-agent.md](./reflection-agent.md)에서는 LangGraph를 이용해 Reflection을 반영하는 Agent를 생성하는 방법을 설명하고 있습니다. 
+
+### Reflexion
+
+[reflexion-agent.md](./reflexion-agent.md)에서는 Reflexion방식의 Agent에 대해 설명합니다.
+
+### Language Agent Tree Search
+
+[language-agent-tree-search.md](./language-agent-tree-search.md)에서는 Tree Search 방식의 Agent를 만드는것을 설명합니다. 
+
+### Multi agent
+
+[multi-agent.md](./multi-agent.md)에서는 여러개의 Agent를 이용하는 방법에 대해 설명합니다. 
+
+
+
+### Storm Agent
+
+[stome-agent.md](./stome-agent.md)에서는 풍부한 기사를 생성(richer article generation) Storm Agent에 대해 설명합니다.
+
+
 ### 참고 사례들
 
 - [langgraph-agent.md](./langgraph-agent.md)에서는 LangGraph를 이용해 Agent를 생성하는 방법을 설명합니다. 
@@ -353,17 +373,9 @@ def execute_tools(state: AgentState):
   
 - [Self RAG](https://github.com/kyopark2014/llm-agent/blob/main/self-rag.md)에서는 RAG의 결과를 Grade하고 Hallucination을 방지하기 위한 task를 활용해 RAG의 성능을 높입니다.
 
-  
-
-### Multi agent
-
-[multi-agent.md](./multi-agent.md)에서는 여러개의 Agent를 이용하는 방법에 대해 설명합니다. 
 
 
 
-### Storm Agent
-
-[stome-agent.md](./stome-agent.md)에서는 풍부한 기사를 생성(richer article generation) Storm Agent에 대해 설명합니다.
 
 ## 직접 실습 해보기
 

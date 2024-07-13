@@ -36,7 +36,7 @@ from opensearchpy import OpenSearch
 
 from typing import TypedDict, Annotated, Sequence, List, Union
 from langchain_core.agents import AgentAction, AgentFinish
-from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
+from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, SystemMessage
 from langgraph.prebuilt.tool_executor import ToolExecutor
 from langgraph.graph import START, END, StateGraph
 from langgraph.prebuilt import ToolNode
@@ -1172,6 +1172,100 @@ def run_agent_executor_chat_from_scratch_using_revised_question(connectionId, re
                                         
     return msg
 
+
+####################### LangGraph #######################
+# Reflection Agent
+#########################################################
+def generation_node(state: ChatAgentState):    
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                "당신은 5문단의 에세이 작성을 돕는 작가이고 이름은 서연입니다"
+                "사용자의 요청에 대해 최고의 에세이를 작성하세요."
+                "사용자가 에세이에 대해 평가를 하면, 이전 에세이를 수정하여 답변하세요."
+                "완성된 에세이는 <result> tag를 붙여주세요.",
+            ),
+            MessagesPlaceholder(variable_name="messages"),
+        ]
+    )
+    chain = prompt | chat
+
+    response = chain.invoke(state["messages"])
+    return {"messages": [response]}
+
+def reflection_node(state: ChatAgentState):
+    messages = state["messages"]
+    
+    reflection_prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                "당신은 교사로서 학셍의 에세이를 평가하삽니다. 비평과 개선사항을 친절하게 설명해주세요."
+                "이때 장점, 단점, 길이, 깊이, 스타일등에 대해 충분한 정보를 제공합니다."
+                "특히 주제에 맞는 적절한 예제가 잘 반영되어있는지 확인합니다",
+            ),
+            MessagesPlaceholder(variable_name="messages"),
+        ]
+    )
+    reflect = reflection_prompt | chat
+    
+    cls_map = {"ai": HumanMessage, "human": AIMessage}
+    translated = [messages[0]] + [
+        cls_map[msg.type](content=msg.content) for msg in messages[1:]
+    ]
+    res = reflect.invoke({"messages": translated})    
+    response = HumanMessage(content=res.content)    
+    return {"messages": [response]}
+
+def should_continue_of_reflection(state: ChatAgentState) -> Literal["continue", "end"]:
+    messages = state["messages"]
+    
+    if len(messages) >= 6:   # End after 3 iterations        
+        return "end"
+    else:
+        return "continue"
+
+def buildReflectionAgent():
+    workflow = StateGraph(ChatAgentState)
+    workflow.add_node("generate", generation_node)
+    workflow.add_node("reflect", reflection_node)
+    workflow.set_entry_point("generate")
+    workflow.add_conditional_edges(
+        "generate",
+        should_continue_of_reflection,
+        {
+            "continue": "reflect",
+            "end": END,
+        },
+    )
+
+    workflow.add_edge("reflect", "generate")
+    return workflow.compile()
+
+reflection_app = buildReflectionAgent()
+
+def run_reflection_agent(connectionId, requestId, app, query):
+    isTyping(connectionId, requestId)
+    
+    inputs = [HumanMessage(content=query)]
+    config = {"recursion_limit": 50}
+    
+    message = ""
+    for event in app.stream({"messages": inputs}, config, stream_mode="values"):   
+        print('event: ', event)
+        
+        message = event["messages"][-1]
+        print('message: ', message)
+
+    msg = readStreamMsg(connectionId, requestId, message.content)
+
+    return msg
+
+
+
+
+
 ####################### agent_tool_calling #######################
 def run_agent_tool_calling(connectionId, requestId, chat, query):
     toolList = ", ".join((t.name for t in tools))
@@ -1754,6 +1848,11 @@ def getResponse(connectionId, jsonBody):
                         msg = run_agent_executor_chat_from_scratch_using_revised_question(connectionId, requestId, app_from_scratch, text)
                     else:
                         msg = run_agent_executor_chat_from_scratch(connectionId, requestId, app_chat_from_scratch, text)  
+                        
+                elif convType == 'reflection-agent':
+                    msg = run_reflection_agent(connectionId, requestId, chat_app, text)      
+                                        
+                        
                         
                 elif convType == 'agent-toolcalling':
                     msg = run_agent_tool_calling(connectionId, requestId, chat, text)

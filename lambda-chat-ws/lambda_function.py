@@ -1002,42 +1002,6 @@ def run_agent_executor(connectionId, requestId, app, query):
 
     return msg
 
-def run_agent_executor_chat(connectionId, requestId, app, query):
-    isTyping(connectionId, requestId)
-    
-    inputs = {"input": query}    
-    config = {"recursion_limit": 50}
-    for output in app.stream(inputs, config=config):
-        for key, value in output.items():
-            print("---")
-            print(f"Node '{key}': {value}")
-            
-            if 'agent_outcome' in value and isinstance(value['agent_outcome'], AgentFinish):
-                response = value['agent_outcome'].return_values
-                msg = readStreamMsg(connectionId, requestId, response['output'])
-                                        
-    return msg
-
-def run_agent_executor_chat_using_revised_question(connectionId, requestId, app, query):
-    # revise question
-    revised_question = revise_question(connectionId, requestId, chat, query)     
-    print('revised_question: ', revised_question)  
-    
-    isTyping(connectionId, requestId)
-    
-    inputs = {"input": revised_question}    
-    config = {"recursion_limit": 50}
-    for output in app.stream(inputs, config=config):
-        for key, value in output.items():
-            print("---")
-            print(f"Node '{key}': {value}")
-            
-            if 'agent_outcome' in value and isinstance(value['agent_outcome'], AgentFinish):
-                response = value['agent_outcome'].return_values
-                msg = readStreamMsg(connectionId, requestId, response['output'])
-                                        
-    return msg
-
 ####################### LangGraph #######################
 # Agent Executor From Scratch
 #########################################################
@@ -1852,8 +1816,9 @@ def getResponse(connectionId, jsonBody):
                 elif convType == 'agent-executor':
                     msg = run_agent_executor(connectionId, requestId, chat_app, text)      
                 elif convType == 'agent-executor-chat':
-                    if separated_chat_history=='true': 
-                        msg = run_agent_executor_chat_using_revised_question(connectionId, requestId, chat_app, text)
+                    revised_question = revise_question(connectionId, requestId, chat, text)     
+                    print('revised_question: ', revised_question)  
+                    msg = run_agent_executor(connectionId, requestId, chat_app, revised_question)      
                                 
                 elif convType == 'agent-executor-from-scratch':
                     msg = run_agent_executor_from_scratch(connectionId, requestId, app_from_scratch, text)      

@@ -1029,7 +1029,7 @@ def run_agent_executor(connectionId, requestId, app, query):
         #        output = output+'\n\n'+message.content
         #    print('output: ', output)
 
-    msg = readStreamMsg(connectionId, requestId, message)
+    msg = readStreamMsg(connectionId, requestId, message.content)
         
     return msg
 

@@ -1849,15 +1849,15 @@ def getResponse(connectionId, jsonBody):
                     else:
                         msg = run_agent_react_chat(connectionId, requestId, chat, text)
 
-                elif convType == 'langgraph-agent':
+                elif convType == 'agent-executor':
                     msg = run_agent_executor(connectionId, requestId, chat_app, text)      
-                elif convType == 'langgraph-agent-chat':
+                elif convType == 'agent-executor-chat':
                     if separated_chat_history=='true': 
                         msg = run_agent_executor_chat_using_revised_question(connectionId, requestId, chat_app, text)
                                 
-                elif convType == 'langgraph-agent-from-scratch':
+                elif convType == 'agent-executor-from-scratch':
                     msg = run_agent_executor_from_scratch(connectionId, requestId, app_from_scratch, text)      
-                elif convType == 'langgraph-agent-chat-from-scratch':
+                elif convType == 'agent-executor-chat-from-scratch':
                     if separated_chat_history=='true': 
                         msg = run_agent_executor_chat_from_scratch_using_revised_question(connectionId, requestId, app_from_scratch, text)
                     else:

@@ -23,7 +23,6 @@ from langchain.memory import ConversationBufferWindowMemory
 from langchain_aws import ChatBedrock
 from langchain_community.vectorstores.opensearch_vector_search import OpenSearchVectorSearch
 from langchain_community.embeddings import BedrockEmbeddings
-from langchain_core.messages import HumanMessage, SystemMessage
 
 from langchain.agents import tool
 from langchain.agents import AgentExecutor, create_react_agent
@@ -37,7 +36,7 @@ from opensearchpy import OpenSearch
 
 from typing import TypedDict, Annotated, Sequence, List, Union
 from langchain_core.agents import AgentAction, AgentFinish
-from langchain_core.messages import BaseMessage
+from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from langgraph.prebuilt.tool_executor import ToolExecutor
 from langgraph.graph import START, END, StateGraph
 from langgraph.prebuilt import ToolNode
@@ -949,10 +948,6 @@ def should_continue(state: ChatAgentState) -> Literal["continue", "end"]:
 #    response = model.invoke(state["messages"])
 #    return {"messages": [response]}    
 
-
-from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-
 def call_model(state: ChatAgentState):
     prompt = ChatPromptTemplate.from_messages(
         [
@@ -997,27 +992,14 @@ def run_agent_executor(connectionId, requestId, app, query):
     config = {"recursion_limit": 50}
     
     message = ""
-    for event in app.stream({"messages": inputs}, stream_mode="values"):   
+    for event in app.stream({"messages": inputs}, config, stream_mode="values"):   
         print('event: ', event)
         
         message = event["messages"][-1]
         print('message: ', message)
-        
-        #if message.content and len(event["messages"])>1:
-        #    if output == "": # first message
-        #        output = message.content 
-        #    else: # other messages
-        #        output = output+'\n\n'+message.content
-        #    print('output: ', output)
-    
-    output = message.content
-    output.replace("<result>\n","")
-    output.replace("\n</result>","")
 
-    msg = readStreamMsg(connectionId, requestId, output)
-    
-    # msg = msg[msg.find('<result>')+8:len(msg)-9]
-    
+    msg = readStreamMsg(connectionId, requestId, message.content)
+
     return msg
 
 def run_agent_executor_chat(connectionId, requestId, app, query):

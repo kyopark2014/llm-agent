@@ -945,9 +945,48 @@ def should_continue(state: ChatAgentState) -> Literal["continue", "end"]:
     else:
         return "continue"
 
+#def call_model(state: ChatAgentState):
+#    response = model.invoke(state["messages"])
+#    return {"messages": [response]}    
+
+
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+
 def call_model(state: ChatAgentState):
-    response = model.invoke(state["messages"])
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                "다음의 Human과 Assistant의 친근한 이전 대화입니다."
+                "Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다."
+                "Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다.",
+                #"당신은 5문단의 에세이 작성을 돕는 작가이고 이름은 서연입니다"
+                #"사용자의 요청에 대해 최고의 에세이를 작성하세요."
+                #"사용자가 에세이에 대해 평가를 하면, 이전 에세이를 수정하여 답변하세요."
+                #"완성된 에세이는 <result> tag를 붙여주세요.",
+            ),
+            MessagesPlaceholder(variable_name="messages"),
+        ]
+    )
+    chain = prompt | model
+    
+    #request = HumanMessage(
+    #    content="어린왕자가 현대 아동문학에 어떤 의미를 가지는지 에세이로 작성하세요."
+    #)
+
+    #output = chain.stream({"messages": [request]})
+    #for event in output:
+    #    print(event.content, end="")
+    #    essay += event.content
+    
+    response = chain.invoke(state["messages"])
     return {"messages": [response]}    
+
+    #response = model.invoke(state["messages"])
+    #return {"messages": [response]}    
+
+
 
 def buildChatAgent():
     workflow = StateGraph(ChatAgentState)
@@ -969,7 +1008,7 @@ def buildChatAgent():
 
 chat_app = buildChatAgent()
 
-def run_langgraph_agent(connectionId, requestId, app, query):
+def run_agent_executor(connectionId, requestId, app, query):
     isTyping(connectionId, requestId)
     
     inputs = [HumanMessage(content=query)]
@@ -993,7 +1032,7 @@ def run_langgraph_agent(connectionId, requestId, app, query):
         
     return msg
 
-def run_langgraph_agent_chat(connectionId, requestId, app, query):
+def run_agent_executor_chat(connectionId, requestId, app, query):
     isTyping(connectionId, requestId)
     
     inputs = {"input": query}    
@@ -1009,7 +1048,7 @@ def run_langgraph_agent_chat(connectionId, requestId, app, query):
                                         
     return msg
 
-def run_langgraph_agent_chat_using_revised_question(connectionId, requestId, app, query):
+def run_agent_executor_chat_using_revised_question(connectionId, requestId, app, query):
     # revise question
     revised_question = revise_question(connectionId, requestId, chat, query)     
     print('revised_question: ', revised_question)  
@@ -1083,7 +1122,7 @@ def buildAgentFromScratch():
 
 app_from_scratch = buildAgentFromScratch()
 
-def run_langgraph_agent_from_scratch(connectionId, requestId, app, query):
+def run_agent_executor_from_scratch(connectionId, requestId, app, query):
     isTyping(connectionId, requestId)
     
     inputs = {"input": query}    
@@ -1127,7 +1166,7 @@ def buildAgentChat():
 
 app_chat_from_scratch = buildAgentChat()
 
-def run_langgraph_agent_chat_from_scratch(connectionId, requestId, app, query):
+def run_agent_executor_chat_from_scratch(connectionId, requestId, app, query):
     isTyping(connectionId, requestId)
     
     inputs = {"input": query}    
@@ -1143,7 +1182,7 @@ def run_langgraph_agent_chat_from_scratch(connectionId, requestId, app, query):
                                         
     return msg
 
-def run_langgraph_agent_chat_from_scratch_using_revised_question(connectionId, requestId, app, query):
+def run_agent_executor_chat_from_scratch_using_revised_question(connectionId, requestId, app, query):
     # revise question
     revised_question = revise_question(connectionId, requestId, chat, query)     
     print('revised_question: ', revised_question)  
@@ -1733,18 +1772,18 @@ def getResponse(connectionId, jsonBody):
                         msg = run_agent_react_chat(connectionId, requestId, chat, text)
 
                 elif convType == 'langgraph-agent':
-                    msg = run_langgraph_agent(connectionId, requestId, chat_app, text)      
+                    msg = run_agent_executor(connectionId, requestId, chat_app, text)      
                 elif convType == 'langgraph-agent-chat':
                     if separated_chat_history=='true': 
-                        msg = run_langgraph_agent_chat_using_revised_question(connectionId, requestId, chat_app, text)
+                        msg = run_agent_executor_chat_using_revised_question(connectionId, requestId, chat_app, text)
                                 
                 elif convType == 'langgraph-agent-from-scratch':
-                    msg = run_langgraph_agent_from_scratch(connectionId, requestId, app_from_scratch, text)      
+                    msg = run_agent_executor_from_scratch(connectionId, requestId, app_from_scratch, text)      
                 elif convType == 'langgraph-agent-chat-from-scratch':
                     if separated_chat_history=='true': 
-                        msg = run_langgraph_agent_chat_from_scratch_using_revised_question(connectionId, requestId, app_from_scratch, text)
+                        msg = run_agent_executor_chat_from_scratch_using_revised_question(connectionId, requestId, app_from_scratch, text)
                     else:
-                        msg = run_langgraph_agent_chat_from_scratch(connectionId, requestId, app_chat_from_scratch, text)  
+                        msg = run_agent_executor_chat_from_scratch(connectionId, requestId, app_chat_from_scratch, text)  
                         
                 elif convType == 'agent-toolcalling':
                     msg = run_agent_tool_calling(connectionId, requestId, chat, text)

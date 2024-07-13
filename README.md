@@ -212,12 +212,12 @@ LangGraph는 agent를 생성하고 여러개의 Agent가 있을때의 흐름을 
 Agent를 위한 Class인 AgentState와 tool을 비롯한 각 노드를 정의합니다.
 
 ```python
-class AgentState(TypedDict):
-    messages: Annotated[Sequence[BaseMessage], operator.add]
+class ChatAgentState(TypedDict):
+    messages: Annotated[list, add_messages]
     
 tool_node = ToolNode(tools)
 
-def should_continue(state):
+def should_continue(state: ChatAgentState) -> Literal["continue", "end"]:
     messages = state["messages"]
     last_message = messages[-1]
     if not last_message.tool_calls:
@@ -225,10 +225,22 @@ def should_continue(state):
     else:
         return "continue"
 
-def call_model(state):
-    messages = state["messages"]
-    response = model.invoke(messages)
-    return {"messages": [response]}
+def call_model(state: ChatAgentState):
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system",
+                "다음의 Human과 Assistant의 친근한 이전 대화입니다."
+                "Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다."
+                "Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다."
+                "최종 답변에는 조사한 내용을 반드시 포함하여야 하고, <result> tag를 붙여주세요.",
+            ),
+            MessagesPlaceholder(variable_name="messages"),
+        ]
+    )
+    chain = prompt | model
+        
+    response = chain.invoke(state["messages"])
+    return {"messages": [response]}   
 ```
 
 각 Node state를 정의합니다. 

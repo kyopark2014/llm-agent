@@ -931,8 +931,8 @@ model = chat.bind_tools(tools)
 
 from langgraph.graph.message import add_messages
 class ChatAgentState(TypedDict):
-    messages: Annotated[Sequence[BaseMessage], operator.add]
-    # messages: Annotated[list, add_messages]
+    # messages: Annotated[Sequence[BaseMessage], operator.add]
+    messages: Annotated[list, add_messages]
 
 tool_node = ToolNode(tools)
 
@@ -987,20 +987,10 @@ def run_langgraph_agent(connectionId, requestId, app, query):
                 output = message.content 
             else: # other messages
                 output = output+'\n\n'+message.content
-            
-            # msg = msg + message.content
             print('output: ', output)
 
     msg = readStreamMsg(connectionId, requestId, output)    
         
-    #for output in app.stream(inputs, config=config):
-    #    for key, value in output.items():
-    #        print("---")
-    #        print(f"Node '{key}': {value}")
-            
-    #        if 'agent_outcome' in value and isinstance(value['agent_outcome'], AgentFinish):
-    #            response = value['agent_outcome'].return_values
-    #            msg = readStreamMsg(connectionId, requestId, response['output'])                                        
     return msg
 
 def run_langgraph_agent_chat(connectionId, requestId, app, query):

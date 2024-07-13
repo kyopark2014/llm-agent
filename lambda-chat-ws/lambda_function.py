@@ -1013,6 +1013,8 @@ def run_agent_executor(connectionId, requestId, app, query):
     msg = readStreamMsg(connectionId, requestId, message.content)
     
     # msg = msg[msg.find('<result>')+8:len(msg)-9]
+    msg.replace("<result>\n","")
+    msg.replace("</result>\n","")
 
     return msg
 

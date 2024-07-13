@@ -1850,7 +1850,7 @@ def getResponse(connectionId, jsonBody):
                         msg = run_agent_executor_chat_from_scratch(connectionId, requestId, app_chat_from_scratch, text)  
                         
                 elif convType == 'reflection-agent':
-                    msg = run_reflection_agent(connectionId, requestId, chat_app, text)      
+                    msg = run_reflection_agent(connectionId, requestId, reflection_app, text)      
                                         
                         
                         

@@ -1009,13 +1009,15 @@ def run_agent_executor(connectionId, requestId, app, query):
         #    else: # other messages
         #        output = output+'\n\n'+message.content
         #    print('output: ', output)
-        
-    msg = readStreamMsg(connectionId, requestId, message.content)
+    
+    output = message.content
+    output.replace("<result>\n","")
+    output.replace("\n</result>","")
+
+    msg = readStreamMsg(connectionId, requestId, output)
     
     # msg = msg[msg.find('<result>')+8:len(msg)-9]
-    msg.replace("<result>\n","")
-    msg.replace("</result>\n","")
-
+    
     return msg
 
 def run_agent_executor_chat(connectionId, requestId, app, query):

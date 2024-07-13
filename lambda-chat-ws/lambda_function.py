@@ -1272,7 +1272,7 @@ def run_reflection_agent(connectionId, requestId, app, query):
                 'status': 'proceeding'
             }
             #print('result: ', json.dumps(result))
-            sendMessage(connectionId, result)
+            msg = sendMessage(connectionId, result)
 
     return msg
 

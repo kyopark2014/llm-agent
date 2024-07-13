@@ -960,7 +960,7 @@ def call_model(state: ChatAgentState):
                 "system",
                 "다음의 Human과 Assistant의 친근한 이전 대화입니다."
                 "Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다."
-                "Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다.",
+                "Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다."
                 "최종 답변에는 필요한 정보를 모두 제공합니다.",
                 #<result> tag를 붙여주세요.",
                 #"당신은 5문단의 에세이 작성을 돕는 작가이고 이름은 서연입니다"

@@ -1030,11 +1030,10 @@ def run_agent_executor(connectionId, requestId, app, query):
         #        output = output+'\n\n'+message.content
         #    print('output: ', output)
         
-    output = message.content
-    msg = output[output.find('<result>')+8:len(output)-9]
+    msg = readStreamMsg(connectionId, requestId, message.content)
+    
+    msg = msg[msg.find('<result>')+8:len(msg)-9]
 
-    msg = readStreamMsg(connectionId, requestId, msg)
-        
     return msg
 
 def run_agent_executor_chat(connectionId, requestId, app, query):

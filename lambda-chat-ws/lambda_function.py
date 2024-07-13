@@ -955,7 +955,7 @@ def call_model(state: ChatAgentState):
                 "다음의 Human과 Assistant의 친근한 이전 대화입니다."
                 "Assistant은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다."
                 "Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다."
-                "최종 답변에는 <result> tag를 붙여주세요.",
+                "최종 답변에는 조사한 내용을 반드시 포함하여야 하고, <result> tag를 붙여주세요.",
             ),
             MessagesPlaceholder(variable_name="messages"),
         ]

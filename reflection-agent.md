@@ -8,11 +8,18 @@ LangGraph를 사용하여 3가지 반영 기술을 구축하는 방법을 설명
 
 ## Simple Reflection
 
-[agent-reflection.ipynb](./agent/agent-reflection.ipynb)와 [agent-reflection-kor.ipynb](./agent/agent-reflection-kor.ipynb)에서는 MessageGraph()로 LangGraph Agent 만드는것을 설명합니다.
+[agent-reflection-kor.ipynb](./agent/agent-reflection-kor.ipynb)에서는 Reflection을 구현하는 방법에 대해 설명합니다. 이때의 개념도는 아래와 같습니다. 
 
-[reflection.ipynb](https://github.com/langchain-ai/langgraph/blob/main/examples/reflection/reflection.ipynb)에서는 LangGraph로 Reflection을 이용한 Agent를 설명하고 있습니다. 이것은 re-planning, search, evalution에 활용될 수 있습니다. 
+![image](https://github.com/user-attachments/assets/2a77a177-5be9-4a7d-97a8-4d5a19f9709e)
 
-![image](https://github.com/kyopark2014/llm-agent/assets/52392004/7ceb3d72-7fc3-4939-bdd0-f0260121e498)
+*참고문헌*
+
+- [agent-reflection.ipynb](./agent/agent-reflection.ipynb) 에서는 MessageGraph()로 LangGraph Agent 만드는것을 설명합니다.
+
+- [reflection.ipynb](https://github.com/langchain-ai/langgraph/blob/main/examples/reflection/reflection.ipynb)에서는 LangGraph로 Reflection을 이용한 Agent를 설명하고 있습니다. 이것은 re-planning, search, evalution에 활용될 수 있습니다. 
+
+
+
 
 이것을 구현한 코드는 아래와 같습니다.
 
@@ -32,6 +39,14 @@ builder.add_conditional_edges("generate", should_continue)
 builder.add_edge("reflect", "generate")
 graph = builder.compile()
 ```
+
+
+
+![image](https://github.com/user-attachments/assets/d40b049f-3fc3-4e26-909c-d04236b36c27)
+
+
+
+
 
 ## Reflexion
 

@@ -40,6 +40,7 @@ from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, System
 from langgraph.prebuilt.tool_executor import ToolExecutor
 from langgraph.graph import START, END, StateGraph
 from langgraph.prebuilt import ToolNode
+from langgraph.graph.message import add_messages
 
 s3 = boto3.client('s3')
 s3_bucket = os.environ.get('s3_bucket') # bucket name
@@ -928,7 +929,6 @@ chat = get_chat()
 
 model = chat.bind_tools(tools)
 
-from langgraph.graph.message import add_messages
 class ChatAgentState(TypedDict):
     # messages: Annotated[Sequence[BaseMessage], operator.add]
     messages: Annotated[list, add_messages]

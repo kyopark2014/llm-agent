@@ -2,6 +2,16 @@
 
 [Advance RAG control flow with Mistral and LangChain: Corrective RAG, Self-RAG, Adaptive RAG](https://www.youtube.com/watch?v=sgnrL7yo1TE)에서는 Self Reflection을 이용해 RAG의 성능을 향상시킵니다.
 
+## Corrective RAG
+
+여기서 구현하련느 Corrective RAG의 형태는 아래와 같습니다. 
+
+![image](https://github.com/user-attachments/assets/63e3caa9-0b97-472a-bbcc-2132afce46f5)
+
+
+
+## Reference 
+
 [corrective_rag_mistral.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/langchain/corrective_rag_mistral.ipynb)에서는 문서를 검색할 때에 self-reflection /self-grading을 적용합니다.
 
 ![image](https://github.com/kyopark2014/llm-agent/assets/52392004/dcb682f5-35e4-4478-8189-5db5cdbb266d)

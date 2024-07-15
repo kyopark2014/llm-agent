@@ -1,0 +1,19 @@
+@startuml
+skinparam monochrome true
+
+start
+-> start;
+:retrieve;
+
+:grade_document;
+
+if (decide_to_generate) then (yes)    
+else (no)
+  :websearch;
+endif
+
+:generate;
+
+-> end;
+stop
+@enduml

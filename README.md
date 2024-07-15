@@ -343,28 +343,18 @@ def execute_tools(state: AgentState):
 
 3) Reflexion: [reflexion-agent.md](./reflexion-agent.md)에서는 Reflexion방식의 Agent에 대해 설명합니다.
 
-4) Language Agent Tree Search: [language-agent-tree-search.md](./language-agent-tree-search.md)에서는 Tree Search 방식의 Agent를 만드는것을 설명합니다.
+4) Corrective RAG: [corrective-rag-agent.md](./corrective-rag-agent.md)에서는 Self reflection을 이용한 RAG 성능 강화에 대해 설명합니다.
 
-5) Reasoning without Observation: [rewoo.md](./rewoo.md)에서는 Reasoning without Observation 방식의 Agent에 대해 설명합니다.
+5) Self-Corrective RAG: [self-corrective-rag.md](./self-corrective-rag-agent.md)에서는 Self Corrective RAGf를 Agent로 구현하는것을 설명합니다.
 
-6) LLMCompiler: [llm-compiler.md](./llm-compiler.md)에서는 "An LLM Compiler for Parallel Function Calling"을 구현하는것에 대해 설명합니다. 
-
-7) Multi agent: [multi-agent.md](./multi-agent.md)에서는 여러개의 Agent를 이용하는 방법에 대해 설명합니다. 
-
-
-
-### Storm Agent
-
-[stome-agent.md](./stome-agent.md)에서는 풍부한 기사를 생성(richer article generation) Storm Agent에 대해 설명합니다.
+6) Self RAG: [Self RAG](https://github.com/kyopark2014/llm-agent/blob/main/self-rag.md)에서는 RAG의 결과를 Grade하고 Hallucination을 방지하기 위한 task를 활용해 RAG의 성능을 높입니다.
 
 
 ### 참고 사례들
 
 - [langgraph-agent.md](./langgraph-agent.md)에서는 LangGraph를 이용해 Agent를 생성하는 방법을 설명합니다. 
 
-
 - [reflection-agent.md](./reflection-agent.md)에서는 reflection을 이용해 성능을 향상시키는 방법에 대해 설명합니다.
-
 
 - [persistence-agent.md](./persistence-agent.md)에서는 checkpoint를 이용해 이전 state로 돌아가는 것을 보여줍니다.
 
@@ -374,17 +364,22 @@ def execute_tools(state: AgentState):
 
 - [email-agent.md](./email-agent.md)에서는 LangGraph를 이용해 email을 생성하는 예제입니다.
 
-- [corrective-rag-agent.md](./corrective-rag-agent.md)에서는 Self reflection을 이용한 RAG 성능 강화에 대해 설명합니다.
-
 - [support-bot-agent.md](./support-bot-agent.md)에서는 고객 지원하는 Bot을 Agent로 생성합니다.
+
+- Language Agent Tree Search: [language-agent-tree-search.md](./language-agent-tree-search.md)에서는 Tree Search 방식의 Agent를 만드는것을 설명합니다.
+
+- Reasoning without Observation: [rewoo.md](./rewoo.md)에서는 Reasoning without Observation 방식의 Agent에 대해 설명합니다.
+
+- LLMCompiler: [llm-compiler.md](./llm-compiler.md)에서는 "An LLM Compiler for Parallel Function Calling"을 구현하는것에 대해 설명합니다. 
+
+- Multi agent: [multi-agent.md](./multi-agent.md)에서는 여러개의 Agent를 이용하는 방법에 대해 설명합니다. 
+
+- [stome-agent.md](./stome-agent.md)에서는 풍부한 기사를 생성(richer article generation) Storm Agent에 대해 설명합니다.
 
 - [GPT Newspape](https://www.youtube.com/watch?v=E7nFHaSs3q8)에서는 신문요약에 대해 설명하고 있습니다. ([github](https://github.com/rotemweiss57/gpt-newspaper/tree/master) 링크)
 
 - [Essay Writer](https://github.com/kyopark2014/llm-agent/blob/main/essay-writer.md)에서는 essay를 작성하는 Agent를 생성합니다.
   
-- [Self RAG](https://github.com/kyopark2014/llm-agent/blob/main/self-rag.md)에서는 RAG의 결과를 Grade하고 Hallucination을 방지하기 위한 task를 활용해 RAG의 성능을 높입니다.
-
-
 
 
 

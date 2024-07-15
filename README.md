@@ -345,7 +345,7 @@ def execute_tools(state: AgentState):
 
 4) Corrective RAG: [corrective-rag-agent.md](./corrective-rag-agent.md)에서는 Self reflection을 이용한 RAG 성능 강화에 대해 설명합니다.
 
-5) Self-Corrective RAG: [self-corrective-rag.md](./self-corrective-rag-agent.md)에서는 Self Corrective RAGf를 Agent로 구현하는것을 설명합니다.
+5) Self-Corrective RAG: [self-corrective-rag.md](./self-corrective-rag.md)에서는 Self Corrective RAGf를 Agent로 구현하는것을 설명합니다.
 
 6) Self RAG: [Self RAG](https://github.com/kyopark2014/llm-agent/blob/main/self-rag.md)에서는 RAG의 결과를 Grade하고 Hallucination을 방지하기 위한 task를 활용해 RAG의 성능을 높입니다.
 

@@ -177,7 +177,7 @@ pprint(value["generation"])
 ```
 
 
-## Reference 
+## 예제: Mistral LLM을 이용한 Corrective RAG 구현 
 
 [corrective_rag_mistral.ipynb](https://github.com/mistralai/cookbook/blob/main/third_party/langchain/corrective_rag_mistral.ipynb)에서는 문서를 검색할 때에 self-reflection /self-grading을 적용합니다.
 

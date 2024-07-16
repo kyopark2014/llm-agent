@@ -22,16 +22,29 @@ skinparam activityDiamond {
 start
 -> start;
 
-:retrieve;
+repeat :retrieve;
 
-:grade_document;
+
+'partition RAG {
+
+:grade document;
 
 if (decide_to_generate) then (yes)    
 else (no)
   :websearch;
 endif
 
-:generate;
+'}
+
+repeat :generate;
+
+-> answer;
+
+repeat while (halluciations?)
+
+backward :rewrite;
+
+repeat while (answers question?)
 
 -> end;
 stop

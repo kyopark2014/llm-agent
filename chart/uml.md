@@ -45,3 +45,45 @@ stop
 
 ![image](https://github.com/user-attachments/assets/f6832e19-315b-4cec-8631-9885a003fecd)
 
+### Activity Diagram
+
+[activity-diagram](https://github.com/mattjhayes/PlantUML-Examples/blob/master/docs/Misc/BlogSource/activity-diagram.txt)
+
+![image](https://github.com/user-attachments/assets/b7386a41-40f2-4a54-9285-553c72922158)
+
+```text
+@startuml
+skinparam shadowing false
+
+title Activity Diagram Example\n
+
+skinparam activity {
+    StartColor limegreen
+    EndColor darkblue
+    BackgroundColor #d4de5e
+    BorderColor #5e94de
+    ArrowColor black
+}
+skinparam activityDiamond {
+    BackgroundColor #5ede68
+    BorderColor #5e94de
+    fontSize 16
+}
+
+start
+:choose diagram type to suit 
+message and audience;
+:choose example diagram
+and copy code;
+
+while (Is diagram finished?) is (not finished)
+    :update diagram code;
+    :render and review diagram;
+endwhile (finished)
+
+:publish diagram;
+
+stop
+
+@enduml
+```

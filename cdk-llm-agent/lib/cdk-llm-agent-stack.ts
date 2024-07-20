@@ -31,7 +31,7 @@ let opensearch_url = "";
 const bucketName = `storage-for-${projectName}-${accountId}-${region}`; 
 const debugMessageMode = 'false'; // if true, debug messages will be delivered to the client.
 const max_object_size = 102400000; // 100 MB max size of an object, 50MB(default)
-const enableHybridSearch = 'false';
+const enableHybridSearch = 'true';
 const enableParallelSummay = 'true';
 const supportedFormat = JSON.stringify(["pdf", "txt", "csv", "pptx", "ppt", "docx", "doc", "xlsx", "py", "js", "md", "jpeg", "jpg", "png"]);  
 const separated_chat_history = 'true';
@@ -689,7 +689,6 @@ export class CdkLlmAgentStack extends cdk.Stack {
         timeout: cdk.Duration.seconds(600),
         memorySize: 8192,
         environment: {
-          bedrock_region: LLM_embedding[i].bedrock_region,
           s3_bucket: s3Bucket.bucketName,
           s3_prefix: s3_prefix,
           opensearch_account: opensearch_account,

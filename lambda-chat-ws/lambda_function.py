@@ -1061,6 +1061,8 @@ class AgentState(TypedDict):
     agent_outcome: Union[AgentAction, AgentFinish, None]
     intermediate_steps: Annotated[list[tuple[AgentAction, str]], operator.add]
 
+chat = get_chat()
+
 mode  = 'kor'
 prompt_template = get_react_prompt_template(mode)
 agent_runnable = create_react_agent(chat, tools, prompt_template)

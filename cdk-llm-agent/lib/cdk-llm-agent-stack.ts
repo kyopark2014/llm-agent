@@ -63,7 +63,7 @@ const titan_embedding_v1 = [
 
 const titan_embedding_v2 = [
   {
-    "bedrock_region": "us-west-2", // Oregon
+    "bedrock_region": "us-east-1", // Oregon
     "model_type": "titan",
     "model_id": "amazon.titan-embed-text-v2:0"
   }

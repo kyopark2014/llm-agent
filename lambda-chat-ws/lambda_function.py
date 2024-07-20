@@ -63,6 +63,7 @@ selected_embedding = 0
 maxOutputTokens = 4096
 separated_chat_history = os.environ.get('separated_chat_history')
 enalbeParentDocumentRetrival = os.environ.get('enalbeParentDocumentRetrival')
+enableHybridSearch = os.environ.get('enableHybridSearch')
 
 # api key to get weather information in agent
 secretsmanager = boto3.client('secretsmanager')
@@ -703,6 +704,56 @@ def search_by_opensearch(keyword: str) -> str:
                             
             answer = answer + f"{excerpt}, URL: {uri}\n\n"
     
+    if enableHybridSearch == 'true':
+        answer = answer + lexical_search_for_tool(keyword, top_k)
+    
+    return answer
+
+def lexical_search_for_tool(query, top_k):
+    # lexical search (keyword)
+    min_match = 0
+    
+    query = {
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "match": {
+                            "text": {
+                                "query": query,
+                                "minimum_should_match": f'{min_match}%',
+                                "operator":  "or",
+                            }
+                        }
+                    },
+                ],
+                "filter": [
+                ]
+            }
+        }
+    }
+
+    response = os_client.search(
+        body=query,
+        index="idx-*", # all
+    )
+    print('lexical query result: ', json.dumps(response))
+        
+    answer = ""
+    for i, document in enumerate(response['hits']['hits']):
+        if i>=top_k: 
+            break
+                    
+        excerpt = document['_source']['text']
+
+        uri = ""
+        if "uri" in document['_source']['metadata']:
+            uri = document['_source']['metadata']['uri']
+        # print('uri: ', uri)
+
+        answer = answer + f"{excerpt}, URL: {uri}\n\n"
+        
+    print('lexical answer: ', answer)
     return answer
 
 # define tools

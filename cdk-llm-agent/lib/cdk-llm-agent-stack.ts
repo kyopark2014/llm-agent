@@ -31,6 +31,7 @@ let opensearch_url = "";
 const bucketName = `storage-for-${projectName}-${accountId}-${region}`; 
 const debugMessageMode = 'false'; // if true, debug messages will be delivered to the client.
 const max_object_size = 102400000; // 100 MB max size of an object, 50MB(default)
+const enableHybridSearch = 'true';
 const enableParallelSummay = 'true';
 const supportedFormat = JSON.stringify(["pdf", "txt", "csv", "pptx", "ppt", "docx", "doc", "xlsx", "py", "js", "md", "jpeg", "jpg", "png"]);  
 const separated_chat_history = 'true';
@@ -572,7 +573,8 @@ export class CdkLlmAgentStack extends cdk.Stack {
         debugMessageMode: debugMessageMode,
         projectName: projectName,
         separated_chat_history: separated_chat_history,
-        enalbeParentDocumentRetrival: enalbeParentDocumentRetrival    
+        enalbeParentDocumentRetrival: enalbeParentDocumentRetrival,
+        enableHybridSearch: enableHybridSearch    
       }
     });     
     lambdaChatWebsocket.grantInvoke(new iam.ServicePrincipal('apigateway.amazonaws.com'));  
@@ -627,6 +629,23 @@ export class CdkLlmAgentStack extends cdk.Stack {
     }); 
 
     // S3 - Lambda(S3 event) - SQS(fifo) - Lambda(document)
+    // DLQ
+    let dlq:any[] = [];
+    for(let i=0;i<LLM_embedding.length;i++) {
+      dlq[i] = new sqs.Queue(this, 'DlqS3EventFifo'+i, {
+        visibilityTimeout: cdk.Duration.seconds(600),
+        queueName: `dlq-s3-event-for-${projectName}-${i}.fifo`,  
+        fifo: true,
+        contentBasedDeduplication: false,
+        deliveryDelay: cdk.Duration.millis(0),
+        retentionPeriod: cdk.Duration.days(14),
+        deadLetterQueue: {
+          maxReceiveCount: 1,
+          queue: dlq[i]
+        }
+      });
+    }
+
     // SQS for S3 event (fifo) 
     let queueUrl:string[] = [];
     let queue:any[] = [];
@@ -685,7 +704,8 @@ export class CdkLlmAgentStack extends cdk.Stack {
           LLM_for_multimodal:JSON.stringify(claude3_sonnet),
           LLM_embedding: JSON.stringify(titan_embedding_v2),
           enableParallelSummay: enableParallelSummay,
-          enalbeParentDocumentRetrival: enalbeParentDocumentRetrival
+          enalbeParentDocumentRetrival: enalbeParentDocumentRetrival,
+          enableHybridSearch: enableHybridSearch
         }
       });         
       s3Bucket.grantReadWrite(lambdDocumentManager[i]); // permission for s3

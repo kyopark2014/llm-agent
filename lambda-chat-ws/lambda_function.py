@@ -449,7 +449,6 @@ def get_documents_from_opensearch(vectorstore_opensearch, query, top_k):
                     if len(relevant_documents)>=top_k:
                         break
                                 
-    # print('lexical query result: ', json.dumps(response))
     print('relevant_documents: ', relevant_documents)
     
     return relevant_documents

@@ -300,7 +300,7 @@ Reflection: [reflection-agent.md](./reflection-agent.md)에서는 LangGraph를 �
 
 ### CDK를 이용한 인프라 설치
 
-본 실습에서는 Seoul 리전 (ap-northeast-2)을 사용합니다. [인프라 설치](./deployment.md)에 따라 CDK로 인프라 설치를 진행합니다. 
+본 실습에서는 Oregon 리전 (us-west-2)을 사용합니다. [인프라 설치](./deployment.md)에 따라 CDK로 인프라 설치를 진행합니다. 
 
 ## 실행결과
 
@@ -423,9 +423,9 @@ LangSmith의 로그를 보면 아래와 같이 search_by_opensearch(RAG)를 호�
 
 더이상 인프라를 사용하지 않는 경우에 아래처럼 모든 리소스를 삭제할 수 있습니다. 
 
-1) [API Gateway Console](https://ap-northeast-2.console.aws.amazon.com/apigateway/main/apis?region=ap-northeast-2)로 접속하여 "rest-api-for-llm-agent", "ws-api-for-llm-agent"을 삭제합니다.
+1) [API Gateway Console](https://us-west-2.console.aws.amazon.com/apigateway/main/apis?region=us-west-2)로 접속하여 "rest-api-for-llm-agent", "ws-api-for-llm-agent"을 삭제합니다.
 
-2) [Cloud9 Console](https://ap-northeast-2.console.aws.amazon.com/cloud9control/home?region=ap-northeast-2#/)에 접속하여 아래의 명령어로 전체 삭제를 합니다.
+2) [Cloud9 Console](https://us-west-2.console.aws.amazon.com/cloud9control/home?region=us-west-2#/)에 접속하여 아래의 명령어로 전체 삭제를 합니다.
 
 
 ```text

@@ -638,11 +638,7 @@ export class CdkLlmAgentStack extends cdk.Stack {
         fifo: true,
         contentBasedDeduplication: false,
         deliveryDelay: cdk.Duration.millis(0),
-        retentionPeriod: cdk.Duration.days(14),
-        deadLetterQueue: {
-          maxReceiveCount: 1,
-          queue: dlq[i]
-        }
+        retentionPeriod: cdk.Duration.days(14)
       });
     }
 
@@ -657,6 +653,10 @@ export class CdkLlmAgentStack extends cdk.Stack {
         contentBasedDeduplication: false,
         deliveryDelay: cdk.Duration.millis(0),
         retentionPeriod: cdk.Duration.days(2),
+        deadLetterQueue: {
+          maxReceiveCount: 1,
+          queue: dlq[i]
+        }
       });
       queueUrl.push(queue[i].queueUrl);
     }

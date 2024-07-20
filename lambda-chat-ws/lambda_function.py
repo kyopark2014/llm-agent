@@ -41,7 +41,7 @@ from langgraph.prebuilt.tool_executor import ToolExecutor
 from langgraph.graph import START, END, StateGraph
 from langgraph.prebuilt import ToolNode
 from langgraph.graph.message import add_messages
-
+from langgraph.prebuilt import tools_condition
 s3 = boto3.client('s3')
 s3_bucket = os.environ.get('s3_bucket') # bucket name
 s3_prefix = os.environ.get('s3_prefix')
@@ -449,6 +449,7 @@ def get_documents_from_opensearch(vectorstore_opensearch, query, top_k):
                     if len(relevant_documents)>=top_k:
                         break
                                 
+    # print('lexical query result: ', json.dumps(response))
     print('relevant_documents: ', relevant_documents)
     
     return relevant_documents
@@ -702,10 +703,10 @@ def search_by_opensearch(keyword: str) -> str:
             uri = document[0].metadata['uri']
                             
             answer = answer + f"{excerpt}, URL: {uri}\n\n"
-    
+
     if enableHybridSearch == 'true':
         answer = answer + lexical_search_for_tool(keyword, top_k)
-    
+        
     return answer
 
 def lexical_search_for_tool(query, top_k):
@@ -974,9 +975,9 @@ def run_agent_react_chat_using_revised_question(connectionId, requestId, chat, q
 ####################### LangGraph #######################
 # Chat Agent Executor
 #########################################################
-chat = get_chat() 
+chatModel = get_chat() 
 
-model = chat.bind_tools(tools)
+model = chatModel.bind_tools(tools)
 
 class ChatAgentState(TypedDict):
     # messages: Annotated[Sequence[BaseMessage], operator.add]
@@ -1202,6 +1203,8 @@ def generation_node(state: ChatAgentState):
             MessagesPlaceholder(variable_name="messages"),
         ]
     )
+    
+    chat = get_chat()
     chain = prompt | chat
 
     response = chain.invoke(state["messages"])
@@ -1222,6 +1225,8 @@ def reflection_node(state: ChatAgentState):
             MessagesPlaceholder(variable_name="messages"),
         ]
     )
+    
+    chat = get_chat()
     reflect = reflection_prompt | chat
     
     cls_map = {"ai": HumanMessage, "human": AIMessage}

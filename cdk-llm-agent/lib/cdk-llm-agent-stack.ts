@@ -130,7 +130,7 @@ export class CdkLlmAgentStack extends cdk.Stack {
       destinationBucket: s3Bucket,
     });
 
-    new cdk.CfnOutput(this, 'HtmlUpdateCommend', {
+    new cdk.CfnOutput(this, 'HtmlUpdateCommand', {
       value: 'aws s3 cp ../html/ ' + 's3://' + s3Bucket.bucketName + '/ --recursive',
       description: 'copy commend for web pages',
     });

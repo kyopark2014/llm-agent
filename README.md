@@ -25,6 +25,11 @@ LLM을 사용할 때 다양한 API로부터 얻은 결과를 사용하여 더 �
 
 Agent를 이용하면 LLM 결과를 향상시킬 수 있습니다. 
 
+### ReAct 동작
+
+![image](https://github.com/user-attachments/assets/ec24363e-c580-45a3-90d2-9c7ec70ac5a7)
+
+
 #### 관련 자료
 
   - [Andrew Ng: What's next for AI agentic workflows ft. Andrew Ng of AI Fund](https://www.youtube.com/watch?v=sal78ACtGTc)
